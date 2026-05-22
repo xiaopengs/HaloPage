@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🧬 Agent Harness Builder</title>
+<style>
+/* ════════════════════════════════════════════
+   DESIGN SYSTEM — Dark Engineering Console
+   Insp: Linear / Vercel / Stripe dark mode
+   ════════════════════════════════════════════ */
+:root {
+  --bg: #05050d;
+  --bg2: #0a0a18;
+  --panel: #0e0e1f;
+  --panel2: #111128;
+  --card: #141430;
+  --card2: #18183a;
+  --border: rgba(245,158,11,.06);
+  --border-m: rgba(245,158,11,.12);
+  --border-h: rgba(245,158,11,.22);
+  --border-a: rgba(245,158,11,.35);
+  --a: #f59e0b;
+  --a1: #fbbf24;
+  --a2: #d97706;
+  --a-glow: rgba(245,158,11,.1);
+  --a-glow-m: rgba(245,158,11,.18);
+  --a-glow-s: rgba(245,158,11,.35);
+  --tx: #f1f1f6;
+  --tx2: #9ca3af;
+  --tx3: #5f6780;
+  --tx4: #3a3f55;
+  --b: #3b82f6;
+  --b-glow: rgba(59,130,246,.12);
+  --g: #22c55e;
+  --g-glow: rgba(34,197,94,.1);
+  --c: #06b6d4;
+  --c-glow: rgba(6,182,212,.1);
+  --p: #a78bfa;
+  --p-glow: rgba(167,139,250,.1);
+  --r: #ef4444;
+  --r-glow: rgba(239,68,68,.1);
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--tx);
+  min-height:100vh;
+  line-height:1.5;
+  /* subtle noise texture */
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;outline:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(245,158,11,.12);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(245,158,11,.2)}
+
+.app{max-width:780px;margin:0 auto;padding:20px 20px 32px;display:flex;flex-direction:column;gap:16px;min-height:100vh}
+
+/* ── Header ── */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 0}
+.hd-l{display:flex;flex-direction:column;gap:4px}
+.hd-title{display:flex;align-items:center;gap:8px}
+.hd-title h1{font-size:20px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,var(--a) 0%,var(--a1) 50%,var(--a) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hd-badge{font-size:9px;padding:2px 8px;border-radius:100px;background:var(--a-glow);border:1px solid var(--border-h);color:var(--a);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.hd-sub{font-size:11px;color:var(--tx3);letter-spacing:.01em}
+
+/* ── Role Selector ── */
+.rs-scroll{overflow-x:auto;padding:2px 0;-webkit-overflow-scrolling:touch}
+.rs-scroll::-webkit-scrollbar{height:0}
+.rs{display:flex;gap:8px;min-width:fit-content;padding:0 1px}
+.rc{
+  flex-shrink:0;display:flex;flex-direction:column;gap:4px;
+  padding:14px 16px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--panel);
+  cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);
+  min-width:130px;position:relative;overflow:hidden;
+}
+.rc::after{content:'';position:absolute;inset:0;border-radius:var(--radius);opacity:0;transition:opacity .25s;background:radial-gradient(ellipse at top left,rgba(245,158,11,.06) 0%,transparent 70%)}
+.rc:hover{border-color:var(--border-m);background:var(--panel2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.rc:hover::after{opacity:1}
+.rc.on{border-color:var(--a);background:linear-gradient(135deg,rgba(245,158,11,.08) 0%,rgba(245,158,11,.02) 100%);box-shadow:0 0 0 4px var(--a-glow),0 8px 32px rgba(0,0,0,.4)}
+.rc.on::after{background:radial-gradient(ellipse at top left,rgba(245,158,11,.12) 0%,transparent 70%);opacity:1}
+.rc-emoji{font-size:24px;line-height:1;filter:grayscale(0)}
+.rc-name{font-size:13px;font-weight:700;color:var(--tx);letter-spacing:-.01em;line-height:1.2}
+.rc-type{font-size:9px;color:var(--tx3);letter-spacing:.02em;text-transform:uppercase;font-weight:500}
+.rc-desc{font-size:10px;color:var(--tx4);line-height:1.35;margin-top:1px}
+
+/* ── Section labels ── */
+.sl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);font-weight:600;margin-bottom:-8px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Pipeline Viz ── */
+.pv{display:flex;align-items:stretch;overflow-x:auto;padding:4px 0;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;gap:0;min-height:0}
+.pv::-webkit-scrollbar{height:0}
+.pn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 14px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--panel);
+  cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);
+  min-width:78px;flex-shrink:0;position:relative
+}
+.pn:hover{border-color:var(--border-m);background:var(--panel2);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.pn.active{border-color:var(--a);background:linear-gradient(180deg,rgba(245,158,11,.07) 0%,rgba(245,158,11,.01) 100%);box-shadow:0 0 0 3px var(--a-glow),0 0 24px var(--a-glow-m),0 8px 24px rgba(0,0,0,.3)}
+.pn-num{font-size:9px;font-weight:700;color:var(--tx4);letter-spacing:.05em;transition:color .2s}
+.pn.active .pn-num{color:var(--a)}
+.pn-emoji{font-size:22px;line-height:1;transition:transform .2s}
+.pn.active .pn-emoji{transform:scale(1.1)}
+.pn-name{font-size:10px;font-weight:600;color:var(--tx2);text-align:center;line-height:1.3;max-width:70px}
+.pn.active .pn-name{color:var(--a)}
+.pn-gate{display:flex;gap:2px}
+.pn-gate span{font-size:8px;color:var(--tx4);transition:color .2s}
+.pn.active .pn-gate span,.pn.has-gate .pn-gate span{color:var(--a)}
+/* connector */
+.pc{display:flex;align-items:center;flex-shrink:0;padding:0 2px}
+.pc-line{width:28px;height:1.5px;background:linear-gradient(90deg,var(--tx4),var(--tx4));position:relative;border-radius:4px}
+.pc-line::after{content:'';position:absolute;right:-3px;top:-3px;width:0;height:0;border-left:6px solid var(--tx4);border-top:4px solid transparent;border-bottom:4px solid transparent}
+
+/* ── Panel ── */
+.pnl{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.pnl-hd{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.pnl-num{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));
+  border:1.5px solid var(--border-h);color:var(--a);
+}
+.pnl-info{flex:1;min-width:0}
+.pnl-name{font-size:15px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.pnl-gate{font-size:9px;padding:2px 8px;border-radius:100px;background:var(--a-glow);border:1px solid var(--border-h);color:var(--a);font-weight:600;white-space:nowrap}
+.pnl-desc{font-size:11px;color:var(--tx3);line-height:1.5;margin-top:2px}
+.pnl-actions{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);gap:12px}
+.pnl-count{font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:4px}
+.pnl-count strong{color:var(--a);font-weight:700}
+.btn-ghost{
+  font-size:10px;padding:5px 12px;border-radius:6px;
+  border:1px solid var(--border);color:var(--tx3);
+  font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:4px;
+}
+.btn-ghost:hover{border-color:var(--g);color:var(--g);background:var(--g-glow)}
+
+/* ── Skill Grid ── */
+.sg{padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:6px}
+.sk{
+  display:flex;align-items:flex-start;gap:7px;padding:10px 11px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--card);
+  cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;
+}
+.sk:hover{border-color:var(--border-m);background:var(--card2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.sk.on{border-color:var(--a);background:linear-gradient(135deg,rgba(245,158,11,.06) 0%,transparent 100%);box-shadow:0 0 0 1px var(--a-glow-m),0 2px 12px var(--a-glow)}
+.sk-emoji{font-size:16px;flex-shrink:0;margin-top:1px}
+.sk-body{flex:1;min-width:0}
+.sk-name{font-size:11px;font-weight:600;line-height:1.3;color:var(--tx);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.sk-desc{font-size:9px;color:var(--tx4);line-height:1.35;margin-top:1px}
+.sk-tag{font-size:8px;padding:1px 6px;border-radius:100px;font-weight:600;white-space:nowrap}
+.sk-tag.rec{background:var(--g-glow);color:var(--g);border:1px solid rgba(34,197,94,.15)}
+.sk-tag.ext{background:var(--c-glow);color:var(--c);border:1px solid rgba(6,182,212,.12)}
+.sk-tag.infra{background:var(--p-glow);color:var(--p);border:1px solid rgba(167,139,250,.12)}
+.sk-check{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:9px;color:#000;font-weight:800;opacity:0;transform:scale(.5);transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.sk.on .sk-check{opacity:1;transform:scale(1)}
+
+/* ── Bottom Bar ── */
+.bb{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);gap:12px;flex-wrap:wrap}
+.bb-stats{font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:12px}
+.bb-stats strong{color:var(--a);font-weight:700;font-size:14px}
+.bb-stats .div{width:1px;height:14px;background:var(--border-m)}
+.bb-actions{display:flex;gap:6px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);
+  font-size:12px;font-weight:600;transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+.btn.o{border:1px solid var(--border-m);color:var(--tx2);background:transparent}
+.btn.o:hover{border-color:var(--border-h);color:var(--tx);background:var(--card)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--a) 0%,var(--a2) 100%);color:#0a0a0a;
+  box-shadow:0 2px 12px var(--a-glow-s),0 0 40px var(--a-glow-m);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--a-glow-s),0 0 60px var(--a-glow-m)}
+
+/* ── Modal ── */
+.mo{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:24px}
+.mo.on{display:flex}
+.mo-box{background:var(--panel);border:1px solid var(--border-h);border-radius:var(--radius-xl);max-width:500px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:mo .3s cubic-bezier(.4,0,.2,1)}
+@keyframes mo{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mo-hd{padding:20px 24px 12px;display:flex;align-items:center;justify-content:space-between}
+.mo-hd h2{font-size:16px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.mo-close{font-size:20px;color:var(--tx3);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mo-close:hover{color:var(--tx);background:var(--card)}
+.mo-body{flex:1;overflow-y:auto;padding:4px 24px 16px}
+.mo-body pre{font-family:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace;font-size:11px;line-height:1.7;color:var(--tx2);white-space:pre-wrap;word-break:break-all;margin:0;tab-size:2}
+.mo-ft{padding:8px 24px 20px;display:flex;gap:8px}
+.mo-ft .btn{flex:1;justify-content:center}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(24px);background:var(--panel2);border:1px solid var(--border-h);border-radius:var(--radius-sm);padding:8px 16px;font-size:11px;font-weight:500;color:var(--a);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:998;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Particles ── */
+.ps{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ps-p{position:absolute;background:var(--a);border-radius:50%;opacity:0;animation:float 8s linear infinite}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}5%{opacity:.08}95%{opacity:.05}100%{transform:translateY(-5vh) scale(1.4);opacity:0}}
+
+@media(max-width:520px){
+  .app{padding:12px 12px 20px;gap:12px}
+  .sg{grid-template-columns:1fr}
+  .pn{padding:8px 10px;min-width:62px}
+  .pn-emoji{font-size:18px}
+  .pn-name{font-size:9px;max-width:56px}
+  .pc-line{width:16px}
+  .rc{min-width:110px;padding:10px 12px}
+}
+</style>
+</head>
+<body>
+
+<div class="ps" id="ps"></div>
+
+<div class="app">
+  <!-- Header -->
+  <div class="hd">
+    <div class="hd-l">
+      <div class="hd-title">
+        <h1>Agent Harness Builder</h1>
+        <span class="hd-badge">v2</span>
+      </div>
+      <span class="hd-sub">基于 Harness Engineering 理论 · 角色即管线 · Skill 可装配</span>
+    </div>
+  </div>
+
+  <!-- Role Selector -->
+  <div class="sl">选择角色</div>
+  <div class="rs-scroll"><div class="rs" id="rs"></div></div>
+
+  <!-- Pipeline -->
+  <div class="sl">Harness 管线</div>
+  <div class="pv" id="pv"></div>
+
+  <!-- Stage Panel -->
+  <div class="pnl" id="pnl">
+    <div class="pnl-hd">
+      <div class="pnl-num" id="pnlNum">1</div>
+      <div class="pnl-info">
+        <div class="pnl-name"><span id="pnlName"></span><span class="pnl-gate" id="pnlGate" style="display:none"></span></div>
+        <div class="pnl-desc" id="pnlDesc"></div>
+      </div>
+    </div>
+    <div class="pnl-actions">
+      <div class="pnl-count">已装配 <strong id="pnlCount">0</strong> / <span id="pnlTotal">0</span> 个 Skill</div>
+      <button class="btn-ghost" id="resetNodeBtn">↺ 恢复推荐</button>
+    </div>
+    <div class="sg" id="sg"></div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bb">
+    <div class="bb-stats">
+      <span>总计 <strong id="totalSkills">0</strong> Skill</span>
+      <span class="div"></span>
+      <span><strong id="totalStages">0</strong> 阶段</span>
+    </div>
+    <div class="bb-actions">
+      <button class="btn o" id="resetAllBtn">↺ 全部重置</button>
+      <button class="btn btn-primary" id="genBtn">⚡ 生成 Harness 配置</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="mo" id="mo">
+  <div class="mo-box">
+    <div class="mo-hd"><h2>📋 Harness 配置</h2><button class="mo-close" id="moClose">✕</button></div>
+    <div class="mo-body"><pre id="moContent"></pre></div>
+    <div class="mo-ft">
+      <button class="btn o" id="copyBtn">📋 复制</button>
+      <button class="btn btn-primary" id="dlBtn">⬇ 下载 .md</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// SKILLS MASTER
+// ════════════════════════════════════════════
+const S = {
+  // 创作
+  wc:   {e:'✍️',n:'花叔公众号创作',d:'风格指导 · 选题讨论 · 审校优化',c:'creation'},
+  wdp:  {e:'📤',n:'公众号草稿发布',d:'HTML排版 → 草稿箱 → 发布全流程',c:'creation'},
+  wea:  {e:'🔥',n:'爆款内容分析',d:'六维评分 · 内容审核 · 修改方案',c:'creation'},
+  lai:  {e:'🎨',n:'长文配图助手',d:'段落划分 · AI配图提示词 · 批量生成',c:'creation'},
+  // 搜索
+  ar:   {e:'🌐',n:'Agent Reach',d:'17平台全网搜索（社媒/开发/视频）',c:'search'},
+  ms:   {e:'🔍',n:'多引擎搜索',d:'10个国内网站免费搜索',c:'search'},
+  wa:   {e:'🕸️',n:'网页访问',d:'浏览器自动化 · 动态渲染抓取',c:'search'},
+  chr:  {e:'📊',n:'热榜聚合',d:'微博/B站/知乎/抖音/CSDN热榜',c:'search'},
+  // 开发
+  gh:   {e:'🐙',n:'GitHub',d:'Issues / PR / CI / Actions 全功能',c:'dev'},
+  ght:  {e:'📈',n:'GitHub 趋势',d:'日/周/月热门仓库排行',c:'dev'},
+  ghi:  {e:'🎫',n:'GH Issues 管理',d:'订阅 · 自动修复 · PR 监控',c:'dev'},
+  sc:   {e:'🛠️',n:'Skill Creator',d:'创建 · 编辑 · 审计 AgentSkill',c:'dev'},
+  ch:   {e:'📦',n:'ClawHub',d:'技能市场搜索/安装/发布',c:'dev'},
+  mcp:  {e:'🔌',n:'McPorter',d:'MCP 服务器配置 · 认证 · 调用',c:'dev'},
+  spm:  {e:'💪',n:'Superpowers 模式',d:'严格工程流 · 规划→TDD→审查',c:'dev'},
+  // 运维
+  hc:   {e:'🛡️',n:'主机安全审计',d:'安全加固 · 防火墙 · SSH 审计',c:'ops'},
+  p1:   {e:'🖥️',n:'1Panel 管理',d:'资源监控 · 网站/证书/容器',c:'ops'},
+  nc:   {e:'🔗',n:'节点连接诊断',d:'OpenClaw 配对/连接诊断',c:'ops'},
+  tmx:  {e:'🖵',n:'Tmux 控制',d:'远程会话 · 终端交互 · 自动化',c:'ops'},
+  // 编排
+  tf:   {e:'⚙️',n:'TaskFlow',d:'任务流编排 · 子任务 · 状态机',c:'orch'},
+  tft:  {e:'📬',n:'收件箱分类',d:'消息意图分类 · 路由分发',c:'orch'},
+  sia:  {e:'🧠',n:'自改进学习',d:'错误捕获 · 经验沉淀 · 持续改进',c:'orch'},
+  // 社交
+  qqc:  {e:'💬',n:'QQ频道管理',d:'频道 · 子频道 · 成员 · 帖子',c:'social'},
+  qqm:  {e:'📎',n:'QQ富媒体',d:'图片/语音/视频/文件收发',c:'social'},
+  qqr:  {e:'⏰',n:'QQ定时提醒',d:'一次性/周期性提醒管理',c:'social'},
+  // 工具
+  wth:  {e:'🌤️',n:'天气查询',d:'实时天气 · 预报（免 API Key）',c:'util'},
+  // ── 外部运行时工具（文章提及）──
+  clc:  {e:'⚡',n:'Claude Code',d:'Anthropic CLI Agent · 终端 AI 编程',c:'infra'},
+  gmc:  {e:'🤖',n:'Gemini CLI',d:'Google CLI Agent · 开源项目分析',c:'infra'},
+  cdx:  {e:'🔮',n:'Codex CLI',d:'OpenAI CLI · 沙箱代码执行',c:'infra'},
+  cur:  {e:'🖊️',n:'Cursor',d:'AI-native IDE · L1/L2 补全+对话',c:'infra'},
+  cop:  {e:'🤝',n:'GitHub Copilot',d:'代码补全 · 聊天 · Agent 模式',c:'infra'},
+  cbd:  {e:'🏗️',n:'CodeBuddy',d:'腾讯内部 AI 编程 · 规范镜像机制',c:'infra'},
+  cnt:  {e:'🔄',n:'Continue',d:'开源 AI 编程助手 · 多模型适配',c:'infra'},
+  adr:  {e:'🤺',n:'Aider',d:'终端 AI 结对编程 · 多模型 · Git 原生',c:'infra'},
+  cln:  {e:'🧩',n:'Cline',d:'VS Code 自主 Agent · 工具编排',c:'infra'},
+  sup:  {e:'🦸',n:'Superpowers',d:'工程工作流 · 严格编码规范',c:'infra'},
+  a2a:  {e:'🔗',n:'Google A2A',d:'Agent-to-Agent 协议 · 互联互通',c:'infra'},
+  mcp2: {e:'🔧',n:'MCP 协议',d:'Model Context Protocol · 上下文标准',c:'infra'},
+  devx: {e:'🛸',n:'Devin',d:'自主 AI 软件工程师 · 全流程开发',c:'infra'},
+};
+
+// ════════════════════════════════════════════
+// ROLES
+// ════════════════════════════════════════════
+const R = [
+  // 0 内容创作者
+  {
+    id:'cc',e:'✍️',n:'内容创作者',type:'Content Pipeline',desc:'公众号深度创作，选题 → 发布 → 复盘',
+    stages:[
+      {id:'rsch',e:'🔎',n:'选题调研',d:'热榜 · 搜索 · 趋势 → 选题池输出',g:0,sk:['ar','ms','chr','wa','ght'],rec:['ar','ms','chr']},
+      {id:'writ',e:'✍️',n:'内容创作',d:'正文写作 · 配图生成 · 排版设计',g:1,sk:['wc','lai','wa','ar'],rec:['wc','lai']},
+      {id:'revw',e:'🔍',n:'审校优化',d:'六维评分 · 修改润色 · 合规检查',g:1,sk:['wea','wc','sia'],rec:['wea','sia']},
+      {id:'publ',e:'📤',n:'排版发布',d:'HTML排版 → 上传 → 草稿 → 发布',g:0,sk:['wdp','qqm','qqc'],rec:['wdp']},
+      {id:'retr',e:'📊',n:'数据复盘',d:'阅读分析 · 反馈采集 · 经验沉淀',g:0,sk:['sia','tf','wea'],rec:['sia']},
+    ],ht:'内容管线',hd:'选题→创作→审校→发布→复盘。每个阶段产出明确，门禁确保质量底线。'
+  },
+  // 1 全栈开发者
+  {
+    id:'dev',e:'💻',n:'全栈开发者',type:'Engineering Pipeline',desc:'参考 QQ音乐 HE 实践：五阶段+四门禁',
+    stages:[
+      {id:'init',e:'🏗️',n:'初始化',d:'目录骨架 · 上下文加载 · 环境配置',g:0,sk:['gh','ch','tmx','tf','clc','cdx','gmc'],rec:['gh','tf','clc']},
+      {id:'req', e:'📋',n:'需求定义',d:'需求撰写 · TAPD关联 · DoD · 服务清单',g:1,sk:['ghi','tf','sia','sc','gh'],rec:['ghi','tf','sia']},
+      {id:'dsgn',e:'📐',n:'方案设计',d:'技术预研 · 概要/详细设计 · 兼容性检查',g:1,sk:['mcp','gh','sc','spm','a2a','mcp2'],rec:['mcp','spm']},
+      {id:'code',e:'⚡',n:'编码实现',d:'任务拆分 → 门禁 → 仓库检查 → 编码循环',g:2,sk:['gh','ghi','spm','sia','tmx','cur','cop','adr','cln','cbd','cnt'],rec:['gh','ghi','spm','sia','cur']},
+      {id:'ship',e:'🚀',n:'交付验证',d:'测试验收 · MR审查 · 部署 · 归档',g:0,sk:['hc','nc','p1','gh','devx'],rec:['hc','p1']},
+    ],ht:'工程管线',hd:'三仓联动 + 五阶段 + 四门禁。错误在最便宜的地方被拦住。外部运行时工具（Claude Code/Gemini CLI/Cursor等）可按需装配。'
+  },
+  // 2 产品经理
+  {
+    id:'pm',e:'🎯',n:'产品经理',type:'Product Pipeline',desc:'市场洞察 → 需求定义 → 业务规划 → 评审推进 → 效果复盘',
+    stages:[
+      {id:'mkt', e:'🔭',n:'市场洞察',d:'竞品分析 · 行业报告 · 用户调研 · 趋势判断',g:0,sk:['ar','ms','wa','chr','ght'],rec:['ar','ms','wa']},
+      {id:'rdef',e:'📝',n:'需求定义',d:'需求池管理 · 用户故事 · 优先级矩阵 · 价值评估',g:1,sk:['ghi','tf','sc','wc'],rec:['ghi','tf']},
+      {id:'plan',e:'🗺️',n:'业务规划',d:'产品路线图 · 里程碑 · OKR拆解 · 资源规划',g:1,sk:['tf','sia','wc','sc'],rec:['tf','sia']},
+      {id:'exec',e:'🚦',n:'评审推进',d:'PRD撰写 · 原型评审 · 需求宣讲 · 迭代跟进',g:0,sk:['wc','gh','qqc','lai'],rec:['wc','gh']},
+      {id:'retro',e:'📊',n:'效果复盘',d:'数据分析 · A/B结果 · 用户反馈 · 迭代优化',g:0,sk:['sia','wea','chr','tf'],rec:['sia','wea']},
+    ],ht:'产品管线',hd:'从市场洞察到效果验证的完整产品闭环。需求定义和业务规划各设门禁，确保方向正确。'
+  },
+  // 3 运维/SRE
+  {
+    id:'sre',e:'🛡️',n:'运维/SRE',type:'Ops Pipeline',desc:'监控感知 → 诊断定位 → 修复实施 → 验证回归 → 经验沉淀',
+    stages:[
+      {id:'mon', e:'📡',n:'监控感知',d:'健康检查 · 资源监控 · 异常告警',g:0,sk:['hc','p1','wth'],rec:['hc','p1']},
+      {id:'diag',e:'🔬',n:'诊断定位',d:'连接诊断 · 日志分析 · 根因定位',g:0,sk:['nc','tmx','ms','ar'],rec:['nc','tmx']},
+      {id:'fix', e:'🔧',n:'修复实施',d:'方案制定 · 安全审计 · 灰度执行',g:1,sk:['gh','mcp','tmx','spm'],rec:['gh','mcp']},
+      {id:'ver', e:'✅',n:'验证回归',d:'修复后检查 · 回归 · 性能验证',g:0,sk:['hc','p1','nc'],rec:['hc','p1']},
+      {id:'lern',e:'📝',n:'经验沉淀',d:'故障复盘 · 结构化 · 知识库更新',g:0,sk:['sia','sc','tf'],rec:['sia','sc']},
+    ],ht:'运维管线',hd:'从监控到沉淀的完整运维闭环。每次故障都是一次知识注入，AI和人类共同成长。'
+  },
+  // 4 自媒体运营
+  {
+    id:'media',e:'📱',n:'自媒体运营',type:'Media Pipeline',desc:'多平台：热点发现 → 创作 → 审核 → 分发 → 互动',
+    stages:[
+      {id:'disc',e:'🔭',n:'热点发现',d:'全平台热榜 · 趋势识别 · 选题生成',g:0,sk:['chr','ght','ms','ar'],rec:['chr','ar','ms']},
+      {id:'prod',e:'🎬',n:'内容创作',d:'多格式生产（文章/图文/视频脚本）',g:0,sk:['wc','lai','wa'],rec:['wc','lai']},
+      {id:'aud', e:'🔎',n:'审核润色',d:'内容审核 · 爆款评估 · 合规检查',g:1,sk:['wea','sia'],rec:['wea','sia']},
+      {id:'dist',e:'📡',n:'多平台分发',d:'公众号/QQ频道等多渠道发布',g:0,sk:['wdp','qqc','qqm','qqr'],rec:['wdp','qqc']},
+      {id:'eng', e:'💬',n:'互动维护',d:'评论管理 · 定时互动 · 收件箱分类',g:0,sk:['qqr','tft','qqc'],rec:['qqr','tft']},
+    ],ht:'运营管线',hd:'多平台内容运营的标准化流水线。热点发现→创作→审核→分发→互动形成飞轮。'
+  },
+  // 5 数据工程师
+  {
+    id:'data',e:'📊',n:'数据工程师',type:'Data Pipeline',desc:'采集 → 清洗 → 分析 → 可视化 → 报告',
+    stages:[
+      {id:'coll',e:'🗂️',n:'数据采集',d:'多源抓取 · API调度 · 增量采集',g:0,sk:['ar','wa','ms','mcp'],rec:['ar','wa','mcp']},
+      {id:'clean',e:'🧹',n:'清洗转换',d:'数据清洗 · 格式标准化 · Schema对齐',g:0,sk:['mcp','gh','tf'],rec:['mcp','tf']},
+      {id:'anly',e:'🧪',n:'分析建模',d:'统计 · 模型训练 · 假设验证',g:1,sk:['tf','sia','spm'],rec:['tf','sia']},
+      {id:'viz', e:'📈',n:'可视化',d:'图表 · 看板 · 交互展示',g:0,sk:['lai','wdp','p1'],rec:['lai']},
+      {id:'rpt', e:'📝',n:'报告输出',d:'报告撰写 · 结论 · 决策建议',g:0,sk:['wc','wdp','sia'],rec:['wc','sia']},
+    ],ht:'数据管线',hd:'从原始数据到决策报告的标准数据工程流。每层质量校验，产出可追溯。'
+  },
+];
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let ri=0, si=0; // role index, stage index
+let sel={}; // {roleId: {stageId: Set<skillId>}}
+function init(){sel={};R.forEach(r=>{sel[r.id]={};r.stages.forEach(s=>sel[r.id][s.id]=new Set([...s.rec]));});}
+init();
+function gs(rid,sid){return sel[rid]?.[sid]??new Set;}
+function tg(rid,sid,skid){const s=sel[rid][sid];s.has(skid)?s.delete(skid):s.add(skid);}
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+
+function renderRoles(){
+  const role=R[ri];
+  $('rs').innerHTML=R.map((r,i)=>`
+    <div class="rc${i===ri?' on':''}" data-i="${i}">
+      <span class="rc-emoji">${r.e}</span>
+      <span class="rc-name">${r.n}</span>
+      <span class="rc-type">${r.type}</span>
+      <span class="rc-desc">${r.desc}</span>
+    </div>
+  `).join('');
+  $('rs').querySelectorAll('.rc').forEach(c=>c.onclick=()=>{ri=+c.dataset.i;si=0;renderAll();});
+}
+
+function renderPipeline(){
+  const role=R[ri];
+  const html=role.stages.map((s,i)=>{
+    const act=i===si;
+    const gs=s.g===1?'⭐':s.g===2?'⭐⭐':'';
+    return `<div class="pn${act?' active':''}${s.g?' has-gate':''}" data-i="${i}">
+      <span class="pn-num">0${i+1}</span>
+      <span class="pn-emoji">${s.e}</span>
+      <span class="pn-name">${s.n}</span>
+      ${gs?`<div class="pn-gate"><span>${gs}</span></div>`:''}
+    </div>`;
+  });
+  const conn=role.stages.slice(1).map(()=>'<div class="pc"><div class="pc-line"></div></div>');
+  const all=[];html.forEach((h,i)=>{all.push(h);if(i<conn.length)all.push(conn[i]);});
+  $('pv').innerHTML=all.join('');
+  $('pv').querySelectorAll('.pn').forEach(n=>n.onclick=()=>{si=+n.dataset.i;renderPanel();renderPipeline();stats();});
+}
+
+function renderPanel(){
+  const role=R[ri],stage=role.stages[si];
+  const set=gs(role.id,stage.id);
+  $('pnlNum').textContent=`0${si+1}`;
+  $('pnlName').textContent=stage.n;
+  const ge=$('pnlGate');
+  if(stage.g){ge.style.display='inline-block';ge.textContent='⭐'.repeat(stage.g)+' 强制门禁';}
+  else ge.style.display='none';
+  $('pnlDesc').textContent=stage.d;
+  $('pnlCount').textContent=set.size;
+  $('pnlTotal').textContent=stage.sk.length;
+  // skills grid
+  $('sg').innerHTML=stage.sk.map(sid=>{
+    const sk=S[sid];if(!sk)return'';
+    const on=set.has(sid),rec=stage.rec.includes(sid);
+    let tag='';if(rec)tag='<span class="sk-tag rec">推荐</span>';
+    else if(sk.c==='infra')tag='<span class="sk-tag infra">运行时</span>';
+    else tag='<span class="sk-tag ext">扩展</span>';
+    return `<div class="sk${on?' on':''}" data-sid="${sid}">
+      <span class="sk-emoji">${sk.e}</span>
+      <div class="sk-body">
+        <span class="sk-name">${sk.n}${tag}</span>
+        <div class="sk-desc">${sk.d}</div>
+      </div>
+      <span class="sk-check">✓</span>
+    </div>`;
+  }).join('');
+  $('sg').querySelectorAll('.sk').forEach(c=>{
+    c.onclick=()=>{tg(role.id,stage.id,c.dataset.sid);renderPanel();stats();};
+  });
+  $('resetNodeBtn').onclick=()=>{sel[role.id][stage.id]=new Set([...stage.rec]);renderPanel();stats();};
+}
+
+function stats(){
+  const role=R[ri];
+  let total=0,stages=0;
+  role.stages.forEach(s=>{const set=gs(role.id,s.id);total+=set.size;if(set.size)stages++;});
+  $('totalSkills').textContent=total;
+  $('totalStages').textContent=stages;
+}
+
+function renderAll(){renderRoles();renderPipeline();renderPanel();stats();}
+
+// ════════════════════════════════════════════
+// MD GENERATION
+// ════════════════════════════════════════════
+function genMD(){
+  const role=R[ri],now=new Date().toISOString().slice(0,10);
+  const allIds=new Set();role.stages.forEach(s=>gs(role.id,s.id).forEach(x=>allIds.add(x)));
+  let m='';
+  m+=`# Agent Harness 配置\n\n`;
+  m+=`> **生成时间**：${now}  \n`;
+  m+=`> **角色**：${role.e} ${role.n}  \n`;
+  m+=`> **Harness 类型**：${role.ht}  \n`;
+  m+=`> ${role.hd}\n\n---\n\n`;
+  m+=`## 🔗 Harness 管线\n\n`;
+  m+=`\`\`\`\n${role.stages.map((s,i)=>`${s.e} ${s.n}${i<role.stages.length-1?' → ':''}`).join('')}\n\`\`\`\n\n`;
+  role.stages.forEach((s,i)=>{
+    const set=gs(role.id,s.id);
+    m+=`### Stage ${i+1}: ${s.e} ${s.n}${s.g?' '+'⭐'.repeat(s.g):''}\n`;
+    if(s.g)m+=`> 🚧 **强制门禁** — 必须通过方可进入下一阶段\n\n`;
+    else m+=`\n`;
+    m+=`${s.d}\n\n**装配 Skill (${set.size})：**\n\n`;
+    if(!set.size)m+=`- *(未选择)*\n\n`;
+    else[...set].forEach(x=>{const sk=S[x];m+=`- **${sk.e} ${sk.n}** — ${sk.d}\n`;});
+    m+=`\n`;
+  });
+  m+=`---\n\n## 📦 安装命令\n\n\`\`\`bash\nclawhub install ${[...allIds].filter(x=>S[x]?.c!=='infra').join(' ')}\n\`\`\`\n\n`;
+  m+=`## 📋 Skill 清单\n\n| Skill | 描述 | 阶段 | 类型 |\n`;
+  m+=`|-------|------|------|------|\n`;
+  role.stages.forEach(s=>{
+    [...gs(role.id,s.id)].forEach(x=>{
+      const sk=S[x];
+      m+=`| ${sk.e} ${sk.n} | ${sk.d} | ${s.n} | ${sk.c==='infra'?'🟣 运行时':sk.c==='creation'?'🟠 创作':sk.c==='search'?'🔵 搜索':sk.c==='dev'?'🟢 开发':sk.c==='ops'?'🟡 运维':sk.c==='orch'?'⚪ 编排':sk.c==='social'?'🩵 社交':'⚫ 工具'} |\n`;
+    });
+  });
+  return m;
+}
+
+function showMo(){$('moContent').textContent=genMD();$('mo').classList.add('on');}
+function hideMo(){$('mo').classList.remove('on');}
+async function copyMD(){try{await navigator.clipboard.writeText(genMD());t('✅ 已复制')}catch{t('❌ 复制失败')}}
+function dlMD(){
+  const role=R[ri],md=genMD();
+  const b=new Blob([md],{type:'text/markdown;charset=utf-8'}),u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=`harness-${role.id}-${new Date().toISOString().slice(0,10)}.md`;a.click();
+  URL.revokeObjectURL(u);t('✅ 已下载');
+}
+function resetAll(){init();renderAll();t('↺ 已恢复全部推荐配置');}
+function t(msg){const e=$('toast');e.textContent=msg;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2000);}
+
+// ════════════════════════════════════════════
+// PARTICLES
+// ════════════════════════════════════════════
+(function(){
+  const c=$('ps');
+  for(let i=0;i<25;i++){const p=document.createElement('div');p.className='ps-p';p.style.left=Math.random()*100+'%';p.style.animationDelay=Math.random()*8+'s';p.style.animationDuration=(7+Math.random()*12)+'s';p.style.width=(1+Math.random()*2)+'px';p.style.height=p.style.width;c.appendChild(p);}
+})();
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+$('genBtn').onclick=showMo;
+$('moClose').onclick=hideMo;
+$('mo').addEventListener('click',e=>{if(e.target===$('mo'))hideMo();});
+$('copyBtn').onclick=copyMD;
+$('dlBtn').onclick=dlMD;
+$('resetAllBtn').onclick=resetAll;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideMo();});
+renderAll();
+</script>
+</body>
+</html>
