@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>云舟 · 个人作品集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Caveat:wght@600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* 晚霞暖色调色板 */
+    --amber:#ff8a3c;
+    --ember:#e0552f;
+    --gold:#f2b25c;
+    --sage:#8fae7d;
+    --crimson:#e06a5a;
+    --ink:#fff7ee;
+    --glass:rgba(20,12,8,.32);
+    --glass-brd:rgba(255,220,180,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Archivo',"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:#0b0e14; overflow:hidden; -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- 舞台 ---------- */
+  .stage{position:fixed; inset:0; border-radius:28px; overflow:hidden; background:#000}
+  video.hero{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; pointer-events:none; transform:translateZ(0);
+  }
+  .veil{
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(8,6,10,.4) 0%, rgba(8,6,10,0) 22%, rgba(8,6,10,0) 60%, rgba(8,6,10,.55) 100%),
+      radial-gradient(120% 90% at 66% 40%, rgba(0,0,0,0) 44%, rgba(6,4,8,.4) 100%),
+      linear-gradient(90deg, rgba(6,4,8,.52) 0%, rgba(6,4,8,.14) 44%, rgba(6,4,8,0) 62%);
+  }
+  .grain{
+    position:absolute; inset:-50%; pointer-events:none; opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain 7s steps(6) infinite;
+  }
+  @keyframes grain{
+    0%,100%{transform:translate(0,0)} 20%{transform:translate(-4%,3%)}
+    40%{transform:translate(3%,-4%)} 60%{transform:translate(-3%,-2%)} 80%{transform:translate(4%,2%)}
+  }
+
+  /* ---------- 顶栏 ---------- */
+  .topbar{
+    position:absolute; top:0; left:0; right:0; z-index:10;
+    display:flex; align-items:center; justify-content:flex-start; gap:26px; padding:24px 38px;
+  }
+  .brand{
+    color:var(--ink); font-weight:900; letter-spacing:.42em; font-size:15px;
+    display:flex; align-items:center; gap:12px; text-shadow:0 2px 18px rgba(0,0,0,.4);
+  }
+  .brand i{font-style:normal; font-size:19px; letter-spacing:0; color:var(--amber)}
+  .nav{
+    display:flex; gap:6px; padding:7px 10px;
+    background:var(--glass); border:1px solid var(--glass-brd);
+    border-radius:999px; backdrop-filter:blur(18px) saturate(1.4);
+    -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  }
+  .nav a{
+    color:var(--ink); text-decoration:none; font-size:13px; font-weight:700;
+    padding:8px 18px; border-radius:999px; letter-spacing:.08em;
+    transition:background .3s cubic-bezier(.22,1,.36,1);
+  }
+  .nav a:hover{background:rgba(255,255,255,.18)}
+
+  /* ---------- 主文案：第一版文字，单行，位置上移 ---------- */
+  .hero-copy{
+    position:absolute; z-index:10; left:52px; top:15%;
+    max-width:min(62vw,900px);
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; letter-spacing:.22em; color:var(--ink);
+    background:var(--glass); border:1px solid var(--glass-brd);
+    padding:9px 18px; border-radius:999px;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    margin-bottom:24px; opacity:0; animation:fadeUp .9s .2s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .badge b{color:var(--amber); font-weight:900}
+  h1{
+    color:var(--ink); font-weight:900;
+    font-size:clamp(38px, 4.6vw, 68px);
+    line-height:1.1; letter-spacing:.06em; white-space:nowrap;
+    text-shadow:0 10px 44px rgba(0,0,0,.4);
+    opacity:0; animation:fadeUp 1s .38s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  @keyframes fadeUp{from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:translateY(0)}}
+  h1 .accent{color:var(--amber)}
+  h1 .script{
+    font-family:'Caveat',cursive; font-weight:600;
+    font-size:.44em; letter-spacing:0; color:#ffd9a8;
+    vertical-align:.16em; margin-left:.5em;
+    text-shadow:0 4px 20px rgba(0,0,0,.45);
+    transform:rotate(-4deg); display:inline-block;
+  }
+
+  /* ---------- 左侧卡片矩阵（2行2列 · 统一尺寸 · 3D悬浮） ---------- */
+  .drawer{
+    position:absolute; z-index:11;
+    left:52px; bottom:48px;
+    width:min(560px, 44vw);
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;
+    perspective:1200px;
+    opacity:0; animation:fadeUp 1s .9s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .card{
+    --c1:var(--amber); --c2:var(--ember);
+    position:relative;
+    height:196px;
+    border-radius:20px; padding:18px 20px;
+    background:linear-gradient(160deg, rgba(32,20,12,.72), rgba(15,10,8,.78));
+    border:1px solid rgba(255,220,180,.18);
+    backdrop-filter:blur(20px) saturate(1.3);
+    -webkit-backdrop-filter:blur(20px) saturate(1.3);
+    box-shadow:0 18px 44px rgba(0,0,0,.45);
+    cursor:pointer; overflow:hidden;
+    transform-style:preserve-3d;
+    transition:border-color .4s, box-shadow .5s;
+    will-change:transform;
+  }
+  .card:hover{
+    border-color:color-mix(in srgb, var(--c1) 60%, transparent);
+    box-shadow:0 28px 64px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--c1) 30%, transparent);
+  }
+  /* 卡内氛围光 */
+  .card::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 15% -10%, color-mix(in srgb, var(--c1) 30%, transparent) 0%, transparent 55%),
+      radial-gradient(100% 80% at 98% 112%, color-mix(in srgb, var(--c2) 24%, transparent) 0%, transparent 60%);
+  }
+  .card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+    background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),
+      color-mix(in srgb, var(--c1) 26%, transparent) 0%, transparent 65%);
+    transition:opacity .35s;
+  }
+  .card:hover::after{opacity:1}
+  .card .glowline{
+    position:absolute; top:0; left:16%; right:16%; height:2px; border-radius:2px;
+    background:linear-gradient(90deg, transparent, var(--c1), transparent); opacity:.8;
+  }
+  .card .head{display:flex; align-items:center; gap:14px}
+  .card .icon{
+    width:42px; height:42px; border-radius:13px; flex:none;
+    display:grid; place-items:center; font-size:20px;
+    background:linear-gradient(150deg, color-mix(in srgb, var(--c1) 34%, rgba(0,0,0,.4)), rgba(0,0,0,.25));
+    border:1px solid color-mix(in srgb, var(--c1) 44%, transparent);
+    box-shadow:0 8px 20px color-mix(in srgb, var(--c1) 26%, transparent);
+  }
+  .card h3{
+    color:var(--ink); font-size:16px; font-weight:900; letter-spacing:.04em;
+    display:flex; flex-direction:column; gap:3px;
+  }
+  .card h3 small{
+    font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:700;
+    color:color-mix(in srgb, var(--c1) 88%, #fff); letter-spacing:.16em;
+  }
+  .card p{
+    margin-top:12px; color:rgba(255,244,230,.74);
+    font-size:12px; line-height:1.7; letter-spacing:.03em;
+    position:relative;
+  }
+  .card .metric{
+    margin-top:12px; display:flex; align-items:baseline; gap:7px;
+    font-family:'JetBrains Mono',monospace; position:relative;
+  }
+  .card .metric b{font-size:19px; font-weight:700; color:var(--c1)}
+  .card .metric span{font-size:10.5px; color:rgba(255,244,230,.55); letter-spacing:.1em}
+  /* 四卡配色：各取晚霞一抹 */
+  .card.perf{--c1:var(--amber);  --c2:var(--ember)}
+  .card.edge{--c1:var(--gold);   --c2:#c98a3a}
+  .card.os  {--c1:var(--sage);   --c2:#4a6b4f}
+  .card.yoyo{--c1:var(--crimson);--c2:#a83a3a}
+
+  /* ---------- 右上提示 ---------- */
+  .hint{
+    position:absolute; right:40px; top:96px; z-index:10;
+    display:flex; align-items:center; gap:12px;
+    background:var(--glass); border:1px solid var(--glass-brd);
+    color:#ffe9d2; font-size:12.5px; font-weight:700; letter-spacing:.12em;
+    padding:13px 22px; border-radius:999px;
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    opacity:0; animation:fadeUp 1s 1.3s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .hint .pulse{
+    width:8px; height:8px; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 0 0 rgba(255,138,60,.7); animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,138,60,.65)}
+    70%{box-shadow:0 0 0 12px rgba(255,138,60,0)}
+    100%{box-shadow:0 0 0 0 rgba(255,138,60,0)}
+  }
+
+  /* ---------- 鼠标跟随光斑 ---------- */
+  .cursor-glow{
+    position:fixed; z-index:60; left:0; top:0;
+    width:340px; height:340px; margin:-170px 0 0 -170px;
+    border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,178,110,.20) 0%, rgba(255,138,60,.07) 42%, rgba(255,138,60,0) 68%);
+    mix-blend-mode:screen; will-change:transform;
+  }
+  .cursor-dot{
+    position:fixed; z-index:61; left:0; top:0;
+    width:10px; height:10px; margin:-5px 0 0 -5px;
+    border-radius:50%; pointer-events:none;
+    background:#fff; mix-blend-mode:difference; will-change:transform;
+  }
+
+  /* ---------- 载入遮罩 + 进度条 ---------- */
+  .loader{
+    position:fixed; inset:0; z-index:100; background:#0b0e14;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px;
+    transition:opacity .7s ease, visibility .7s;
+  }
+  .loader.done{opacity:0; visibility:hidden}
+  .loader .title{
+    color:var(--ink); font-size:13px; letter-spacing:.55em; font-weight:700; opacity:.8;
+    text-indent:.55em;
+  }
+  .loader .bar{
+    width:min(300px,60vw); height:2px; border-radius:2px;
+    background:rgba(255,220,180,.14); overflow:hidden; position:relative;
+  }
+  .loader .bar i{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg, var(--ember), var(--amber), var(--gold));
+    border-radius:2px; transition:width .3s ease;
+    box-shadow:0 0 14px rgba(255,138,60,.55);
+  }
+  .loader .pct{
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    color:rgba(255,230,205,.55); letter-spacing:.2em;
+  }
+
+  @media (max-width:1080px){
+    .drawer{width:min(480px,80vw); left:28px; bottom:32px; gap:14px}
+    .card{height:170px}
+    .hero-copy{left:28px; top:12%}
+    h1{white-space:normal}
+  }
+  @media (max-width:820px){.nav{display:none}.hint{display:none}}
+</style>
+</head>
+<body>
+
+  <div class="stage">
+    <!-- 静音 / playsInline / preload=auto / 不自动播放；时间轴完全由鼠标 X 驱动 -->
+    <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
+           src="assets/turn.mp4" disablepictureinpicture></video>
+    <div class="veil"></div>
+    <div class="grain"></div>
+
+    <header class="topbar">
+      <div class="brand"><i>✦</i>云 舟</div>
+      <nav class="nav">
+        <a href="#">作品</a><a href="#">系列</a><a href="#">画册</a><a href="#">关于</a>
+      </nav>
+    </header>
+
+    <main class="hero-copy">
+      <div class="badge"><b>✦</b> 个人作品集 · 2026</div>
+      <h1>执剑 <span class="accent">入山海</span> 见众生<em class="script">Portfolio 2026</em></h1>
+    </main>
+
+    <!-- 抽屉卡片：统一尺寸 · 叠放 · 悬停抽出 -->
+    <section class="drawer" id="drawer">
+      <article class="card perf">
+        <span class="glowline"></span>
+        <div class="head">
+          <div class="icon">⚡</div>
+          <h3>性能功耗 <small>POWER</small></h3>
+        </div>
+        <p>全链路性能剖析与功耗建模，帧率、发热、续航三线合一的极致调优实践。</p>
+        <div class="metric"><b>-38%</b><span>整机功耗优化</span></div>
+      </article>
+      <article class="card edge">
+        <span class="glowline"></span>
+        <div class="head">
+          <div class="icon">◈</div>
+          <h3>端侧计算 <small>ON-DEVICE</small></h3>
+        </div>
+        <p>大模型下沉终端：量化、剪枝与 NPU 调度，让智能在本地实时发生。</p>
+        <div class="metric"><b>17ms</b><span>端侧推理时延</span></div>
+      </article>
+      <article class="card os">
+        <span class="glowline"></span>
+        <div class="head">
+          <div class="icon">❖</div>
+          <h3>Agentic OS <small>AGENT</small></h3>
+        </div>
+        <p>以智能体为内核的操作系统范式：意图理解、任务编排与跨应用执行。</p>
+        <div class="metric"><b>128</b><span>原子能力编排</span></div>
+      </article>
+      <article class="card yoyo">
+        <span class="glowline"></span>
+        <div class="head">
+          <div class="icon">🦞</div>
+          <h3>YOYO 龙虾 <small>MASCOT</small></h3>
+        </div>
+        <p>一只会写代码的龙虾——原创 IP 形象设计、表情包与交互动效全集。</p>
+        <div class="metric"><b>42</b><span>套表情包上线</span></div>
+      </article>
+    </section>
+
+    <div class="hint"><span class="pulse"></span> ↔ 左右移动鼠标 · 控制人物转身</div>
+  </div>
+
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- 载入：简洁进度条 -->
+  <div class="loader" id="loader">
+    <div class="title">江 湖 载 入 中</div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="pct" id="pct">0%</div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  const video = document.getElementById("heroVideo");
+  const SENSITIVITY = 0.8;
+
+  /* ========== 1. 鼠标位移 → 目标时间 ==========
+     视频内容是从右向左转身，因此映射取反：
+     鼠标在屏幕左侧 → 时间轴末端（人物朝左）；右侧 → 时间轴起点（人物朝右）。
+     即 ratio 反转后线性映射到整条时间轴。 */
+  let targetTime = 0;
+  let smoothTime = 0;
+  let ready = false;
+
+  window.addEventListener("mousemove", function (e) {
+    if (!ready || !video.duration) return;
+    const ratio = 1 - e.clientX / window.innerWidth;
+    targetTime = Math.max(0, Math.min(video.duration, ratio * video.duration));
+  }, { passive: true });
+
+  /* ========== 2. 平滑 seek 引擎（rAF 插值 + 串行 seek 队列） ========== */
+  let seeking = false;
+  const SEEK_EPS = 1 / 48;
+
+  function tick() {
+    if (ready) {
+      smoothTime += (targetTime - smoothTime) * 0.14;
+      if (Math.abs(targetTime - smoothTime) < 0.001) smoothTime = targetTime;
+      if (!seeking && Math.abs(smoothTime - video.currentTime) > SEEK_EPS) {
+        seeking = true;
+        video.currentTime = smoothTime;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  video.addEventListener("seeked", function () { seeking = false; });
+  setInterval(function () { if (seeking && !video.seeking) seeking = false; }, 120);
+
+  /* ========== 3. 加载进度条 ========== */
+  const loader = document.getElementById("loader");
+  const barFill = document.getElementById("barFill");
+  const pct = document.getElementById("pct");
+  let shown = 0, real = 0.06, finished = false;
+
+  video.addEventListener("progress", function () {
+    try {
+      if (video.buffered.length && video.duration) {
+        real = Math.max(real, video.buffered.end(video.buffered.length - 1) / video.duration);
+      }
+    } catch (_) {}
+  });
+  video.addEventListener("loadedmetadata", function () {
+    targetTime = smoothTime = video.duration * 0.5;
+    video.currentTime = targetTime;
+  });
+  video.addEventListener("canplaythrough", function () { real = 1; }, { once: true });
+
+  (function progressLoop() {
+    if (finished) return;
+    const target = real >= 1 ? 1 : Math.min(real, shown + 0.012);
+    shown += (target - shown) * 0.12;
+    const p = Math.round(shown * 100);
+    barFill.style.width = p + "%";
+    pct.textContent = p + "%";
+    if (shown > 0.995 && real >= 1) {
+      finished = true; ready = true;
+      loader.classList.add("done");
+      return;
+    }
+    requestAnimationFrame(progressLoop);
+  })();
+  setTimeout(function () {
+    if (!finished) { finished = true; ready = true; loader.classList.add("done"); }
+  }, 6000);
+
+  video.pause(); // 明确关闭自动播放
+  requestAnimationFrame(tick);
+
+  /* ========== 4. 卡片 3D 悬浮倾斜 + 高光 ========== */
+  const cards = Array.from(document.querySelectorAll(".card"));
+  cards.forEach(function (card) {
+    card._rx = 0; card._ry = 0; card._lz = 0;   // 当前值（平滑）
+    card._tx = 0; card._ty = 0; card._tz = 0;   // 目标值
+    card.addEventListener("mousemove", function (e) {
+      const r = card.getBoundingClientRect();
+      const lx = (e.clientX - r.left) / r.width - 0.5;
+      const ly = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty("--mx", ((lx + 0.5) * 100) + "%");
+      card.style.setProperty("--my", ((ly + 0.5) * 100) + "%");
+      card._tx = -ly * 12; card._ty = lx * 14; card._tz = 16;   // 悬停倾斜+浮起
+    }, { passive: true });
+    card.addEventListener("mouseleave", function () {
+      card._tx = 0; card._ty = 0; card._tz = 0;
+    });
+  });
+  (function tiltLoop() {
+    cards.forEach(function (card) {
+      card._rx += (card._tx - card._rx) * 0.14;
+      card._ry += (card._ty - card._ry) * 0.14;
+      card._lz += (card._tz - card._lz) * 0.14;
+      card.style.transform =
+        "rotateX(" + card._rx.toFixed(2) + "deg) rotateY(" + card._ry.toFixed(2) +
+        "deg) translateZ(" + card._lz.toFixed(1) + "px)";
+    });
+    requestAnimationFrame(tiltLoop);
+  })();
+
+  /* ========== 5. 鼠标跟随光斑 ========== */
+  const glow = document.getElementById("cursorGlow");
+  const dot  = document.getElementById("cursorDot");
+  let mx = innerWidth / 2, my = innerHeight / 2;
+  let gx = mx, gy = my, dx = mx, dy = my;
+
+  window.addEventListener("mousemove", function (e) {
+    mx = e.clientX; my = e.clientY;
+  }, { passive: true });
+
+  (function cursorLoop() {
+    gx += (mx - gx) * 0.075; gy += (my - gy) * 0.075;
+    dx += (mx - dx) * 0.35;  dy += (my - dy) * 0.35;
+    glow.style.transform = "translate3d(" + gx + "px," + gy + "px,0)";
+    dot.style.transform  = "translate3d(" + dx + "px," + dy + "px,0)";
+    requestAnimationFrame(cursorLoop);
+  })();
+})();
+</script>
+</body>
+</html>

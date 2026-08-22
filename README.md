@@ -30,3 +30,34 @@ cp EatHelper/index.html /path/to/site/index/eat/index.html
 ```text
 https://your-domain/static/eat/
 ```
+
+### Yunzhou
+
+「云舟 · 个人作品集」鼠标/触摸驱动视频时间轴交互主页：
+
+- 视频随鼠标/触摸位置 scrubbing（人物转身跟随）
+- 晚霞暖色调玻璃拟态 UI，纯静态单页
+- 随附《视频加载教程》：动态视频背景加载方案 · 小白图文教程
+
+线上示例：
+
+<https://thinkspc.fun/static/yunzhou/>
+
+部署方式：
+
+```bash
+mkdir -p /path/to/site/index/yunzhou
+cp -r Yunzhou/* /path/to/site/index/yunzhou/
+```
+
+访问：
+
+```text
+https://your-domain/static/yunzhou/
+```
+
+教程页面：
+
+```text
+https://your-domain/static/yunzhou/视频加载教程/
+```
