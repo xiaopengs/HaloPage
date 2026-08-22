@@ -39,10 +39,6 @@ https://your-domain/static/eat/
 - 晚霞暖色调玻璃拟态 UI，纯静态单页
 - 随附《视频加载教程》：动态视频背景加载方案 · 小白图文教程
 
-线上示例：
-
-<https://thinkspc.fun/static/yunzhou/>
-
 部署方式：
 
 ```bash
