@@ -218,7 +218,7 @@
 
   /* ---------- 载入遮罩 + 进度条 ---------- */
   .loader{
-    position:fixed; inset:0; z-index:100; background:#0b0e14;
+    position:fixed; inset:0; z-index:100; background:rgba(11,14,20,.82);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px;
     transition:opacity .7s ease, visibility .7s;
   }
@@ -283,6 +283,7 @@
   <div class="stage">
     <!-- 静音 / playsInline / preload=auto / 不自动播放；时间轴完全由鼠标 X 驱动 -->
     <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
+           poster="assets/poster.jpg?v=20260822d"
            disablepictureinpicture></video>
     <div class="veil"></div>
     <div class="grain"></div>
@@ -361,7 +362,7 @@
   const barFill = document.getElementById("barFill");
   const pct = document.getElementById("pct");
 
-  const V = "20260822c";  // 资源版本号：换视频/页面后 +1，绕开浏览器 7 天缓存
+  const V = "20260822d";  // 资源版本号：换视频/页面后 +1，绕开浏览器 7 天缓存
 
   /* ========== 1. 鼠标位移 → 目标时间 ==========
      视频内容是从右向左转身，因此映射取反：
@@ -418,18 +419,47 @@
   video.addEventListener("seeked", function () { seeking = false; });
   setInterval(function () { if (seeking && !video.seeking) seeking = false; }, 200);
 
-  /* ========== 3. 加载：fetch 整段下载 → Blob URL ==========
-     进度条绑定真实字节数（不再有“假 100%”）。
-     下载完成后所有 seek 都是本地内存操作，零网络延迟。
-     慢网兜底：25s 未下完 → 放弃 blob，退回直连流式，页面立即可用。 */
+  /* ========== 3. 加载：本地化预下载 → Blob URL ==========
+     · 优先读 Cache Storage（第一次下载后永久本地缓存，二次访问秒开）
+     · 未命中则 fetch 整段下载，进度条绑定真实字节数，并写入缓存
+     · 下载完成前不开放 scrub（先下载、再预览），完成后全部本地内存操作
+     · 慢网兜底：25s 未下完 → 退回直连流式，页面立即可用 */
+  const VIDEO_URL = "assets/turn.mp4?v=" + V;
+  const CACHE_NAME = "yunzhou-v1";
+
   function showDone() {
     if (ready) return;
     ready = true;
     loader.classList.add("done");
   }
 
+  function useBlob(blob) {
+    video.src = URL.createObjectURL(blob);
+    video.pause();
+    video.addEventListener("loadedmetadata", function () {
+      targetTime = smoothTime = video.duration * 0.5;
+      video.currentTime = targetTime;
+      video.addEventListener("seeked", showDone, { once: true });
+    }, { once: true });
+    setTimeout(showDone, 10000);  // blob 已就绪后的最终兜底
+  }
+
+  function saveToCache(blob) {
+    try {
+      caches.open(CACHE_NAME).then(function (cache) {
+        cache.put(new URL(VIDEO_URL, location.href).href,
+                  new Response(blob, { headers: { "Content-Type": "video/mp4" } }));
+        // 顺手清掉旧版本缓存
+        caches.keys().then(function (keys) {
+          keys.filter(function (k) { return k.indexOf("yunzhou-") === 0 && k !== CACHE_NAME; })
+              .forEach(function (k) { caches.delete(k); });
+        });
+      });
+    } catch (_) {}
+  }
+
   function attachFallbackSrc() {
-    video.src = "assets/turn.mp4?v=" + V;
+    video.src = VIDEO_URL;
     video.pause();
     video.addEventListener("loadedmetadata", function () {
       targetTime = smoothTime = video.duration * 0.5;
@@ -444,8 +474,19 @@
       if (!ready) { try { ctrl && ctrl.abort(); } catch (_) {} attachFallbackSrc(); }
     }, 25000);
     try {
+      // 1) 本地缓存命中 → 直接预览（零网络）
+      if (typeof caches !== "undefined") {
+        const cache = await caches.open(CACHE_NAME);
+        const hit = await cache.match(new URL(VIDEO_URL, location.href).href);
+        if (hit) {
+          clearTimeout(watchdog);
+          useBlob(await hit.blob());
+          return;
+        }
+      }
+      // 2) 未命中 → 整段下载（真实进度）并写入本地缓存
       ctrl = new AbortController();
-      const res = await fetch("assets/turn.mp4?v=" + V, { signal: ctrl.signal });
+      const res = await fetch(VIDEO_URL, { signal: ctrl.signal });
       if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
       const total = parseInt(res.headers.get("Content-Length") || "0", 10);
       const reader = res.body.getReader();
@@ -463,14 +504,9 @@
         }
       }
       clearTimeout(watchdog);
-      video.src = URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
-      video.pause();
-      video.addEventListener("loadedmetadata", function () {
-        targetTime = smoothTime = video.duration * 0.5;
-        video.currentTime = targetTime;
-        video.addEventListener("seeked", showDone, { once: true });
-      }, { once: true });
-      setTimeout(showDone, 10000);  // blob 已就绪后的最终兜底
+      const blob = new Blob(chunks, { type: "video/mp4" });
+      saveToCache(blob);  // 后台写入本地缓存，不阻塞预览
+      useBlob(blob);
     } catch (err) {
       clearTimeout(watchdog);
       attachFallbackSrc();  // fetch 失败/中断 → 退回直连流式
