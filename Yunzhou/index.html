@@ -4,8 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>云舟 · 个人作品集</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Caveat:wght@600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
 <style>
   :root{
     /* 晚霞暖色调色板 */
@@ -191,6 +190,7 @@
     backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     opacity:0; animation:fadeUp 1s 1.3s cubic-bezier(.19,1,.22,1) forwards;
   }
+  .hint .hint-touch{display:none}
   .hint .pulse{
     width:8px; height:8px; border-radius:50%; background:var(--amber);
     box-shadow:0 0 0 0 rgba(255,138,60,.7); animation:pulse 2.2s infinite;
@@ -244,11 +244,38 @@
 
   @media (max-width:1080px){
     .drawer{width:min(480px,80vw); left:28px; bottom:32px; gap:14px}
-    .card{height:170px}
-    .hero-copy{left:28px; top:12%}
+    .card{height:auto; min-height:158px; padding:15px 16px}
+    .card p{margin-top:9px; font-size:11.5px; line-height:1.65}
+    .card .metric{margin-top:9px}
+    .hero-copy{left:28px; top:10%}
     h1{white-space:normal}
   }
-  @media (max-width:820px){.nav{display:none}.hint{display:none}}
+  /* 手机端：导航收窄横排 + 触摸提示（不隐藏） */
+  @media (max-width:820px){
+    .topbar{padding:18px 22px; gap:16px}
+    .nav{display:flex; gap:3px; padding:5px 6px}
+    .nav a{font-size:11.5px; padding:6px 11px; letter-spacing:.04em}
+    .hint{right:20px; top:84px; font-size:11px; padding:10px 16px}
+    .hint .hint-touch{display:inline}
+    .hint .hint-mouse{display:none}
+  }
+  /* 小屏手机：进一步紧凑，保证 2×2 卡片文字完整显示 */
+  @media (max-width:520px){
+    .cursor-glow,.cursor-dot{display:none}
+    .card{padding:13px 13px; min-height:150px}
+    .card .icon{width:34px; height:34px; border-radius:10px; font-size:16px}
+    .card h3{font-size:14px; letter-spacing:.02em}
+    .card h3 small{font-size:8.5px; letter-spacing:.12em}
+    .card p{font-size:11px; line-height:1.6; margin-top:8px}
+    .card .metric b{font-size:16px}
+    .card .metric span{font-size:9.5px}
+    .drawer{gap:12px; left:20px; bottom:26px}
+    .hero-copy{left:20px; top:9%}
+    .topbar{padding:18px 20px; gap:18px}
+    .brand{font-size:13px; letter-spacing:.34em}
+    h1{font-size:clamp(30px, 9vw, 38px)}
+    .badge{font-size:11px; padding:8px 14px; margin-bottom:16px}
+  }
 </style>
 </head>
 <body>
@@ -256,7 +283,7 @@
   <div class="stage">
     <!-- 静音 / playsInline / preload=auto / 不自动播放；时间轴完全由鼠标 X 驱动 -->
     <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
-           src="assets/turn.mp4" disablepictureinpicture></video>
+           disablepictureinpicture></video>
     <div class="veil"></div>
     <div class="grain"></div>
 
@@ -312,7 +339,7 @@
       </article>
     </section>
 
-    <div class="hint"><span class="pulse"></span> ↔ 左右移动鼠标 · 控制人物转身</div>
+    <div class="hint"><span class="pulse"></span><span class="hint-mouse"> ↔ 左右移动鼠标 · 控制人物转身</span><span class="hint-touch"> ↔ 左右滑动屏幕 · 控制人物转身</span></div>
   </div>
 
   <div class="cursor-glow" id="cursorGlow"></div>
@@ -330,7 +357,11 @@
   "use strict";
 
   const video = document.getElementById("heroVideo");
-  const SENSITIVITY = 0.8;
+  const loader = document.getElementById("loader");
+  const barFill = document.getElementById("barFill");
+  const pct = document.getElementById("pct");
+
+  const V = "20260822c";  // 资源版本号：换视频/页面后 +1，绕开浏览器 7 天缓存
 
   /* ========== 1. 鼠标位移 → 目标时间 ==========
      视频内容是从右向左转身，因此映射取反：
@@ -340,72 +371,118 @@
   let smoothTime = 0;
   let ready = false;
 
-  window.addEventListener("mousemove", function (e) {
+  function scrubTo(x) {
     if (!ready || !video.duration) return;
-    const ratio = 1 - e.clientX / window.innerWidth;
+    const ratio = 1 - x / window.innerWidth;
     targetTime = Math.max(0, Math.min(video.duration, ratio * video.duration));
+  }
+  window.addEventListener("pointermove", function (e) { scrubTo(e.clientX); }, { passive: true });
+  window.addEventListener("touchmove", function (e) {
+    if (e.touches.length) scrubTo(e.touches[0].clientX);
   }, { passive: true });
 
-  /* ========== 2. 平滑 seek 引擎（rAF 插值 + 串行 seek 队列） ========== */
+  /* ========== 2. 平滑 seek 引擎（合并节流版） ==========
+     - 目标与当前帧差 > SEEK_EPS 才 seek，避免无谓 seek
+     - 大幅移动(>1.2s)用 fastSeek：只跳关键帧、不等解码，连续拖动不排队
+     - 小幅移动走精确 seek；非 fastSeek 浏览器限频 MIN_SEEK_INTERVAL，
+       杜绝原来每秒 ~60 次 seek 的解码风暴 */
   let seeking = false;
-  const SEEK_EPS = 1 / 48;
+  let lastSeekAt = 0;
+  const SEEK_EPS = 1 / 48;        // 展示平滑阈值（约 0.02s）
+  const MIN_SEEK_INTERVAL = 66;   // ms；精确 seek 的最小间隔
+
+  function issueSeek(t) {
+    const dist = Math.abs(t - video.currentTime);
+    if (dist > 1.2 && typeof video.fastSeek === "function") {
+      try { video.fastSeek(t); return; } catch (_) {}
+    }
+    video.currentTime = t;
+  }
 
   function tick() {
     if (ready) {
       smoothTime += (targetTime - smoothTime) * 0.14;
       if (Math.abs(targetTime - smoothTime) < 0.001) smoothTime = targetTime;
-      if (!seeking && Math.abs(smoothTime - video.currentTime) > SEEK_EPS) {
+      const drift = Math.abs(smoothTime - video.currentTime);
+      const now = performance.now();
+      const useFast = typeof video.fastSeek === "function" && drift > 1.2;
+      if (drift > SEEK_EPS && !seeking &&
+          (useFast || now - lastSeekAt >= MIN_SEEK_INTERVAL)) {
         seeking = true;
-        video.currentTime = smoothTime;
+        lastSeekAt = now;
+        issueSeek(smoothTime);
       }
     }
     requestAnimationFrame(tick);
   }
   video.addEventListener("seeked", function () { seeking = false; });
-  setInterval(function () { if (seeking && !video.seeking) seeking = false; }, 120);
+  setInterval(function () { if (seeking && !video.seeking) seeking = false; }, 200);
 
-  /* ========== 3. 加载进度条 ========== */
-  const loader = document.getElementById("loader");
-  const barFill = document.getElementById("barFill");
-  const pct = document.getElementById("pct");
-  let shown = 0, real = 0.06, finished = false;
+  /* ========== 3. 加载：fetch 整段下载 → Blob URL ==========
+     进度条绑定真实字节数（不再有“假 100%”）。
+     下载完成后所有 seek 都是本地内存操作，零网络延迟。
+     慢网兜底：25s 未下完 → 放弃 blob，退回直连流式，页面立即可用。 */
+  function showDone() {
+    if (ready) return;
+    ready = true;
+    loader.classList.add("done");
+  }
 
-  video.addEventListener("progress", function () {
+  function attachFallbackSrc() {
+    video.src = "assets/turn.mp4?v=" + V;
+    video.pause();
+    video.addEventListener("loadedmetadata", function () {
+      targetTime = smoothTime = video.duration * 0.5;
+      video.currentTime = targetTime;
+    });
+    showDone();  // 直连模式：页面立即可见，视频边下边用（seek 引擎已限频）
+  }
+
+  async function loadVideo() {
+    let ctrl;
+    const watchdog = setTimeout(function () {
+      if (!ready) { try { ctrl && ctrl.abort(); } catch (_) {} attachFallbackSrc(); }
+    }, 25000);
     try {
-      if (video.buffered.length && video.duration) {
-        real = Math.max(real, video.buffered.end(video.buffered.length - 1) / video.duration);
+      ctrl = new AbortController();
+      const res = await fetch("assets/turn.mp4?v=" + V, { signal: ctrl.signal });
+      if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
+      const total = parseInt(res.headers.get("Content-Length") || "0", 10);
+      const reader = res.body.getReader();
+      const chunks = [];
+      let got = 0;
+      for (;;) {
+        const r = await reader.read();
+        if (r.done) break;
+        chunks.push(r.value);
+        got += r.value.length;
+        if (total > 0) {
+          const p = Math.min(1, got / total);
+          barFill.style.width = (p * 100).toFixed(1) + "%";
+          pct.textContent = Math.round(p * 100) + "%";
+        }
       }
-    } catch (_) {}
-  });
-  video.addEventListener("loadedmetadata", function () {
-    targetTime = smoothTime = video.duration * 0.5;
-    video.currentTime = targetTime;
-  });
-  video.addEventListener("canplaythrough", function () { real = 1; }, { once: true });
-
-  (function progressLoop() {
-    if (finished) return;
-    const target = real >= 1 ? 1 : Math.min(real, shown + 0.012);
-    shown += (target - shown) * 0.12;
-    const p = Math.round(shown * 100);
-    barFill.style.width = p + "%";
-    pct.textContent = p + "%";
-    if (shown > 0.995 && real >= 1) {
-      finished = true; ready = true;
-      loader.classList.add("done");
-      return;
+      clearTimeout(watchdog);
+      video.src = URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
+      video.pause();
+      video.addEventListener("loadedmetadata", function () {
+        targetTime = smoothTime = video.duration * 0.5;
+        video.currentTime = targetTime;
+        video.addEventListener("seeked", showDone, { once: true });
+      }, { once: true });
+      setTimeout(showDone, 10000);  // blob 已就绪后的最终兜底
+    } catch (err) {
+      clearTimeout(watchdog);
+      attachFallbackSrc();  // fetch 失败/中断 → 退回直连流式
     }
-    requestAnimationFrame(progressLoop);
-  })();
-  setTimeout(function () {
-    if (!finished) { finished = true; ready = true; loader.classList.add("done"); }
-  }, 6000);
-
-  video.pause(); // 明确关闭自动播放
+  }
+  loadVideo();
   requestAnimationFrame(tick);
 
   /* ========== 4. 卡片 3D 悬浮倾斜 + 高光 ========== */
   const cards = Array.from(document.querySelectorAll(".card"));
+  const canHover = window.matchMedia("(hover: hover)").matches;
+  if (!canHover) cards.forEach(function (card) { card.style.transform = "none"; });
   cards.forEach(function (card) {
     card._rx = 0; card._ry = 0; card._lz = 0;   // 当前值（平滑）
     card._tx = 0; card._ty = 0; card._tz = 0;   // 目标值
@@ -421,7 +498,8 @@
       card._tx = 0; card._ty = 0; card._tz = 0;
     });
   });
-  (function tiltLoop() {
+  if (!canHover) { /* 触屏设备跳过 3D 倾斜循环 */ }
+  else (function tiltLoop() {
     cards.forEach(function (card) {
       card._rx += (card._tx - card._rx) * 0.14;
       card._ry += (card._ty - card._ry) * 0.14;
