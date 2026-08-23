@@ -72,8 +72,7 @@
   }
   function footer() { return `<footer class="footer"><span>赛点青 · 本地优先赛事记录</span><span>所有比分仅保存在当前浏览器</span></footer>`; }
   function ruleBand() {
-    const rules = [["单循环", "6 人、15 场、每人 5 场"], ["11 分制", "胜方至少 11 分，领先 2 分"], ["胜场积分", "胜 1 分，负 0 分"], ["即时排序", "积分 → 净胜分 → 总得分"]];
-    return `<section class="rules-band" aria-labelledby="rule-heading"><div class="section-heading"><h2 id="rule-heading">记分规则</h2><p>录入、排名与颁奖严格采用同一套规则。</p></div><div class="rule-list">${rules.map(([name, desc]) => `<article><h3>${name}</h3><p>${desc}</p></article>`).join("")}</div></section>`;
+    return `<section class="rules-brief" aria-label="积分规则"><strong>比赛规则</strong><span>6 人单循环 · 15 场</span><span>11 分制 · 领先 2 分</span><span><b>胜 1 积分</b> · 负 0 积分</span><span>同分按净胜分、总得分</span><button class="text-button" data-view="stats">查看排名规则 →</button></section>`;
   }
   function homeView() {
     const active = nextMatch(); const a = playerById(active.a); const b = playerById(active.b); const first = leader();
@@ -98,9 +97,78 @@
     return `<main class="page"><section class="page-intro"><div><h1>积分榜不会忘记每一分。</h1><p>排名顺序为积分、净胜分、总得分、固定报名顺序。每一次保存都会实时重新计算。</p></div><span class="intro-tag">实时排名</span></section><section class="standings" role="table" aria-label="循环赛积分榜"><div class="standing-head" role="row"><span>名次</span><span>选手</span><span>场次</span><span>积分</span><span>胜</span><span>负</span><span>得分</span><span>失分</span><span>净胜</span></div>${rows.map((row, index) => `<div class="standing-row ${index < 2 ? "is-leading" : ""}" role="row"><span class="standing-rank">${String(index + 1).padStart(2, "0")}</span><span class="standing-person">${avatar(row, "avatar--table")}<span><b>${esc(row.name)}</b><small>${esc(row.gender)}子组</small></span></span><span class="stat-optional">${row.played}</span><strong>${row.points}</strong><span class="stat-optional">${row.wins}</span><span class="stat-optional">${row.losses}</span><span class="stat-optional">${row.pf}</span><span class="stat-optional">${row.pa}</span><b>${row.diff >= 0 ? "+" : ""}${row.diff}</b></div>`).join("")}</section><section class="ranking-note"><h2>排名如何产生？</h2><p>胜一场记 1 积分，负一场记 0 积分。积分相同依次比较净胜分、总得分和固定报名顺序。全部 15 场录入后，前两名进入最终颁奖页。</p><div class="season-progress"><span>赛季完成度</span><i><b style="width:${completedPercent()}%"></b></i><strong>${completedPercent()}%</strong></div></section>${footer()}</main>`;
   }
   function podiumPlace(row, rank, label) { return `<article class="podium-place podium-place--${rank}">${avatar(row, "avatar--podium")}<span>${label}</span><h2>${esc(row.name)}</h2><p>${statText(row)}</p></article>`; }
+  function posterExport(table) {
+    const champion = table[0]; const runnerUp = table[1];
+    return `<section class="poster-export" aria-labelledby="poster-title"><div class="poster-preview" aria-hidden="true"><small>赛点青 · FINAL</small><strong>结果<br />海报</strong><div><span>冠军 ${esc(champion.name)}</span><span>亚军 ${esc(runnerUp.name)}</span></div></div><div class="poster-copy"><span class="poster-label">赛后分享</span><h2 id="poster-title">把最终名次带出赛场。</h2><p>生成一张包含冠亚军与完整积分榜的竖版图片。可保存到相册；在支持系统分享的手机上，也可直接呼出分享面板。</p><div class="poster-actions"><button class="button button--primary" id="export-poster">保存结果海报</button><button class="button button--quiet" id="share-poster">系统分享图片</button></div><p class="poster-feedback" id="poster-feedback">海报仅在全部 15 场赛果确认后开放，内容来自当前最终积分榜。</p></div></section>`;
+  }
+  function loadAvatarSheet() {
+    return new Promise((resolve, reject) => {
+      const image = new Image(); image.crossOrigin = "anonymous"; image.onload = () => resolve(image); image.onerror = reject; image.src = "/manus-storage/pickleball-roster-pixel-sheet_e611089d.png";
+    });
+  }
+  function drawCanvasText(ctx, text, x, y, options = {}) {
+    const { size = 24, weight = 500, color = "#171716", align = "left", family = '"Noto Sans SC", sans-serif' } = options;
+    ctx.fillStyle = color; ctx.font = `${weight} ${size}px ${family}`; ctx.textAlign = align; ctx.textBaseline = "alphabetic"; ctx.fillText(text, x, y);
+  }
+  function avatarTileIndex(player) { return state.players.findIndex((item) => item.id === player.id); }
+  function drawPosterAvatar(ctx, sheet, player, x, y, size) {
+    const index = avatarTileIndex(player); const sw = sheet.naturalWidth / 3; const sh = sheet.naturalHeight / 2;
+    const sx = (index % 3) * sw; const sy = Math.floor(index / 3) * sh;
+    ctx.drawImage(sheet, sx, sy, sw, sh, x, y, size, size);
+  }
+  async function createResultPoster() {
+    const table = calculateStats();
+    if (finishedCount() !== 15) throw new Error("全部 15 场赛果确认后才能生成结果海报。");
+    await document.fonts?.ready;
+    const sheet = await loadAvatarSheet(); const canvas = document.createElement("canvas"); canvas.width = 1080; canvas.height = 1620;
+    const ctx = canvas.getContext("2d"); const W = canvas.width; const H = canvas.height;
+    ctx.fillStyle = "#f4f1e8"; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(23,23,22,.16)"; ctx.lineWidth = 1;
+    for (let y = 44; y < H; y += 44) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    ctx.fillStyle = "#171716"; ctx.fillRect(58, 62, W - 116, 7);
+    ctx.fillStyle = "#c7ff3e"; ctx.fillRect(58, 95, 246, 38);
+    drawCanvasText(ctx, "赛点青 · ROUND ROBIN", 74, 122, { size: 20, weight: 800, family: '"Barlow Condensed", sans-serif' });
+    drawCanvasText(ctx, "最终结果", 58, 244, { size: 116, weight: 800, family: '"Barlow Condensed", sans-serif' });
+    drawCanvasText(ctx, state.title, 62, 290, { size: 25, weight: 700, color: "#6a685f" });
+    ctx.fillStyle = "#171716"; ctx.fillRect(58, 334, W - 116, 2);
+    const champion = table[0]; const runnerUp = table[1];
+    ctx.fillStyle = "#c7ff3e"; ctx.fillRect(58, 378, 474, 320); ctx.fillStyle = "#fffdf6"; ctx.fillRect(548, 378, 474, 320);
+    drawCanvasText(ctx, "冠军", 88, 424, { size: 24, weight: 800 }); drawCanvasText(ctx, "亚军", 578, 424, { size: 24, weight: 800 });
+    drawPosterAvatar(ctx, sheet, champion, 88, 460, 142); drawPosterAvatar(ctx, sheet, runnerUp, 578, 460, 142);
+    drawCanvasText(ctx, champion.name, 252, 540, { size: 76, weight: 800, family: '"Barlow Condensed", "Noto Sans SC", sans-serif' });
+    drawCanvasText(ctx, runnerUp.name, 742, 540, { size: 76, weight: 800, family: '"Barlow Condensed", "Noto Sans SC", sans-serif' });
+    drawCanvasText(ctx, `${champion.points} 积分 · ${champion.wins} 胜 ${champion.losses} 负`, 252, 580, { size: 20, weight: 600, color: "#3e3c35" });
+    drawCanvasText(ctx, `${runnerUp.points} 积分 · ${runnerUp.wins} 胜 ${runnerUp.losses} 负`, 742, 580, { size: 20, weight: 600, color: "#6a685f" });
+    drawCanvasText(ctx, `净胜分 ${champion.diff >= 0 ? "+" : ""}${champion.diff}`, 252, 626, { size: 20, weight: 700 });
+    drawCanvasText(ctx, `净胜分 ${runnerUp.diff >= 0 ? "+" : ""}${runnerUp.diff}`, 742, 626, { size: 20, weight: 700 });
+    drawCanvasText(ctx, "完整积分榜", 58, 786, { size: 48, weight: 800, family: '"Barlow Condensed", sans-serif' });
+    drawCanvasText(ctx, "排名", 70, 836, { size: 18, weight: 700, color: "#6a685f" }); drawCanvasText(ctx, "选手", 180, 836, { size: 18, weight: 700, color: "#6a685f" });
+    drawCanvasText(ctx, "积分", 696, 836, { size: 18, weight: 700, color: "#6a685f", align: "center" }); drawCanvasText(ctx, "胜-负", 826, 836, { size: 18, weight: 700, color: "#6a685f", align: "center" }); drawCanvasText(ctx, "净胜", 972, 836, { size: 18, weight: 700, color: "#6a685f", align: "center" });
+    ctx.strokeStyle = "#171716"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(58, 858); ctx.lineTo(W - 58, 858); ctx.stroke();
+    table.forEach((row, index) => {
+      const y = 902 + index * 104; if (index < 2) { ctx.fillStyle = index === 0 ? "rgba(199,255,62,.58)" : "rgba(255,253,246,.88)"; ctx.fillRect(58, y - 42, W - 116, 84); }
+      drawCanvasText(ctx, String(index + 1).padStart(2, "0"), 70, y + 9, { size: 34, weight: 800, family: '"Barlow Condensed", sans-serif' }); drawPosterAvatar(ctx, sheet, row, 180, y - 30, 60);
+      drawCanvasText(ctx, row.name, 260, y - 2, { size: 31, weight: 800 }); drawCanvasText(ctx, `${row.played} 场 · ${row.pf} 得分`, 262, y + 27, { size: 15, weight: 500, color: "#6a685f" });
+      drawCanvasText(ctx, String(row.points), 696, y + 9, { size: 34, weight: 800, align: "center", family: '"Barlow Condensed", sans-serif' }); drawCanvasText(ctx, `${row.wins}-${row.losses}`, 826, y + 9, { size: 28, weight: 700, align: "center", family: '"Barlow Condensed", sans-serif' }); drawCanvasText(ctx, `${row.diff >= 0 ? "+" : ""}${row.diff}`, 972, y + 9, { size: 28, weight: 700, align: "center", family: '"Barlow Condensed", sans-serif' });
+      ctx.strokeStyle = "rgba(23,23,22,.22)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(58, y + 61); ctx.lineTo(W - 58, y + 61); ctx.stroke();
+    });
+    ctx.fillStyle = "#171716"; ctx.fillRect(58, 1532, W - 116, 2); drawCanvasText(ctx, "15 场赛果已确认 · 数据由赛点青本地计算", 58, 1572, { size: 18, weight: 600, color: "#6a685f" }); drawCanvasText(ctx, "PICKLEBALL LEAGUE", W - 58, 1572, { size: 18, weight: 800, color: "#171716", align: "right", family: '"Barlow Condensed", sans-serif' });
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("海报生成失败，请重试。")), "image/png"));
+  }
+  async function downloadResultPoster() {
+    const feedback = document.getElementById("poster-feedback");
+    try { if (feedback) feedback.textContent = "正在生成高清结果海报…"; const blob = await createResultPoster(); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = "赛点青-循环赛最终结果.png"; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500); if (feedback) feedback.textContent = "图片已开始下载，可保存到相册后分享到朋友圈。"; } catch (error) { if (feedback) feedback.textContent = error.message || "海报生成失败，请重试。"; }
+  }
+  async function shareResultPoster() {
+    const feedback = document.getElementById("poster-feedback");
+    try { if (feedback) feedback.textContent = "正在准备分享图片…"; const blob = await createResultPoster(); const file = new File([blob], "赛点青-循环赛最终结果.png", { type: "image/png" });
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) { await navigator.share({ title: "赛点青 · 循环赛最终结果", text: "本届匹克球循环赛最终排名", files: [file] }); if (feedback) feedback.textContent = "已打开系统分享面板，可选择微信等已安装应用。"; }
+      else { if (feedback) feedback.textContent = "当前浏览器不支持系统分享，已改为下载图片。"; const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = "赛点青-循环赛最终结果.png"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1500); }
+    } catch (error) { if (error?.name === "AbortError") { if (feedback) feedback.textContent = "已取消分享，海报没有丢失，可随时再次生成。"; } else if (feedback) feedback.textContent = error.message || "分享准备失败，请改用保存图片。"; }
+  }
   function podiumView() {
     const table = calculateStats(); const complete = finishedCount() === 15;
-    return `<main class="page"><section class="page-intro"><div><h1>${complete ? "最后一分落地，名次定格。" : "终局尚未抵达。"}</h1><p>${complete ? "全部 15 场赛果已经确认，最终名次按积分榜规则生成。" : `还剩 ${15 - finishedCount()} 场需要记录。全部录入后，冠军与亚军将在这里揭晓。`}</p></div><span class="intro-tag ${complete ? "intro-tag--done" : ""}">${complete ? "赛季已完赛" : "等待终局"}</span></section>${complete ? `<section class="podium-board">${podiumPlace(table[1], "second", "亚军")}${podiumPlace(table[0], "first", "冠军")}${podiumPlace(table[2], "third", "季军")}</section>` : `<section class="podium-pending"><b>${finishedCount()} / 15</b><span>终局前，所有排名都是实时名次。</span><button class="button button--black" data-view="scores">继续录分</button></section>`}${footer()}</main>`;
+    return `<main class="page"><section class="page-intro"><div><h1>${complete ? "最后一分落地，名次定格。" : "终局尚未抵达。"}</h1><p>${complete ? "全部 15 场赛果已经确认，最终名次按积分榜规则生成。" : `还剩 ${15 - finishedCount()} 场需要记录。全部录入后，冠军与亚军将在这里揭晓。`}</p></div><span class="intro-tag ${complete ? "intro-tag--done" : ""}">${complete ? "赛季已完赛" : "等待终局"}</span></section>${complete ? `<section class="podium-board">${podiumPlace(table[1], "second", "亚军")}${podiumPlace(table[0], "first", "冠军")}${podiumPlace(table[2], "third", "季军")}</section>${posterExport(table)}` : `<section class="podium-pending"><b>${finishedCount()} / 15</b><span>终局前，所有排名都是实时名次。</span><button class="button button--black" data-view="scores">继续录分</button></section>`}${footer()}</main>`;
   }
   function render() {
     const views = { home: homeView, roster: rosterView, schedule: scheduleView, scores: scoresView, stats: statsView, podium: podiumView };
@@ -131,6 +199,10 @@
     });
     const clear = document.getElementById("clear-score");
     if (clear) clear.addEventListener("click", () => { const match = selectedMatch(); if (result(match) && confirm("确认清除本场比分？")) { delete state.scores[match.id]; saveState(); render(); } });
+    const exportPoster = document.getElementById("export-poster");
+    if (exportPoster) exportPoster.addEventListener("click", downloadResultPoster);
+    const sharePoster = document.getElementById("share-poster");
+    if (sharePoster) sharePoster.addEventListener("click", shareResultPoster);
   }
   render();
 })();
