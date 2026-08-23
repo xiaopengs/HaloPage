@@ -34,8 +34,10 @@
      全局重置
      ================================================================ */
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden}
+  html{height:100%}
+  html,body{overflow-x:hidden}
   body{
+    min-height:100%;
     font-family:'Archivo',"Noto Serif SC","Source Han Serif SC","SimSun","STSong",serif;
     background:var(--bg);
     -webkit-font-smoothing:antialiased;
@@ -46,20 +48,25 @@
      舞台 / Stage
      ================================================================ */
   .stage{
-    position:fixed;inset:0;
+    position:relative;
+    background:linear-gradient(180deg,#000 0%,var(--bg) 100vh);
+  }
+  /* 首屏视频区：铺满视口，人物完整可见 */
+  .hero{
+    position:relative;
+    height:100vh;
+    min-height:560px;
     overflow:hidden;
     background:#000;
   }
-  video.hero{
-    position:absolute;inset:0;width:100%;height:100%;
+  video.hero-video{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;pointer-events:none;transform:translateZ(0);
   }
   .veil{
     position:absolute;inset:0;pointer-events:none;
     background:
-      linear-gradient(180deg, rgba(8,8,8,.55) 0%, rgba(8,8,8,0) 25%, rgba(8,8,8,0) 55%, rgba(8,8,8,.70) 100%),
-      radial-gradient(120% 90% at 70% 35%, rgba(0,0,0,0) 40%, rgba(6,6,6,.55) 100%),
-      linear-gradient(90deg, rgba(6,6,6,.65) 0%, rgba(6,6,6,.20) 40%, rgba(6,6,6,0) 60%);
+      linear-gradient(180deg, rgba(8,8,8,.45) 0%, rgba(8,8,8,0) 28%, rgba(8,8,8,0) 62%, rgba(8,8,8,.55) 100%),
+      linear-gradient(90deg, rgba(6,6,6,.40) 0%, rgba(6,6,6,0) 30%, rgba(6,6,6,0) 70%, rgba(6,6,6,.35) 100%);
   }
   .grain{
     position:absolute;inset:-50%;pointer-events:none;opacity:.04;
@@ -214,17 +221,17 @@
   @keyframes fadeIn{from{opacity:0}to{opacity:.85}}
 
   /* ================================================================
-     Dashboard 仪表盘 (中间 4 列)
+     Dashboard 仪表盘 (视频下方延伸区, 4 列)
      ================================================================ */
   .dashboard{
-    position:absolute;z-index:12;
-    left:44px;right:44px;
-    bottom:132px;
+    position:relative;z-index:12;
+    max-width:1560px;margin:0 auto;
+    padding:64px 44px 0;
     display:grid;grid-template-columns:1.1fr 1fr 1.15fr .9fr;
     gap:16px;
-    height:230px;
     opacity:0;animation:fadeUp 1s .55s cubic-bezier(.19,1,.22,1) forwards;
   }
+  .dash-col{height:240px}
   .dash-col{
     background:var(--surface);
     border:1px solid var(--surface-border);
@@ -409,15 +416,14 @@
   .skill-status.building{color:var(--building);background:rgba(138,122,90,.10)}
 
   /* ================================================================
-     底部区域 (3 列)
+     底部区域 (3 列, 视频下方延伸区)
      ================================================================ */
   .bottom-section{
-    position:absolute;z-index:12;
-    left:44px;right:44px;
-    bottom:44px;
+    position:relative;z-index:12;
+    max-width:1560px;margin:0 auto;
+    padding:36px 44px 8px;
     display:grid;grid-template-columns:1.1fr 1.3fr .9fr;
     gap:16px;
-    height:72px;
     opacity:0;animation:fadeUp 1s .7s cubic-bezier(.19,1,.22,1) forwards;
   }
   .bot-col{
@@ -484,11 +490,10 @@
      Footer
      ================================================================ */
   .footer{
-    position:absolute;z-index:12;
-    left:44px;right:44px;
-    bottom:8px;
+    position:relative;z-index:12;
+    max-width:1560px;margin:0 auto;
     display:flex;align-items:center;justify-content:space-between;
-    padding-top:8px;
+    padding:24px 44px 36px;
     border-top:1px solid rgba(200,169,122,.06);
     opacity:0;animation:fadeUp 1s .9s cubic-bezier(.19,1,.22,1) forwards;
   }
@@ -574,13 +579,17 @@
      响应式兜底
      ================================================================ */
   @media (max-width:1200px){
-    .dashboard{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:460px;bottom:120px}
-    .bottom-section{grid-template-columns:1fr 1fr 1fr}
+    .dashboard{grid-template-columns:1fr 1fr;padding:48px 24px 0;gap:12px}
+    .dash-col{height:230px}
+    .bottom-section{grid-template-columns:1fr 1fr 1fr;padding:28px 24px 8px;gap:12px}
+    .footer{padding:20px 24px 30px}
     .hero-motto{right:20px;font-size:28px}
   }
   @media (max-width:900px){
-    .dashboard{left:20px;right:20px;gap:10px}
-    .bottom-section{left:20px;right:20px;gap:10px}
+    .dashboard{grid-template-columns:1fr;padding:36px 16px 0;gap:12px}
+    .dash-col{height:auto;min-height:190px}
+    .bottom-section{grid-template-columns:1fr;padding:24px 16px 8px;gap:18px}
+    .footer{flex-direction:column;gap:10px;text-align:center;padding:18px 16px 28px}
     .hero-section{left:20px}
     .topbar{padding:16px 20px}
     .nav{gap:14px}
@@ -594,8 +603,13 @@
      ================================================================ -->
 <div class="stage">
 
+  <!-- ================================================================
+       首屏视频区 (铺满首屏，人物完整可见)
+       ================================================================ -->
+  <div class="hero">
+
   <!-- 视频背景 -->
-  <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
+  <video id="heroVideo" class="hero-video" muted playsinline webkit-playsinline preload="auto"
          poster="assets/poster.jpg?v=20260823"
          disablepictureinpicture></video>
   <div class="veil"></div>
@@ -651,6 +665,8 @@
     入山海<br>见众生
     <span class="seal">云舟</span>
   </div>
+
+  </div><!-- /hero -->
 
   <!-- ================================================================
        Dashboard 仪表盘 (4 列)
