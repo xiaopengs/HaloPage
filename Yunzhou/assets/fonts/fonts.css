@@ -1,3 +1,12 @@
+/* 行楷字体 (hero-motto 竖排书法字, 志莽行书子集) */
+@font-face {
+  font-family: 'Xingkai';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./xingkai.woff2) format('woff2');
+}
+
 /* vietnamese */
 @font-face {
   font-family: 'Archivo';

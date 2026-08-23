@@ -204,11 +204,23 @@
     writing-mode:vertical-rl;
     text-orientation:upright;
     font-size:clamp(32px,3.5vw,52px);
-    font-weight:900;letter-spacing:.35em;
+    font-weight:400;letter-spacing:.35em;
     color:var(--ink);opacity:.85;
     text-shadow:0 4px 20px rgba(0,0,0,.5);
-    font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif;
+    font-family:'Xingkai',"Noto Serif SC","Source Han Serif SC","SimSun",serif;
     opacity:0;animation:fadeIn 1.2s .8s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  /* 入山海：橙色 + 左移 200px 靠近中间 */
+  .hero-motto .motto-ru{
+    display:block;
+    color:var(--amber,#ff8a3c);
+    text-shadow:0 4px 24px rgba(255,138,60,.45);
+    transform:translateX(-200px);
+  }
+  /* 见众生：下移 200px */
+  .hero-motto .motto-jian{
+    display:block;
+    transform:translateY(200px);
   }
   .hero-motto .seal{
     display:block;width:28px;height:28px;margin-top:16px;
@@ -662,7 +674,8 @@
 
   <!-- 右侧竖排书法字 -->
   <div class="hero-motto">
-    入山海<br>见众生
+    <span class="motto-ru">入山海</span>
+    <span class="motto-jian">见众生</span>
     <span class="seal">云舟</span>
   </div>
 
