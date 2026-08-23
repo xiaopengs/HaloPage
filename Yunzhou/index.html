@@ -3,42 +3,66 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>云舟 · 个人作品集</title>
+<title>云舟 CLOUD BOAT / 01 — PERSONAL AGENT WORLD</title>
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <style>
+  /* ================================================================
+     设计令牌 / Design Tokens
+     ================================================================ */
   :root{
-    /* 晚霞暖色调色板 */
-    --amber:#ff8a3c;
-    --ember:#e0552f;
-    --gold:#f2b25c;
-    --sage:#8fae7d;
-    --crimson:#e06a5a;
-    --ink:#fff7ee;
-    --glass:rgba(20,12,8,.32);
-    --glass-brd:rgba(255,220,180,.22);
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    font-family:'Archivo',"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-    background:#0b0e14; overflow:hidden; -webkit-font-smoothing:antialiased;
+    --gold:#c8a97a;
+    --gold-dim:#8a7a5a;
+    --gold-bright:#e8d5a8;
+    --gold-glow:rgba(200,169,122,.25);
+    --bg:#080808;
+    --surface:rgba(18,18,18,.72);
+    --surface-hover:rgba(24,24,24,.85);
+    --surface-border:rgba(200,169,122,.10);
+    --surface-border-hover:rgba(200,169,122,.22);
+    --text:#e8e0d5;
+    --text-secondary:rgba(200,190,175,.50);
+    --text-tertiary:rgba(200,190,175,.30);
+    --glass:rgba(16,16,16,.55);
+    --glass-border:rgba(200,169,122,.12);
+    --active:#c8a97a;
+    --building:#8a7a5a;
+    --running:#c8a97a;
+    --ink:#e8e0d5;
   }
 
-  /* ---------- 舞台 ---------- */
-  .stage{position:fixed; inset:0; border-radius:28px; overflow:hidden; background:#000}
+  /* ================================================================
+     全局重置
+     ================================================================ */
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:'Archivo',"Noto Serif SC","Source Han Serif SC","SimSun","STSong",serif;
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    color:var(--text);
+  }
+
+  /* ================================================================
+     舞台 / Stage
+     ================================================================ */
+  .stage{
+    position:fixed;inset:0;
+    overflow:hidden;
+    background:#000;
+  }
   video.hero{
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:cover; pointer-events:none; transform:translateZ(0);
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;pointer-events:none;transform:translateZ(0);
   }
   .veil{
-    position:absolute; inset:0; pointer-events:none;
+    position:absolute;inset:0;pointer-events:none;
     background:
-      linear-gradient(180deg, rgba(8,6,10,.4) 0%, rgba(8,6,10,0) 22%, rgba(8,6,10,0) 60%, rgba(8,6,10,.55) 100%),
-      radial-gradient(120% 90% at 66% 40%, rgba(0,0,0,0) 44%, rgba(6,4,8,.4) 100%),
-      linear-gradient(90deg, rgba(6,4,8,.52) 0%, rgba(6,4,8,.14) 44%, rgba(6,4,8,0) 62%);
+      linear-gradient(180deg, rgba(8,8,8,.55) 0%, rgba(8,8,8,0) 25%, rgba(8,8,8,0) 55%, rgba(8,8,8,.70) 100%),
+      radial-gradient(120% 90% at 70% 35%, rgba(0,0,0,0) 40%, rgba(6,6,6,.55) 100%),
+      linear-gradient(90deg, rgba(6,6,6,.65) 0%, rgba(6,6,6,.20) 40%, rgba(6,6,6,0) 60%);
   }
   .grain{
-    position:absolute; inset:-50%; pointer-events:none; opacity:.05;
+    position:absolute;inset:-50%;pointer-events:none;opacity:.04;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     animation:grain 7s steps(6) infinite;
   }
@@ -47,312 +71,852 @@
     40%{transform:translate(3%,-4%)} 60%{transform:translate(-3%,-2%)} 80%{transform:translate(4%,2%)}
   }
 
-  /* ---------- 顶栏 ---------- */
+  /* ================================================================
+     顶栏 / Topbar
+     ================================================================ */
   .topbar{
-    position:absolute; top:0; left:0; right:0; z-index:10;
-    display:flex; align-items:center; justify-content:flex-start; gap:26px; padding:24px 38px;
+    position:absolute;top:0;left:0;right:0;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 44px;
+    opacity:0;animation:fadeUp .8s .15s cubic-bezier(.19,1,.22,1) forwards;
   }
+  .topbar-left{display:flex;align-items:center;gap:32px}
   .brand{
-    color:var(--ink); font-weight:900; letter-spacing:.42em; font-size:15px;
-    display:flex; align-items:center; gap:12px; text-shadow:0 2px 18px rgba(0,0,0,.4);
+    display:flex;align-items:center;gap:10px;
+    color:var(--ink);font-weight:900;letter-spacing:.32em;font-size:14px;
+    text-shadow:0 2px 14px rgba(0,0,0,.5);
   }
-  .brand i{font-style:normal; font-size:19px; letter-spacing:0; color:var(--amber)}
+  .brand i{
+    font-style:normal;font-size:18px;letter-spacing:0;color:var(--gold);
+    display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;
+  }
+  .brand small{
+    font-size:9px;letter-spacing:.2em;color:var(--text-secondary);
+    font-weight:600;margin-left:4px;
+  }
   .nav{
-    display:flex; gap:6px; padding:7px 10px;
-    background:var(--glass); border:1px solid var(--glass-brd);
-    border-radius:999px; backdrop-filter:blur(18px) saturate(1.4);
-    -webkit-backdrop-filter:blur(18px) saturate(1.4);
+    display:flex;gap:28px;
   }
   .nav a{
-    color:var(--ink); text-decoration:none; font-size:13px; font-weight:700;
-    padding:8px 18px; border-radius:999px; letter-spacing:.08em;
-    transition:background .3s cubic-bezier(.22,1,.36,1);
-  }
-  .nav a:hover{background:rgba(255,255,255,.18)}
-
-  /* ---------- 主文案：第一版文字，单行，位置上移 ---------- */
-  .hero-copy{
-    position:absolute; z-index:10; left:52px; top:15%;
-    max-width:min(62vw,900px);
-  }
-  .badge{
-    display:inline-flex; align-items:center; gap:8px;
-    font-size:12px; font-weight:700; letter-spacing:.22em; color:var(--ink);
-    background:var(--glass); border:1px solid var(--glass-brd);
-    padding:9px 18px; border-radius:999px;
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    margin-bottom:24px; opacity:0; animation:fadeUp .9s .2s cubic-bezier(.19,1,.22,1) forwards;
-  }
-  .badge b{color:var(--amber); font-weight:900}
-  h1{
-    color:var(--ink); font-weight:900;
-    font-size:clamp(38px, 4.6vw, 68px);
-    line-height:1.1; letter-spacing:.06em; white-space:nowrap;
-    text-shadow:0 10px 44px rgba(0,0,0,.4);
-    opacity:0; animation:fadeUp 1s .38s cubic-bezier(.19,1,.22,1) forwards;
-  }
-  @keyframes fadeUp{from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:translateY(0)}}
-  h1 .accent{color:var(--amber)}
-  h1 .script{
-    font-family:'Caveat',cursive; font-weight:600;
-    font-size:.44em; letter-spacing:0; color:#ffd9a8;
-    vertical-align:.16em; margin-left:.5em;
-    text-shadow:0 4px 20px rgba(0,0,0,.45);
-    transform:rotate(-4deg); display:inline-block;
-  }
-
-  /* ---------- 左侧卡片矩阵（2行2列 · 统一尺寸 · 3D悬浮） ---------- */
-  .drawer{
-    position:absolute; z-index:11;
-    left:52px; bottom:48px;
-    width:min(560px, 44vw);
-    display:grid; grid-template-columns:1fr 1fr; gap:18px;
-    perspective:1200px;
-    opacity:0; animation:fadeUp 1s .9s cubic-bezier(.19,1,.22,1) forwards;
-  }
-  .card{
-    --c1:var(--amber); --c2:var(--ember);
+    color:var(--text-secondary);text-decoration:none;
+    font-size:11px;font-weight:700;letter-spacing:.12em;
+    transition:color .3s;
     position:relative;
-    height:196px;
-    border-radius:20px; padding:18px 20px;
-    background:linear-gradient(160deg, rgba(32,20,12,.72), rgba(15,10,8,.78));
-    border:1px solid rgba(255,220,180,.18);
-    backdrop-filter:blur(20px) saturate(1.3);
-    -webkit-backdrop-filter:blur(20px) saturate(1.3);
-    box-shadow:0 18px 44px rgba(0,0,0,.45);
-    cursor:pointer; overflow:hidden;
-    transform-style:preserve-3d;
-    transition:border-color .4s, box-shadow .5s;
-    will-change:transform;
+    font-family:'Archivo',sans-serif;
   }
-  .card:hover{
-    border-color:color-mix(in srgb, var(--c1) 60%, transparent);
-    box-shadow:0 28px 64px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--c1) 30%, transparent);
+  .nav a:hover{color:var(--gold)}
+  .nav a::after{
+    content:"";position:absolute;bottom:-4px;left:0;width:0;height:1px;
+    background:var(--gold);transition:width .3s;
   }
-  /* 卡内氛围光 */
-  .card::before{
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background:
-      radial-gradient(120% 90% at 15% -10%, color-mix(in srgb, var(--c1) 30%, transparent) 0%, transparent 55%),
-      radial-gradient(100% 80% at 98% 112%, color-mix(in srgb, var(--c2) 24%, transparent) 0%, transparent 60%);
+  .nav a:hover::after{width:100%}
+  .nav a .nav-cn{display:block;font-size:11px;margin-bottom:2px;color:var(--text)}
+  .nav a .nav-en{font-size:9px;color:var(--text-secondary);letter-spacing:.14em}
+
+  .topbar-right{
+    display:flex;align-items:center;gap:18px;
+    font-size:11px;letter-spacing:.1em;
   }
-  .card::after{
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
-    background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),
-      color-mix(in srgb, var(--c1) 26%, transparent) 0%, transparent 65%);
-    transition:opacity .35s;
+  .online-indicator{
+    display:flex;align-items:center;gap:6px;
+    color:var(--text-secondary);
   }
-  .card:hover::after{opacity:1}
-  .card .glowline{
-    position:absolute; top:0; left:16%; right:16%; height:2px; border-radius:2px;
-    background:linear-gradient(90deg, transparent, var(--c1), transparent); opacity:.8;
+  .online-indicator::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 6px var(--gold-glow);
+    animation:pulse-dot 2.5s infinite;
   }
-  .card .head{display:flex; align-items:center; gap:14px}
-  .card .icon{
-    width:42px; height:42px; border-radius:13px; flex:none;
-    display:grid; place-items:center; font-size:20px;
-    background:linear-gradient(150deg, color-mix(in srgb, var(--c1) 34%, rgba(0,0,0,.4)), rgba(0,0,0,.25));
-    border:1px solid color-mix(in srgb, var(--c1) 44%, transparent);
-    box-shadow:0 8px 20px color-mix(in srgb, var(--c1) 26%, transparent);
+  @keyframes pulse-dot{
+    0%,100%{opacity:1} 50%{opacity:.4}
   }
-  .card h3{
-    color:var(--ink); font-size:16px; font-weight:900; letter-spacing:.04em;
-    display:flex; flex-direction:column; gap:3px;
+  .clock{
+    color:var(--text-secondary);font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.05em;
   }
-  .card h3 small{
-    font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:700;
-    color:color-mix(in srgb, var(--c1) 88%, #fff); letter-spacing:.16em;
+
+  /* ================================================================
+     Hero 区域
+     ================================================================ */
+  .hero-section{
+    position:absolute;z-index:10;
+    left:44px;top:14%;
+    max-width:520px;
+    opacity:0;animation:fadeUp 1s .3s cubic-bezier(.19,1,.22,1) forwards;
   }
-  .card p{
-    margin-top:12px; color:rgba(255,244,230,.74);
-    font-size:12px; line-height:1.7; letter-spacing:.03em;
+  .hero-title-main{
+    font-size:clamp(42px,5vw,64px);
+    font-weight:900;letter-spacing:.28em;
+    color:var(--ink);line-height:1.1;
+    text-shadow:0 8px 32px rgba(0,0,0,.5);
+    font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  }
+  .hero-sub-brand{
+    font-size:11px;letter-spacing:.25em;color:var(--gold);
+    margin-top:10px;font-weight:700;
+    font-family:'Archivo',sans-serif;
+  }
+  .hero-heading{
+    margin-top:18px;
+    font-size:clamp(28px,3.2vw,42px);
+    font-weight:900;line-height:1.15;letter-spacing:.04em;
+    color:var(--ink);text-transform:uppercase;
+    text-shadow:0 6px 24px rgba(0,0,0,.45);
+    font-family:'Archivo',sans-serif;
+  }
+  .hero-desc{
+    margin-top:14px;
+    font-size:12.5px;line-height:1.8;
+    color:var(--text-secondary);letter-spacing:.06em;
+    max-width:380px;
+  }
+  .hero-stats{
+    display:flex;gap:32px;margin-top:28px;
+  }
+  .hero-stat{
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .hero-stat .num{
+    font-size:28px;font-weight:900;color:var(--gold);
+    font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;
+    line-height:1;
+  }
+  .hero-stat .label{
+    font-size:9px;color:var(--text-tertiary);letter-spacing:.14em;
+    font-weight:700;
+    font-family:'Archivo',sans-serif;
+  }
+  .hero-stat-divider{
+    width:1px;background:rgba(200,169,122,.15);align-self:stretch;margin:4px 0;
+  }
+
+  /* 右侧竖排书法字 */
+  .hero-motto{
+    position:absolute;z-index:10;
+    right:44px;top:18%;
+    writing-mode:vertical-rl;
+    text-orientation:upright;
+    font-size:clamp(32px,3.5vw,52px);
+    font-weight:900;letter-spacing:.35em;
+    color:var(--ink);opacity:.85;
+    text-shadow:0 4px 20px rgba(0,0,0,.5);
+    font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif;
+    opacity:0;animation:fadeIn 1.2s .8s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .hero-motto .seal{
+    display:block;width:28px;height:28px;margin-top:16px;
+    border:1.5px solid rgba(200,169,122,.35);
+    font-size:10px;color:var(--gold-dim);letter-spacing:0;
+    display:flex;align-items:center;justify-content:center;
+    writing-mode:horizontal-tb;
+    opacity:.6;
+  }
+  @keyframes fadeIn{from{opacity:0}to{opacity:.85}}
+
+  /* ================================================================
+     Dashboard 仪表盘 (中间 4 列)
+     ================================================================ */
+  .dashboard{
+    position:absolute;z-index:12;
+    left:44px;right:44px;
+    bottom:132px;
+    display:grid;grid-template-columns:1.1fr 1fr 1.15fr .9fr;
+    gap:16px;
+    height:230px;
+    opacity:0;animation:fadeUp 1s .55s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .dash-col{
+    background:var(--surface);
+    border:1px solid var(--surface-border);
+    border-radius:14px;
+    padding:16px 18px;
+    backdrop-filter:blur(16px) saturate(1.2);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);
+    position:relative;overflow:hidden;
+    transition:border-color .4s,background .4s;
+  }
+  .dash-col:hover{
+    border-color:var(--surface-border-hover);
+    background:var(--surface-hover);
+  }
+  .dash-col::before{
+    content:"";position:absolute;top:0;left:12%;right:12%;height:1.5px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    opacity:.5;
+  }
+  .col-header{
+    font-size:10px;font-weight:700;letter-spacing:.12em;
+    color:var(--text-secondary);text-transform:uppercase;
+    margin-bottom:2px;
+    font-family:'Archivo',sans-serif;
+  }
+  .col-subheader{
+    font-size:10px;color:var(--text-tertiary);letter-spacing:.08em;
+    margin-bottom:12px;
+  }
+
+  /* --- PROJECT MAP: 雷达图 --- */
+  .radar-wrap{
+    display:flex;align-items:center;justify-content:center;
+    height:calc(100% - 36px);
+  }
+  .radar-svg{width:100%;height:100%;max-height:170px}
+  .radar-grid{fill:none;stroke:rgba(200,169,122,.12);stroke-width:.5}
+  .radar-axis{fill:none;stroke:rgba(200,169,122,.08);stroke-width:.5}
+  .radar-area{fill:rgba(200,169,122,.08);stroke:var(--gold);stroke-width:1.2}
+  .radar-point{fill:var(--gold);r:3}
+  .radar-label{
+    font-size:8px;fill:var(--text-secondary);
+    font-family:'Archivo',sans-serif;letter-spacing:.05em;
+  }
+  .radar-label-cn{
+    font-size:7.5px;fill:var(--text-tertiary);
+    font-family:"Noto Serif SC",serif;
+  }
+
+  /* --- CURRENTLY MOVING: 进度条 --- */
+  .task-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .task-item{display:flex;align-items:center;gap:12px}
+  .task-num{
+    font-size:26px;font-weight:900;color:var(--gold);
+    font-family:'JetBrains Mono',monospace;min-width:36px;
+    line-height:1;letter-spacing:-.02em;
+  }
+  .task-body{flex:1;display:flex;flex-direction:column;gap:3px}
+  .task-title{
+    font-size:10px;color:var(--text-secondary);letter-spacing:.04em;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .task-title .en{font-size:8.5px;color:var(--text-tertiary);letter-spacing:.06em}
+  .task-bar{
+    height:2px;background:rgba(200,169,122,.10);border-radius:1px;overflow:hidden;
+  }
+  .task-bar i{
+    display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));
+    border-radius:1px;transition:width 1.2s cubic-bezier(.22,1,.36,1);
+    width:0;
+  }
+  .task-item.loaded .task-bar i{width:var(--pw)}
+
+  /* --- DIGITAL AGENTS: YOYO 卡片 --- */
+  .agent-card{
+    display:flex;align-items:center;gap:14px;height:calc(100% - 36px);
+  }
+  .agent-info{flex:1;display:flex;flex-direction:column;gap:8px}
+  .agent-name{
+    font-size:22px;font-weight:900;color:var(--gold);letter-spacing:.08em;
+    font-family:'Archivo',sans-serif;line-height:1;
+  }
+  .agent-role{
+    font-size:9px;color:var(--text-tertiary);letter-spacing:.12em;
+    font-family:'Archivo',sans-serif;
+  }
+  .agent-skills{
+    display:flex;flex-direction:column;gap:4px;
+    margin-top:4px;
+  }
+  .agent-skill{
+    font-size:10.5px;color:var(--text-secondary);letter-spacing:.02em;
+    display:flex;align-items:center;gap:6px;
+  }
+  .agent-skill::before{
+    content:"";width:3px;height:3px;border-radius:50%;background:var(--gold-dim);
+  }
+  .agent-status{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:9px;color:var(--gold);letter-spacing:.1em;
+    margin-top:4px;font-family:'Archivo',sans-serif;
+  }
+  .agent-status::before{
+    content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);
+    animation:pulse-dot 2s infinite;
+  }
+  /* YOYO CSS 头像 */
+  .agent-avatar{
+    width:80px;height:100px;flex:none;
+    display:flex;align-items:center;justify-content:center;
     position:relative;
   }
-  .card .metric{
-    margin-top:12px; display:flex; align-items:baseline; gap:7px;
-    font-family:'JetBrains Mono',monospace; position:relative;
+  .yoyo-face{
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(160deg,#1a1a1a,#0d0d0d);
+    border:1.5px solid rgba(200,169,122,.25);
+    position:relative;
+    box-shadow:0 4px 20px rgba(0,0,0,.5),inset 0 1px 2px rgba(200,169,122,.1);
   }
-  .card .metric b{font-size:19px; font-weight:700; color:var(--c1)}
-  .card .metric span{font-size:10.5px; color:rgba(255,244,230,.55); letter-spacing:.1em}
-  /* 四卡配色：各取晚霞一抹 */
-  .card.perf{--c1:var(--amber);  --c2:var(--ember)}
-  .card.edge{--c1:var(--gold);   --c2:#c98a3a}
-  .card.os  {--c1:var(--sage);   --c2:#4a6b4f}
-  .card.yoyo{--c1:var(--crimson);--c2:#a83a3a}
+  .yoyo-eyes{
+    position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);
+    display:flex;gap:10px;
+  }
+  .yoyo-eye{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--gold-bright);
+    box-shadow:0 0 8px var(--gold),0 0 16px rgba(200,169,122,.3);
+    animation:yoyo-blink 4s infinite;
+  }
+  @keyframes yoyo-blink{0%,48%,52%,100%{transform:scaleY(1)}50%{transform:scaleY(.1)}}
+  .yoyo-hat{
+    position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+    width:0;height:0;
+    border-left:30px solid transparent;
+    border-right:30px solid transparent;
+    border-bottom:22px solid rgba(30,30,30,.9);
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  }
+  .yoyo-hat::after{
+    content:"";position:absolute;top:20px;left:-10px;width:20px;height:3px;
+    background:rgba(200,169,122,.3);border-radius:1px;
+  }
+  .yoyo-body{
+    position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+    width:36px;height:28px;
+    background:linear-gradient(180deg,#1f1f1f,#141414);
+    border-radius:8px 8px 4px 4px;
+    border:1px solid rgba(200,169,122,.15);
+  }
+  .yoyo-collar{
+    position:absolute;top:-3px;left:50%;transform:translateX(-50%);
+    width:20px;height:6px;background:rgba(200,169,122,.25);
+    border-radius:3px;
+  }
 
-  /* ---------- 右上提示 ---------- */
-  .hint{
-    position:absolute; right:40px; top:96px; z-index:10;
-    display:flex; align-items:center; gap:12px;
-    background:var(--glass); border:1px solid var(--glass-brd);
-    color:#ffe9d2; font-size:12.5px; font-weight:700; letter-spacing:.12em;
-    padding:13px 22px; border-radius:999px;
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    opacity:0; animation:fadeUp 1s 1.3s cubic-bezier(.19,1,.22,1) forwards;
+  /* --- SKILLS LIBRARY --- */
+  .skill-list{display:flex;flex-direction:column;gap:0;margin-top:4px}
+  .skill-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 0;border-bottom:1px solid rgba(200,169,122,.06);
   }
-  .hint .hint-touch{display:none}
-  .hint .pulse{
-    width:8px; height:8px; border-radius:50%; background:var(--amber);
-    box-shadow:0 0 0 0 rgba(255,138,60,.7); animation:pulse 2.2s infinite;
+  .skill-item:last-child{border-bottom:none}
+  .skill-num{
+    font-size:24px;font-weight:900;color:var(--gold);
+    font-family:'JetBrains Mono',monospace;min-width:28px;
+    line-height:1;opacity:.8;
   }
-  @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(255,138,60,.65)}
-    70%{box-shadow:0 0 0 12px rgba(255,138,60,0)}
-    100%{box-shadow:0 0 0 0 rgba(255,138,60,0)}
+  .skill-body{flex:1;display:flex;flex-direction:column;gap:1px}
+  .skill-name{
+    font-size:11px;font-weight:700;color:var(--text);letter-spacing:.04em;
+    font-family:'Archivo',sans-serif;
+  }
+  .skill-cat{
+    font-size:8.5px;color:var(--text-tertiary);letter-spacing:.06em;
+    font-family:'Archivo',sans-serif;
+  }
+  .skill-status{
+    font-size:8px;font-weight:700;letter-spacing:.1em;padding:2px 6px;
+    border-radius:3px;font-family:'Archivo',sans-serif;
+  }
+  .skill-status.active{color:var(--gold);background:rgba(200,169,122,.10)}
+  .skill-status.building{color:var(--building);background:rgba(138,122,90,.10)}
+
+  /* ================================================================
+     底部区域 (3 列)
+     ================================================================ */
+  .bottom-section{
+    position:absolute;z-index:12;
+    left:44px;right:44px;
+    bottom:44px;
+    display:grid;grid-template-columns:1.1fr 1.3fr .9fr;
+    gap:16px;
+    height:72px;
+    opacity:0;animation:fadeUp 1s .7s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .bot-col{
+    display:flex;flex-direction:column;justify-content:center;
+    padding:0 4px;
+  }
+  .bot-header{
+    font-size:9.5px;font-weight:700;letter-spacing:.1em;
+    color:var(--text-secondary);text-transform:uppercase;
+    margin-bottom:8px;font-family:'Archivo',sans-serif;
+  }
+  .bot-header .cn{font-size:9px;color:var(--text-tertiary);margin-left:6px;letter-spacing:.06em}
+
+  /* BUSINESS */
+  .biz-list{display:flex;gap:18px}
+  .biz-item{display:flex;align-items:center;gap:8px}
+  .biz-num{
+    font-size:22px;font-weight:900;color:var(--gold);
+    font-family:'JetBrains Mono',monospace;line-height:1;
+  }
+  .biz-body{display:flex;flex-direction:column;gap:1px}
+  .biz-name{font-size:9.5px;font-weight:700;color:var(--text);letter-spacing:.04em;font-family:'Archivo',sans-serif}
+  .biz-status{font-size:8px;letter-spacing:.08em;font-family:'Archivo',sans-serif}
+  .biz-status.active{color:var(--gold)}
+  .biz-status.building{color:var(--building)}
+  .biz-status.running{color:var(--running)}
+
+  /* SYSTEM STATUS */
+  .sys-row{display:flex;align-items:center;gap:20px}
+  .sys-metric{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .sys-metric .num{
+    font-size:20px;font-weight:900;color:var(--text);
+    font-family:'JetBrains Mono',monospace;line-height:1;
+  }
+  .sys-metric .label{
+    font-size:7.5px;color:var(--text-tertiary);letter-spacing:.1em;
+    font-family:'Archivo',sans-serif;
+  }
+  .sys-wave{
+    flex:1;height:32px;position:relative;
+  }
+  .sys-wave canvas{width:100%;height:100%}
+  .sys-time{
+    display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .sys-time .time{font-size:14px;font-weight:700;color:var(--text);letter-spacing:.02em}
+  .sys-time .loc{font-size:8px;color:var(--text-tertiary);letter-spacing:.08em}
+
+  /* THE WORLD IS MOVING */
+  .world-text{
+    text-align:right;
+  }
+  .world-text h4{
+    font-size:18px;font-weight:900;color:var(--text);letter-spacing:.06em;
+    line-height:1.2;font-family:'Archivo',sans-serif;
+  }
+  .world-text p{
+    font-size:10px;color:var(--text-tertiary);letter-spacing:.06em;
+    margin-top:4px;
   }
 
-  /* ---------- 鼠标跟随光斑 ---------- */
+  /* ================================================================
+     Footer
+     ================================================================ */
+  .footer{
+    position:absolute;z-index:12;
+    left:44px;right:44px;
+    bottom:8px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding-top:8px;
+    border-top:1px solid rgba(200,169,122,.06);
+    opacity:0;animation:fadeUp 1s .9s cubic-bezier(.19,1,.22,1) forwards;
+  }
+  .footer-left{
+    font-size:9px;color:var(--text-tertiary);letter-spacing:.08em;
+    font-family:'Archivo',sans-serif;
+  }
+  .footer-left strong{color:var(--text-secondary);font-weight:700}
+  .footer-nav{
+    display:flex;gap:20px;
+  }
+  .footer-nav a{
+    font-size:9px;color:var(--text-tertiary);text-decoration:none;
+    letter-spacing:.06em;transition:color .3s;
+    font-family:'Archivo',sans-serif;
+  }
+  .footer-nav a:hover{color:var(--gold)}
+  .footer-right{
+    display:flex;align-items:center;gap:10px;
+    font-size:8.5px;color:var(--text-tertiary);letter-spacing:.04em;
+    font-family:'Archivo',sans-serif;
+  }
+  .footer-seal{
+    width:16px;height:16px;border:1px solid rgba(200,169,122,.25);
+    display:flex;align-items:center;justify-content:center;
+    font-size:7px;color:var(--gold-dim);
+  }
+
+  /* ================================================================
+     鼠标跟随光斑
+     ================================================================ */
   .cursor-glow{
-    position:fixed; z-index:60; left:0; top:0;
-    width:340px; height:340px; margin:-170px 0 0 -170px;
-    border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(255,178,110,.20) 0%, rgba(255,138,60,.07) 42%, rgba(255,138,60,0) 68%);
-    mix-blend-mode:screen; will-change:transform;
+    position:fixed;z-index:60;left:0;top:0;
+    width:340px;height:340px;margin:-170px 0 0 -170px;
+    border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(200,169,122,.14) 0%, rgba(200,169,122,.05) 42%, rgba(200,169,122,0) 68%);
+    mix-blend-mode:screen;will-change:transform;
   }
   .cursor-dot{
-    position:fixed; z-index:61; left:0; top:0;
-    width:10px; height:10px; margin:-5px 0 0 -5px;
-    border-radius:50%; pointer-events:none;
-    background:#fff; mix-blend-mode:difference; will-change:transform;
+    position:fixed;z-index:61;left:0;top:0;
+    width:10px;height:10px;margin:-5px 0 0 -5px;
+    border-radius:50%;pointer-events:none;
+    background:#fff;mix-blend-mode:difference;will-change:transform;
   }
 
-  /* ---------- 载入遮罩 + 进度条 ---------- */
+  /* ================================================================
+     载入遮罩 + 进度条
+     ================================================================ */
   .loader{
-    position:fixed; inset:0; z-index:100; background:rgba(11,14,20,.82);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px;
+    position:fixed;inset:0;z-index:100;background:rgba(8,8,8,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;
     transition:opacity .7s ease, visibility .7s;
   }
-  .loader.done{opacity:0; visibility:hidden}
+  .loader.done{opacity:0;visibility:hidden}
   .loader .title{
-    color:var(--ink); font-size:13px; letter-spacing:.55em; font-weight:700; opacity:.8;
-    text-indent:.55em;
+    color:var(--ink);font-size:13px;letter-spacing:.55em;font-weight:700;opacity:.8;
+    text-indent:.55em;font-family:"Noto Serif SC",serif;
   }
   .loader .bar{
-    width:min(300px,60vw); height:2px; border-radius:2px;
-    background:rgba(255,220,180,.14); overflow:hidden; position:relative;
+    width:min(300px,60vw);height:2px;border-radius:2px;
+    background:rgba(200,169,122,.12);overflow:hidden;position:relative;
   }
   .loader .bar i{
-    position:absolute; left:0; top:0; bottom:0; width:0%;
-    background:linear-gradient(90deg, var(--ember), var(--amber), var(--gold));
-    border-radius:2px; transition:width .3s ease;
-    box-shadow:0 0 14px rgba(255,138,60,.55);
+    position:absolute;left:0;top:0;bottom:0;width:0%;
+    background:linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-bright));
+    border-radius:2px;transition:width .3s ease;
+    box-shadow:0 0 14px rgba(200,169,122,.35);
   }
   .loader .pct{
-    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
-    color:rgba(255,230,205,.55); letter-spacing:.2em;
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;
+    color:rgba(200,190,175,.5);letter-spacing:.1em;
   }
 
-  @media (max-width:1080px){
-    .drawer{width:min(480px,80vw); left:28px; bottom:32px; gap:14px}
-    .card{height:auto; min-height:158px; padding:15px 16px}
-    .card p{margin-top:9px; font-size:11.5px; line-height:1.65}
-    .card .metric{margin-top:9px}
-    .hero-copy{left:28px; top:10%}
-    h1{white-space:normal}
+  /* ================================================================
+     动画关键帧
+     ================================================================ */
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(20px)}
+    to{opacity:1;transform:translateY(0)}
   }
-  /* 手机端：导航收窄横排 + 触摸提示（不隐藏） */
-  @media (max-width:820px){
-    .topbar{padding:18px 22px; gap:16px}
-    .nav{display:flex; gap:3px; padding:5px 6px}
-    .nav a{font-size:11.5px; padding:6px 11px; letter-spacing:.04em}
-    .hint{right:20px; top:84px; font-size:11px; padding:10px 16px}
-    .hint .hint-touch{display:inline}
-    .hint .hint-mouse{display:none}
+
+  /* ================================================================
+     响应式兜底
+     ================================================================ */
+  @media (max-width:1200px){
+    .dashboard{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:460px;bottom:120px}
+    .bottom-section{grid-template-columns:1fr 1fr 1fr}
+    .hero-motto{right:20px;font-size:28px}
   }
-  /* 小屏手机：进一步紧凑，保证 2×2 卡片文字完整显示 */
-  @media (max-width:520px){
-    .cursor-glow,.cursor-dot{display:none}
-    .card{padding:13px 13px; min-height:150px}
-    .card .icon{width:34px; height:34px; border-radius:10px; font-size:16px}
-    .card h3{font-size:14px; letter-spacing:.02em}
-    .card h3 small{font-size:8.5px; letter-spacing:.12em}
-    .card p{font-size:11px; line-height:1.6; margin-top:8px}
-    .card .metric b{font-size:16px}
-    .card .metric span{font-size:9.5px}
-    .drawer{gap:12px; left:20px; bottom:26px}
-    .hero-copy{left:20px; top:9%}
-    .topbar{padding:18px 20px; gap:18px}
-    .brand{font-size:13px; letter-spacing:.34em}
-    h1{font-size:clamp(30px, 9vw, 38px)}
-    .badge{font-size:11px; padding:8px 14px; margin-bottom:16px}
+  @media (max-width:900px){
+    .dashboard{left:20px;right:20px;gap:10px}
+    .bottom-section{left:20px;right:20px;gap:10px}
+    .hero-section{left:20px}
+    .topbar{padding:16px 20px}
+    .nav{gap:14px}
   }
 </style>
 </head>
 <body>
 
-  <div class="stage">
-    <!-- 静音 / playsInline / preload=auto / 不自动播放；时间轴完全由鼠标 X 驱动 -->
-    <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
-           poster="assets/poster.jpg?v=20260822d"
-           disablepictureinpicture></video>
-    <div class="veil"></div>
-    <div class="grain"></div>
+<!-- ================================================================
+     舞台
+     ================================================================ -->
+<div class="stage">
 
-    <header class="topbar">
-      <div class="brand"><i>✦</i>云 舟</div>
+  <!-- 视频背景 -->
+  <video id="heroVideo" class="hero" muted playsinline webkit-playsinline preload="auto"
+         poster="assets/poster.jpg?v=20260823"
+         disablepictureinpicture></video>
+  <div class="veil"></div>
+  <div class="grain"></div>
+
+  <!-- ================================================================
+       顶栏
+       ================================================================ -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand"><i>✦</i>云 舟 <small>CLOUD BOAT</small></div>
       <nav class="nav">
-        <a href="#">作品</a><a href="#">系列</a><a href="#">画册</a><a href="#">关于</a>
+        <a href="#"><span class="nav-cn">项目计划</span><span class="nav-en">PROJECTS</span></a>
+        <a href="#"><span class="nav-cn">数字代理</span><span class="nav-en">AGENTS</span></a>
+        <a href="#"><span class="nav-cn">技能开源</span><span class="nav-en">SKILLS</span></a>
+        <a href="#"><span class="nav-cn">业务链接</span><span class="nav-en">BUSINESS</span></a>
       </nav>
-    </header>
+    </div>
+    <div class="topbar-right">
+      <div class="online-indicator">ONLINE</div>
+      <div class="clock" id="topClock">21:12</div>
+    </div>
+  </header>
 
-    <main class="hero-copy">
-      <div class="badge"><b>✦</b> 个人作品集 · 2026</div>
-      <h1>执剑 <span class="accent">入山海</span> 见众生<em class="script">Portfolio 2026</em></h1>
-    </main>
+  <!-- ================================================================
+       Hero 区域
+       ================================================================ -->
+  <section class="hero-section">
+    <div class="hero-title-main">云 舟</div>
+    <div class="hero-sub-brand">CLOUD BOAT / 01</div>
+    <div class="hero-heading">PERSONAL<br>AGENT<br>WORLD</div>
+    <div class="hero-desc">项目、数字代理、技能与业务<br>的个人操作系统。</div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">04</div>
+        <div class="label">PROJECTS</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="num">12</div>
+        <div class="label">AGENTS</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="num">28</div>
+        <div class="label">SKILLS</div>
+      </div>
+    </div>
+  </section>
 
-    <!-- 抽屉卡片：统一尺寸 · 叠放 · 悬停抽出 -->
-    <section class="drawer" id="drawer">
-      <article class="card perf">
-        <span class="glowline"></span>
-        <div class="head">
-          <div class="icon">⚡</div>
-          <h3>性能功耗 <small>POWER</small></h3>
-        </div>
-        <p>全链路性能剖析与功耗建模，帧率、发热、续航三线合一的极致调优实践。</p>
-        <div class="metric"><b>-38%</b><span>整机功耗优化</span></div>
-      </article>
-      <article class="card edge">
-        <span class="glowline"></span>
-        <div class="head">
-          <div class="icon">◈</div>
-          <h3>端侧计算 <small>ON-DEVICE</small></h3>
-        </div>
-        <p>大模型下沉终端：量化、剪枝与 NPU 调度，让智能在本地实时发生。</p>
-        <div class="metric"><b>17ms</b><span>端侧推理时延</span></div>
-      </article>
-      <article class="card os">
-        <span class="glowline"></span>
-        <div class="head">
-          <div class="icon">❖</div>
-          <h3>Agentic OS <small>AGENT</small></h3>
-        </div>
-        <p>以智能体为内核的操作系统范式：意图理解、任务编排与跨应用执行。</p>
-        <div class="metric"><b>128</b><span>原子能力编排</span></div>
-      </article>
-      <article class="card yoyo">
-        <span class="glowline"></span>
-        <div class="head">
-          <div class="icon">🦞</div>
-          <h3>YOYO 龙虾 <small>MASCOT</small></h3>
-        </div>
-        <p>一只会写代码的龙虾——原创 IP 形象设计、表情包与交互动效全集。</p>
-        <div class="metric"><b>42</b><span>套表情包上线</span></div>
-      </article>
-    </section>
-
-    <div class="hint"><span class="pulse"></span><span class="hint-mouse"> ↔ 左右移动鼠标 · 控制人物转身</span><span class="hint-touch"> ↔ 左右滑动屏幕 · 控制人物转身</span></div>
+  <!-- 右侧竖排书法字 -->
+  <div class="hero-motto">
+    入山海<br>见众生
+    <span class="seal">云舟</span>
   </div>
 
-  <div class="cursor-glow" id="cursorGlow"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
+  <!-- ================================================================
+       Dashboard 仪表盘 (4 列)
+       ================================================================ -->
+  <div class="dashboard" id="dashboard">
 
-  <!-- 载入：简洁进度条 -->
-  <div class="loader" id="loader">
-    <div class="title">江 湖 载 入 中</div>
-    <div class="bar"><i id="barFill"></i></div>
-    <div class="pct" id="pct">0%</div>
+    <!-- PROJECT MAP -->
+    <div class="dash-col project-map">
+      <div class="col-header">PROJECT MAP</div>
+      <div class="col-subheader">正在发生什么</div>
+      <div class="radar-wrap">
+        <svg class="radar-svg" viewBox="0 0 200 170">
+          <!-- 网格 -->
+          <g class="radar-grid">
+            <polygon points="100,25 162,72 140,140 60,140 38,72"/>
+            <polygon points="100,48 143,80 128,122 72,122 57,80"/>
+            <polygon points="100,70 125,92 117,115 83,115 75,92"/>
+            <polygon points="100,92 107,103 103,108 97,108 93,103"/>
+          </g>
+          <!-- 轴线 -->
+          <g class="radar-axis">
+            <line x1="100" y1="25" x2="100" y2="140"/>
+            <line x1="100" y1="25" x2="162" y2="72"/>
+            <line x1="100" y1="25" x2="140" y2="140"/>
+            <line x1="100" y1="25" x2="60" y2="140"/>
+            <line x1="100" y1="25" x2="38" y2="72"/>
+          </g>
+          <!-- 数据区域 -->
+          <polygon class="radar-area" points="100,36 153,66 131,128 60,128 46,72" opacity="0"/>
+          <polygon class="radar-area" points="100,36 153,66 131,128 60,128 46,72" 
+                   style="fill:rgba(200,169,122,.1);stroke:#c8a97a;stroke-width:1;fill-opacity:.15"
+                   id="radarArea"/>
+          <!-- 数据点 -->
+          <circle class="radar-point" cx="100" cy="36" r="3"/>
+          <circle class="radar-point" cx="153" cy="66" r="3"/>
+          <circle class="radar-point" cx="131" cy="128" r="3"/>
+          <circle class="radar-point" cx="60" cy="128" r="3"/>
+          <circle class="radar-point" cx="46" cy="72" r="3"/>
+          <!-- 标签 -->
+          <text class="radar-label" x="100" y="18" text-anchor="middle">PERFORMANCE</text>
+          <text class="radar-label-cn" x="100" y="12" text-anchor="middle">性能功耗</text>
+
+          <text class="radar-label" x="175" y="68" text-anchor="start">EDGE COMPUTING</text>
+          <text class="radar-label-cn" x="175" y="62" text-anchor="start">端侧计算</text>
+
+          <text class="radar-label" x="148" y="155" text-anchor="middle">Agentic OS</text>
+
+          <text class="radar-label" x="52" y="155" text-anchor="middle">YOYO 控制</text>
+          <text class="radar-label-cn" x="52" y="161" text-anchor="middle">CONTROL</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- CURRENTLY MOVING -->
+    <div class="dash-col currently-moving">
+      <div class="col-header">CURRENTLY MOVING</div>
+      <div class="col-subheader">正在推进的任务</div>
+      <div class="task-list">
+        <div class="task-item" data-pw="85%">
+          <div class="task-num">85</div>
+          <div class="task-body">
+            <div class="task-title">端侧 CPU 优化方案评审 <span class="en">CPU OPTIMIZATION REVIEW</span></div>
+            <div class="task-bar"><i style="--pw:85%"></i></div>
+          </div>
+        </div>
+        <div class="task-item" data-pw="60%">
+          <div class="task-num">60</div>
+          <div class="task-body">
+            <div class="task-title">Agentic OS 能力拆解 <span class="en">AGENTIC OS CAPABILITY</span></div>
+            <div class="task-bar"><i style="--pw:60%"></i></div>
+          </div>
+        </div>
+        <div class="task-item" data-pw="40%">
+          <div class="task-num">40</div>
+          <div class="task-body">
+            <div class="task-title">YOYO 控制策略设计 <span class="en">YOYO CONTROL STRATEGY</span></div>
+            <div class="task-bar"><i style="--pw:40%"></i></div>
+          </div>
+        </div>
+        <div class="task-item" data-pw="100%">
+          <div class="task-num">100</div>
+          <div class="task-body">
+            <div class="task-title">DeepSeek Harness 白皮书 <span class="en">WHITEPAPER</span></div>
+            <div class="task-bar"><i style="--pw:100%"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIGITAL AGENTS -->
+    <div class="dash-col digital-agents">
+      <div class="col-header">DIGITAL AGENTS</div>
+      <div class="col-subheader">谁在替你工作</div>
+      <div class="agent-card">
+        <div class="agent-info">
+          <div class="agent-name">YOYO</div>
+          <div class="agent-role">BUSINESS AGENT</div>
+          <div class="agent-skills">
+            <div class="agent-skill">文件上传</div>
+            <div class="agent-skill">User journeys</div>
+            <div class="agent-skill">需求分析</div>
+            <div class="agent-skill">业务方案</div>
+          </div>
+          <div class="agent-status">RUNNING</div>
+        </div>
+        <div class="agent-avatar">
+          <div class="yoyo-hat"></div>
+          <div class="yoyo-face">
+            <div class="yoyo-eyes">
+              <div class="yoyo-eye"></div>
+              <div class="yoyo-eye"></div>
+            </div>
+          </div>
+          <div class="yoyo-body">
+            <div class="yoyo-collar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS LIBRARY -->
+    <div class="dash-col skills-library">
+      <div class="col-header">SKILLS LIBRARY</div>
+      <div class="col-subheader">他们掌握什么</div>
+      <div class="skill-list">
+        <div class="skill-item">
+          <div class="skill-num">01</div>
+          <div class="skill-body">
+            <div class="skill-name">DEEPSEEK HARNESS</div>
+            <div class="skill-cat">AI ENGINEERING</div>
+          </div>
+          <div class="skill-status active">ACTIVE</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-num">02</div>
+          <div class="skill-body">
+            <div class="skill-name">AGENTIC OS</div>
+            <div class="skill-cat">SYSTEM</div>
+          </div>
+          <div class="skill-status active">ACTIVE</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-num">03</div>
+          <div class="skill-body">
+            <div class="skill-name">YOYO CONTROL</div>
+            <div class="skill-cat">BUSINESS</div>
+          </div>
+          <div class="skill-status building">BUILDING</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- ================================================================
+       底部区域 (3 列)
+       ================================================================ -->
+  <div class="bottom-section">
+
+    <!-- BUSINESS -->
+    <div class="bot-col business">
+      <div class="bot-header">BUSINESS <span class="cn">这些能力正在驱动业务世界</span></div>
+      <div class="biz-list">
+        <div class="biz-item">
+          <div class="biz-num">01</div>
+          <div class="biz-body">
+            <div class="biz-name">PRODUCT DESIGN</div>
+            <div class="biz-status active">ACTIVE</div>
+          </div>
+        </div>
+        <div class="biz-item">
+          <div class="biz-num">02</div>
+          <div class="biz-body">
+            <div class="biz-name">AGENT ENGINEERING</div>
+            <div class="biz-status building">BUILDING</div>
+          </div>
+        </div>
+        <div class="biz-item">
+          <div class="biz-num">03</div>
+          <div class="biz-body">
+            <div class="biz-name">BUSINESS AUTOMATION</div>
+            <div class="biz-status running">RUNNING</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM STATUS -->
+    <div class="bot-col system-status">
+      <div class="bot-header">SYSTEM STATUS <span class="cn">系统运行状态</span></div>
+      <div class="sys-row">
+        <div class="sys-metric">
+          <div class="num">04</div>
+          <div class="label">PROJECTS</div>
+        </div>
+        <div class="sys-metric">
+          <div class="num">12</div>
+          <div class="label">AGENTS</div>
+        </div>
+        <div class="sys-metric">
+          <div class="num">28</div>
+          <div class="label">SKILLS</div>
+        </div>
+        <div class="sys-metric">
+          <div class="num">07</div>
+          <div class="label">TASKS TODAY</div>
+        </div>
+        <div class="sys-wave">
+          <canvas id="waveCanvas" width="200" height="32"></canvas>
+        </div>
+        <div class="sys-time">
+          <div class="time" id="sysClock">21:12</div>
+          <div class="loc">SHENZHEN</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE WORLD IS MOVING -->
+    <div class="bot-col world-moving">
+      <div class="world-text">
+        <h4>THE WORLD<br>IS MOVING.</h4>
+        <p>世界在运行，云舟在前行。</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================================================================
+       Footer
+       ================================================================ -->
+  <footer class="footer">
+    <div class="footer-left">
+      <strong>CLOUD BOAT / 01</strong> &nbsp; PERSONAL AGENT WORLD
+    </div>
+    <div class="footer-nav">
+      <a href="#">项目计划</a>
+      <a href="#">数字代理</a>
+      <a href="#">技能开源</a>
+      <a href="#">业务链接</a>
+    </div>
+    <div class="footer-right">
+      <span>© 2026 CLOUD BOAT ALL RIGHTS RESERVED</span>
+      <div class="footer-seal">舟</div>
+    </div>
+  </footer>
+
+</div><!-- /stage -->
+
+<!-- ================================================================
+     鼠标跟随光斑
+     ================================================================ -->
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- ================================================================
+     载入遮罩
+     ================================================================ -->
+<div class="loader" id="loader">
+  <div class="title">系 统 启 动 中</div>
+  <div class="bar"><i id="barFill"></i></div>
+  <div class="pct" id="pct">0%</div>
+</div>
+
+<!-- ================================================================
+     脚本
+     ================================================================ -->
 <script>
 (function () {
   "use strict";
@@ -361,13 +925,9 @@
   const loader = document.getElementById("loader");
   const barFill = document.getElementById("barFill");
   const pct = document.getElementById("pct");
+  const V = "20260823";
 
-  const V = "20260822d";  // 资源版本号：换视频/页面后 +1，绕开浏览器 7 天缓存
-
-  /* ========== 1. 鼠标位移 → 目标时间 ==========
-     视频内容是从右向左转身，因此映射取反：
-     鼠标在屏幕左侧 → 时间轴末端（人物朝左）；右侧 → 时间轴起点（人物朝右）。
-     即 ratio 反转后线性映射到整条时间轴。 */
+  /* ========== 1. 鼠标位移 → 目标时间 (核心交互，完全保留) ========== */
   let targetTime = 0;
   let smoothTime = 0;
   let ready = false;
@@ -382,15 +942,11 @@
     if (e.touches.length) scrubTo(e.touches[0].clientX);
   }, { passive: true });
 
-  /* ========== 2. 平滑 seek 引擎（合并节流版） ==========
-     - 目标与当前帧差 > SEEK_EPS 才 seek，避免无谓 seek
-     - 大幅移动(>1.2s)用 fastSeek：只跳关键帧、不等解码，连续拖动不排队
-     - 小幅移动走精确 seek；非 fastSeek 浏览器限频 MIN_SEEK_INTERVAL，
-       杜绝原来每秒 ~60 次 seek 的解码风暴 */
+  /* ========== 2. 平滑 seek 引擎 (完全保留) ========== */
   let seeking = false;
   let lastSeekAt = 0;
-  const SEEK_EPS = 1 / 48;        // 展示平滑阈值（约 0.02s）
-  const MIN_SEEK_INTERVAL = 66;   // ms；精确 seek 的最小间隔
+  const SEEK_EPS = 1 / 48;
+  const MIN_SEEK_INTERVAL = 66;
 
   function issueSeek(t) {
     const dist = Math.abs(t - video.currentTime);
@@ -419,18 +975,20 @@
   video.addEventListener("seeked", function () { seeking = false; });
   setInterval(function () { if (seeking && !video.seeking) seeking = false; }, 200);
 
-  /* ========== 3. 加载：本地化预下载 → Blob URL ==========
-     · 优先读 Cache Storage（第一次下载后永久本地缓存，二次访问秒开）
-     · 未命中则 fetch 整段下载，进度条绑定真实字节数，并写入缓存
-     · 下载完成前不开放 scrub（先下载、再预览），完成后全部本地内存操作
-     · 慢网兜底：25s 未下完 → 退回直连流式，页面立即可用 */
+  /* ========== 3. 加载：本地化预下载 → Blob URL (完全保留) ========== */
   const VIDEO_URL = "assets/turn.mp4?v=" + V;
-  const CACHE_NAME = "yunzhou-v1";
+  const CACHE_NAME = "yunzhou-v2";
 
   function showDone() {
     if (ready) return;
     ready = true;
     loader.classList.add("done");
+    // 触发进度条动画
+    setTimeout(function(){
+      document.querySelectorAll('.task-item').forEach(function(item){
+        item.classList.add('loaded');
+      });
+    }, 400);
   }
 
   function useBlob(blob) {
@@ -441,7 +999,7 @@
       video.currentTime = targetTime;
       video.addEventListener("seeked", showDone, { once: true });
     }, { once: true });
-    setTimeout(showDone, 10000);  // blob 已就绪后的最终兜底
+    setTimeout(showDone, 10000);
   }
 
   function saveToCache(blob) {
@@ -449,7 +1007,6 @@
       caches.open(CACHE_NAME).then(function (cache) {
         cache.put(new URL(VIDEO_URL, location.href).href,
                   new Response(blob, { headers: { "Content-Type": "video/mp4" } }));
-        // 顺手清掉旧版本缓存
         caches.keys().then(function (keys) {
           keys.filter(function (k) { return k.indexOf("yunzhou-") === 0 && k !== CACHE_NAME; })
               .forEach(function (k) { caches.delete(k); });
@@ -465,7 +1022,7 @@
       targetTime = smoothTime = video.duration * 0.5;
       video.currentTime = targetTime;
     });
-    showDone();  // 直连模式：页面立即可见，视频边下边用（seek 引擎已限频）
+    showDone();
   }
 
   async function loadVideo() {
@@ -474,7 +1031,6 @@
       if (!ready) { try { ctrl && ctrl.abort(); } catch (_) {} attachFallbackSrc(); }
     }, 25000);
     try {
-      // 1) 本地缓存命中 → 直接预览（零网络）
       if (typeof caches !== "undefined") {
         const cache = await caches.open(CACHE_NAME);
         const hit = await cache.match(new URL(VIDEO_URL, location.href).href);
@@ -484,7 +1040,6 @@
           return;
         }
       }
-      // 2) 未命中 → 整段下载（真实进度）并写入本地缓存
       ctrl = new AbortController();
       const res = await fetch(VIDEO_URL, { signal: ctrl.signal });
       if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
@@ -505,37 +1060,36 @@
       }
       clearTimeout(watchdog);
       const blob = new Blob(chunks, { type: "video/mp4" });
-      saveToCache(blob);  // 后台写入本地缓存，不阻塞预览
+      saveToCache(blob);
       useBlob(blob);
     } catch (err) {
       clearTimeout(watchdog);
-      attachFallbackSrc();  // fetch 失败/中断 → 退回直连流式
+      attachFallbackSrc();
     }
   }
   loadVideo();
   requestAnimationFrame(tick);
 
-  /* ========== 4. 卡片 3D 悬浮倾斜 + 高光 ========== */
-  const cards = Array.from(document.querySelectorAll(".card"));
+  /* ========== 4. 卡片 3D 悬浮倾斜 (应用于 dashboard 卡片) ========== */
+  const cards = Array.from(document.querySelectorAll(".dash-col"));
   const canHover = window.matchMedia("(hover: hover)").matches;
   if (!canHover) cards.forEach(function (card) { card.style.transform = "none"; });
   cards.forEach(function (card) {
-    card._rx = 0; card._ry = 0; card._lz = 0;   // 当前值（平滑）
-    card._tx = 0; card._ty = 0; card._tz = 0;   // 目标值
+    card._rx = 0; card._ry = 0; card._lz = 0;
+    card._tx = 0; card._ty = 0; card._tz = 0;
     card.addEventListener("mousemove", function (e) {
       const r = card.getBoundingClientRect();
       const lx = (e.clientX - r.left) / r.width - 0.5;
       const ly = (e.clientY - r.top) / r.height - 0.5;
       card.style.setProperty("--mx", ((lx + 0.5) * 100) + "%");
       card.style.setProperty("--my", ((ly + 0.5) * 100) + "%");
-      card._tx = -ly * 12; card._ty = lx * 14; card._tz = 16;   // 悬停倾斜+浮起
+      card._tx = -ly * 10; card._ty = lx * 12; card._tz = 14;
     }, { passive: true });
     card.addEventListener("mouseleave", function () {
       card._tx = 0; card._ty = 0; card._tz = 0;
     });
   });
-  if (!canHover) { /* 触屏设备跳过 3D 倾斜循环 */ }
-  else (function tiltLoop() {
+  if (canHover) (function tiltLoop() {
     cards.forEach(function (card) {
       card._rx += (card._tx - card._rx) * 0.14;
       card._ry += (card._ty - card._ry) * 0.14;
@@ -547,7 +1101,7 @@
     requestAnimationFrame(tiltLoop);
   })();
 
-  /* ========== 5. 鼠标跟随光斑 ========== */
+  /* ========== 5. 鼠标跟随光斑 (完全保留) ========== */
   const glow = document.getElementById("cursorGlow");
   const dot  = document.getElementById("cursorDot");
   let mx = innerWidth / 2, my = innerHeight / 2;
@@ -564,6 +1118,67 @@
     dot.style.transform  = "translate3d(" + dx + "px," + dy + "px,0)";
     requestAnimationFrame(cursorLoop);
   })();
+
+  /* ========== 6. 实时时钟更新 ========== */
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = h + ":" + m;
+    const topClock = document.getElementById("topClock");
+    const sysClock = document.getElementById("sysClock");
+    if (topClock) topClock.textContent = timeStr;
+    if (sysClock) sysClock.textContent = timeStr;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ========== 7. 波形图动画 ========== */
+  const waveCanvas = document.getElementById("waveCanvas");
+  if (waveCanvas) {
+    const ctx = waveCanvas.getContext("2d");
+    let waveOffset = 0;
+    function drawWave() {
+      const w = waveCanvas.width;
+      const h = waveCanvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(200,169,122,.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x < w; x++) {
+        const y = h / 2 + Math.sin((x + waveOffset) * 0.08) * 6 +
+                  Math.sin((x + waveOffset * 1.5) * 0.04) * 4 +
+                  Math.sin((x + waveOffset * 0.7) * 0.12) * 2;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // 填充渐变
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "rgba(200,169,122,.08)");
+      grad.addColorStop(1, "rgba(200,169,122,0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      waveOffset += 0.8;
+      requestAnimationFrame(drawWave);
+    }
+    drawWave();
+  }
+
+  /* ========== 8. 雷达图渐入 ========== */
+  const radarArea = document.getElementById("radarArea");
+  if (radarArea) {
+    setTimeout(function(){
+      radarArea.style.transition = "opacity 1.2s ease";
+      radarArea.style.opacity = "1";
+    }, 1200);
+  }
+
 })();
 </script>
 </body>
