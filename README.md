@@ -4,6 +4,29 @@
 
 ## Projects
 
+### PickleballLeague
+
+「赛点青 · 匹克球循环赛」六人团建比赛比分记录器：
+
+- 固定 3 男、3 女的球员信息登记
+- 自动生成 15 场单打循环赛程
+- 本地录入比分，实时更新胜负、得失分与排名
+- 全部赛果完成后自动展示冠军、亚军与季军
+- 纯静态页面，赛事数据仅保存在浏览器 `localStorage`
+
+部署方式：
+
+```bash
+mkdir -p /path/to/site/index/pickleball
+cp -r PickleballLeague/* /path/to/site/index/pickleball/
+```
+
+访问：
+
+```text
+https://your-domain/static/pickleball/
+```
+
 ### EatHelper
 
 「今天吃什么」微信可分享小页面：
