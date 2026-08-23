@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T03:37:00+08:00",
+  "title": "Design System: 赛点青赛事编辑部",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "赛事纸张", "canonical": "#f4f1e8", "tonalRamp": ["#1f1e1b", "#48453e", "#6a685f", "#aaa596", "#e8e3d6", "#f4f1e8", "#fffdf6"] },
+      "ink": { "role": "neutral", "displayName": "裁判墨黑", "canonical": "#171716", "tonalRamp": ["#171716", "#383733", "#59574f", "#7d7a70", "#b1ada1", "#e1ddd2", "#fffdf6"] },
+      "court": { "role": "primary", "displayName": "场地绿", "canonical": "#c7ff3e", "tonalRamp": ["#26330c", "#4d6818", "#719824", "#96c830", "#c7ff3e", "#ddff7c", "#efffbe"] },
+      "brick": { "role": "secondary", "displayName": "比分砖红", "canonical": "#e64b32", "tonalRamp": ["#3a0f09", "#711f14", "#a93221", "#d9452d", "#e64b32", "#f28774", "#ffd1c8"] }
+    },
+    "motion": [{ "name": "page-in", "value": "0.34s cubic-bezier(.22,1,.36,1)", "purpose": "页面切换时的克制进入反馈。" }],
+    "breakpoints": [{ "name": "tablet", "value": "980px" }, { "name": "mobile", "value": "700px" }]
+  },
+  "components": [
+    { "name": "主操作按钮", "kind": "button", "refersTo": "button-primary", "description": "用于开始记分与保存赛果。", "html": "<button class=\"ds-btn-primary\">录入下一场</button>", "css": ".ds-btn-primary{min-height:46px;padding:0 18px;border:0;border-radius:2px;background:#c7ff3e;color:#171716;font:800 14px 'Noto Sans SC',sans-serif;box-shadow:0 7px 0 #171716;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .18s cubic-bezier(.22,1,.36,1)}.ds-btn-primary:hover{transform:translateY(-2px);box-shadow:0 9px 0 #171716}.ds-btn-primary:focus-visible{outline:3px solid #c7ff3e;outline-offset:3px}.ds-btn-primary:active{transform:translateY(1px) scale(.98)}" },
+    { "name": "比分输入", "kind": "input", "refersTo": "score-input", "description": "现场录入终局分数的大号数字字段。", "html": "<input class=\"ds-score-input\" value=\"11\" aria-label=\"最终得分\" />", "css": ".ds-score-input{width:140px;min-height:80px;border:1px solid #171716;border-radius:0;background:#f4f1e8;color:#171716;font:700 56px 'Barlow Condensed',sans-serif;text-align:center}.ds-score-input:focus{outline:3px solid #c7ff3e;outline-offset:3px;background:#c7ff3e}.ds-score-input.is-error{border-color:#e64b32;background:#fff1ed}" },
+    { "name": "下一场记分票", "kind": "custom", "refersTo": "next-ticket", "description": "首页中自动指向首个未完成对局的签名组件。", "html": "<article class=\"ds-ticket\"><strong>下一场 · 第 1 轮</strong><p>鹏哥 &nbsp; VS &nbsp; 忱姐</p><button>开始记分 →</button></article>", "css": ".ds-ticket{width:280px;padding:16px;border:1px solid #171716;background:#fffdf6;box-shadow:8px 8px 0 #c7ff3e;color:#171716;font-family:'Noto Sans SC',sans-serif}.ds-ticket strong{font-size:12px}.ds-ticket p{font:700 23px 'Barlow Condensed',sans-serif}.ds-ticket button{padding:0;border:0;background:transparent;color:#171716;font:800 12px 'Noto Sans SC',sans-serif;text-decoration:underline;cursor:pointer}" }
+  ],
+  "narrative": {
+    "northStar": "场边赛事日报",
+    "overview": "赛事编辑部与现场记分板的混合语言。暖纸负责阅读，墨黑负责秩序，场地绿只表明当前行动。",
+    "keyCharacteristics": ["大字号比分叙事", "细线成绩单结构", "像素阵容辅助识别", "移动端底部记分路径"],
+    "rules": [{ "name": "The One Signal Rule", "body": "场地绿只表达当前动作或进行状态。", "section": "colors" }, { "name": "The One Ticket Rule", "body": "只有当前下一场使用实体投影。", "section": "elevation" }],
+    "dos": ["让当前对局、完成进度和榜首在首页第一视域内同时可见。", "在移动端保留所有核心任务。"],
+    "donts": ["不要回退到暗青玻璃、霓虹发光或泛化仪表盘视觉。", "不要让场地绿成为无意义的大面积装饰。"]
+  }
+}
