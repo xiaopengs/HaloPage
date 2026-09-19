@@ -1,0 +1,262 @@
+/* ==========================================================================
+   Design Tokens — 暖色浅色调 · Cloud Console 风格
+   单一真相来源：所有颜色 / 间距 / 字号 / 圆角 / 阴影都从这里取
+   ========================================================================== */
+
+:root {
+  /* ---------- 主色：暖橙 ---------- */
+  --brand-50: #fff7f0;
+  --brand-100: #ffeadb;
+  --brand-200: #ffd3b6;
+  --brand-300: #ffb583;
+  --brand-400: #ff9550;
+  --brand-500: #f97a2c;
+  --brand-600: #e2621a;
+  --brand-700: #b94a10;
+  --brand-800: #8d380c;
+  --brand-900: #612608;
+
+  /* ---------- 中性色：暖灰（带一点黄相，避免冷硬） ---------- */
+  --ink-0: #ffffff;
+  --ink-25: #fdfcfa;
+  --ink-50: #faf8f5;
+  --ink-100: #f4f1ec;
+  --ink-150: #eeeae4;
+  --ink-200: #e5e0d8;
+  --ink-300: #d3ccc1;
+  --ink-400: #aaa299;
+  --ink-500: #857d74;
+  --ink-600: #665f57;
+  --ink-700: #4a443e;
+  --ink-800: #302b26;
+  --ink-900: #1e1a16;
+
+  /* ---------- 语义色（暖化处理） ---------- */
+  --success-50: #f0f8f2;
+  --success-100: #dcefe1;
+  --success-500: #2f9e5f;
+  --success-600: #24804b;
+  --success-700: #1b6139;
+
+  --warning-50: #fff8e9;
+  --warning-100: #ffeeca;
+  --warning-500: #e0a020;
+  --warning-600: #b87f10;
+  --warning-700: #8c5f08;
+
+  --danger-50: #fdf2f0;
+  --danger-100: #fbe0dc;
+  --danger-500: #d9534a;
+  --danger-600: #b83b33;
+  --danger-700: #8d2b25;
+
+  --info-50: #f0f5fb;
+  --info-100: #dde9f6;
+  --info-500: #4a7fc1;
+  --info-600: #37649d;
+  --info-700: #294b78;
+
+  --violet-50: #f6f2fc;
+  --violet-100: #eae1f8;
+  --violet-500: #7d5bc4;
+  --violet-600: #6444a6;
+  --violet-700: #4b3280;
+
+  /* ---------- 表面与边框 ---------- */
+  --bg-app: #faf8f5;
+  --bg-sidebar: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-sunken: #f6f3ef;
+  --bg-raised: #ffffff;
+  --bg-hover: #f6f3ef;
+  --bg-active: #fff0e4;
+
+  --border-subtle: #f0ece5;
+  --border-default: #e5e0d8;
+  --border-strong: #d3ccc1;
+  --border-focus: #ff9550;
+
+  /* ---------- 文本 ---------- */
+  --text-primary: #1e1a16;
+  --text-secondary: #665f57;
+  --text-tertiary: #857d74;
+  --text-quaternary: #aaa299;
+  --text-inverse: #ffffff;
+  --text-brand: #b94a10;
+
+  /* ---------- 字号层级 ---------- */
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-20: 20px;
+  --fs-24: 24px;
+  --fs-30: 30px;
+
+  --lh-tight: 1.25;
+  --lh-snug: 1.4;
+  --lh-normal: 1.6;
+  --lh-relaxed: 1.75;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---------- 间距（4 的倍数） ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ---------- 圆角 ---------- */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 999px;
+
+  /* ---------- 阴影（暖调、极轻） ---------- */
+  --shadow-xs: 0 1px 2px rgba(80, 60, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(80, 60, 40, 0.07), 0 1px 2px rgba(80, 60, 40, 0.04);
+  --shadow-md: 0 4px 12px rgba(80, 60, 40, 0.08), 0 1px 3px rgba(80, 60, 40, 0.04);
+  --shadow-lg: 0 12px 28px rgba(80, 60, 40, 0.1), 0 4px 10px rgba(80, 60, 40, 0.05);
+  --shadow-focus: 0 0 0 3px rgba(255, 149, 80, 0.22);
+
+  /* ---------- 布局尺寸 ---------- */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 72px;
+  --topbar-h: 60px;
+  --content-max: 1440px;
+
+  /* ---------- 动效 ---------- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+
+  /* ---------- 字体族 ---------- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
+    "Noto Sans CJK SC", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+}
+
+/* 全局重置 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  color: var(--text-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--text-brand);
+  text-decoration: none;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* 滚动条：细、暖、低调 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-300);
+  border-radius: var(--r-full);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-400);
+  background-clip: content-box;
+}
+
+::selection {
+  background: var(--brand-200);
+  color: var(--brand-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
