@@ -43,8 +43,8 @@
 | **AI Demo 门户（demo-hub）** | <https://ac94b6715f7cb331d.app.workbuddy.host> | 已部署 |
 | 赛点青 匹克球 | <https://halopage-pmnzigqu.manus.space> | 作者部署（Manus） |
 | 今天吃什么 | <https://thinkspc.fun/static/eat/> | 作者部署 |
-| 云舟 · 个人作品集 | `你的域名/static/yunzhou/` | 需自行部署 |
-| 云舟视频加载教程 | `你的域名/static/yunzhou/视频加载教程/` | 需自行部署 |
+| 云舟 · 个人作品集 | <https://thinkspc.fun/> | 作者部署 |
+| 云舟视频加载教程 | <https://thinkspc.fun/video-loading-tutorial/> | 作者部署 |
 | Agent 装配台 | <https://thinkspc.fun/static/soul-init/> | 作者部署 |
 | 研发工作台 | <https://ac8e20005c1f2185e.app.workbuddy.host> | 在线演示 |
 
@@ -138,6 +138,11 @@
 - 随附《视频加载教程》：动态视频背景加载方案 · 小白图文教程
 
 **技术栈**：原生 HTML / CSS / JS + HTML5 Video，资源约 1.5 MB。
+
+线上体验：
+
+- 个人作品集：<https://thinkspc.fun/>
+- 视频加载教程：<https://thinkspc.fun/video-loading-tutorial/>
 
 ### 4. Agent 装配台（soul-init）
 
@@ -355,6 +360,8 @@ python3 -m http.server 8000
 |:--|:--|
 | AI Demo 门户 | <https://ac94b6715f7cb331d.app.workbuddy.host> |
 | 作者 PickleballLeague 部署 | <https://halopage-pmnzigqu.manus.space> |
+| 作者 Yunzhou 个人作品集 | <https://thinkspc.fun/> |
+| 作者 Yunzhou 视频加载教程 | <https://thinkspc.fun/video-loading-tutorial/> |
 | 作者 EatHelper 部署 | <https://thinkspc.fun/static/eat/> |
 | 作者 soul-init 部署 | <https://thinkspc.fun/static/soul-init/> |
 | 研发工作台演示 | <https://ac8e20005c1f2185e.app.workbuddy.host> |
