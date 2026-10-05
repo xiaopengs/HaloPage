@@ -13,6 +13,26 @@
 | 截图墙 | 无头浏览器实机抓取 + 官方素材补齐，16:10 统一规格 | 165 |
 | 源码索引 | 每个作品的开源仓库地址（点击直达 GitHub） | 20 |
 
+## 应用截图
+
+### 门户首页
+
+作品总数、截图覆盖、实测在线、附带源码地址四项统计，以及 Claude Opus 5.5 精选三作。
+
+![门户首页](../docs-screenshots/hub-01-portal.jpg)
+
+### Astra 案例库
+
+165 个案例的卡片墙，每张含实机截图、平台标签、开源源码地址与试玩入口。
+
+![案例库卡片墙](../docs-screenshots/hub-02-astra.jpg)
+
+### 说明区块
+
+两个合集介绍、全量截图口径、源码地址收录范围与在线状态的实测方法。
+
+![说明区块](../docs-screenshots/hub-03-notes.jpg)
+
 ## 目录结构
 
 ```
@@ -25,13 +45,16 @@ demo-hub/
 ## 本地预览
 
 ```bash
-本仓库根目录另有 `PickleballLeague/`、`EatHelper/`、`Yunzhou/`、`soul-init/`、`requirement-workbench/`
-五个独立静态小项目，以及根 `index.html` 索引页与 `docs-screenshots/` 界面截图，
-详见仓库根 [`README.md`](../README.md)。
 cd demo-hub
 python3 -m http.server 8000
 # 打开 http://localhost:8000/
 ```
+
+无构建步骤、无后端依赖，任意静态目录（Halo / 1Panel / Nginx / GitHub Pages）可直接部署。
+
+本仓库根目录另有 `PickleballLeague/`、`EatHelper/`、`Yunzhou/`、`soul-init/`、`requirement-workbench/`
+五个独立静态小项目，以及根 `index.html` 索引页与 `docs-screenshots/` 界面截图，
+详见仓库根 [`README.md`](../README.md)。
 
 无构建步骤、无后端依赖，任意静态目录（Halo / 1Panel / Nginx / GitHub Pages）可直接部署。
 

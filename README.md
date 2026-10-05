@@ -98,6 +98,20 @@
 |:--|:--|
 | ![风险](docs-screenshots/wb-12-risks.jpg) | ![移动端总览](docs-screenshots/wb-13-mobile-overview.jpg) |
 
+### AI Demo 展示门户（demo-hub）
+
+门户首页：作品总数、截图墙率、实测在线、附带源码地址四项统计，以及 Claude Opus 5.5 精选三作。
+
+![AI Demo 门户首页](docs-screenshots/hub-01-portal.jpg)
+
+Astra 案例库：165 个案例的卡片墙，每张含实机截图、平台标签、开源源码地址与试玩入口，支持分类筛选与搜索。
+
+![Astra 案例库](docs-screenshots/hub-02-astra.jpg)
+
+说明区块：两个合集介绍、全量截图口径、源码地址收录范围，以及在线状态的实测方法说明。
+
+![门户说明](docs-screenshots/hub-03-notes.jpg)
+
 ---
 
 ## 项目说明
@@ -243,11 +257,14 @@ HaloPage/
 │   ├── README.md                   #    门户说明
 │   └── shots/                      #    165 张作品截图
 │
-└── docs-screenshots/               # 界面截图（12 张）
-    ├── 01-pickleball.jpg           #    以下 4 张为实机抓取
+└── docs-screenshots/               # 界面截图（15 张）
+    ├── 01-pickleball.jpg           #    以下 7 张为无头浏览器实机抓取
     ├── 02-eathelper.jpg
     ├── 03-yunzhou.jpg
     ├── 04-soul-init.jpg
+    ├── hub-01-portal.jpg           #    AI Demo 门户：首页
+    ├── hub-02-astra.jpg            #    AI Demo 门户：案例库
+    ├── hub-03-notes.jpg            #    AI Demo 门户：说明区块
     └── wb-*.jpg                    #    研发工作台（仓库官方素材）
 ```
 
