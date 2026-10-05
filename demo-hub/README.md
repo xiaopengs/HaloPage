@@ -19,18 +19,15 @@
 demo-hub/
 ├── index.html          # 门户主页（精选 + 案例库 + 全屏 iframe 体验层）
 ├── astra-data.js       # 案例库数据源（165 项：名称/分类/截图/试玩/源码地址）
-├── shots/              # 165 张作品截图（JPEG，约 5.2MB）
-└── halo-page/          # 本仓库（HaloPage）各子项目的快照索引页
-    ├── index.html      # 5 个项目的卡片式索引 + 部署指引
-    ├── README.md       # 增强版说明（参考地址/截图/部署地址/项目说明/结构）
-    ├── README.upstream.md
-    ├── docs-screenshots/   # 12 张子项目截图
-    └── PickleballLeague/ EatHelper/ Yunzhou/ soul-init/  # 各子项目源码快照
+└── shots/              # 165 张作品截图（JPEG，约 5.2MB）
 ```
 
 ## 本地预览
 
 ```bash
+本仓库根目录另有 `PickleballLeague/`、`EatHelper/`、`Yunzhou/`、`soul-init/`、`requirement-workbench/`
+五个独立静态小项目，以及根 `index.html` 索引页与 `docs-screenshots/` 界面截图，
+详见仓库根 [`README.md`](../README.md)。
 cd demo-hub
 python3 -m http.server 8000
 # 打开 http://localhost:8000/
