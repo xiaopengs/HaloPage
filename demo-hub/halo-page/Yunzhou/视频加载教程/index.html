@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>动态视频背景加载方案 · 小白图文教程</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#14213d;        /* 主色：商务藏青 */
+    --gold:#fca311;        /* 强调：暖金 */
+    --ink:#1c2434;
+    --sub:#5b6478;
+    --line:#e6e9f0;
+    --bg:#f6f7fa;
+    --card:#ffffff;
+    --ok:#1f9d6b;
+    --warn:#d64541;
+    --code-bg:#10182b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Archivo',"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ================= 布局：左目录 + 右正文 ================= */
+  .layout{display:flex; min-height:100vh}
+
+  /* ---------- 左侧目录 ---------- */
+  .sidebar{
+    width:264px; flex:none; position:sticky; top:0; height:100vh;
+    background:linear-gradient(180deg,#101a30 0%, var(--navy) 100%);
+    color:#cdd6ea; display:flex; flex-direction:column;
+    padding:30px 0 24px; overflow-y:auto;
+  }
+  .side-brand{padding:0 26px 22px; border-bottom:1px solid rgba(255,255,255,.09)}
+  .side-brand .kicker{
+    font-size:10px; letter-spacing:.3em; color:var(--gold); font-weight:700;
+  }
+  .side-brand h1{
+    margin-top:10px; font-size:19px; font-weight:900; color:#fff; line-height:1.5;
+  }
+  .side-brand p{margin-top:8px; font-size:11px; color:#8b98b8; line-height:1.7}
+  .toc{padding:18px 14px; flex:1}
+  .toc .group{font-size:10px; letter-spacing:.24em; color:#6d7ea6; padding:14px 12px 8px; font-weight:700}
+  .toc a{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 12px; margin:2px 0; border-radius:10px;
+    color:#b9c4dd; text-decoration:none; font-size:13.5px; font-weight:500;
+    transition:background .25s, color .25s;
+  }
+  .toc a .no{
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+    width:24px; height:24px; border-radius:7px; flex:none;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,.07); color:#93a3c7;
+    transition:background .25s, color .25s;
+  }
+  .toc a:hover{background:rgba(255,255,255,.06); color:#fff}
+  .toc a.active{background:rgba(252,163,17,.14); color:#ffd489}
+  .toc a.active .no{background:var(--gold); color:#14213d}
+  .side-foot{padding:16px 26px 0; border-top:1px solid rgba(255,255,255,.09); font-size:10.5px; color:#6d7ea6; line-height:1.8}
+
+  /* ---------- 右侧正文 ---------- */
+  .main{flex:1; min-width:0; padding:44px 56px 80px}
+  .page{display:none; max-width:920px; margin:0 auto; animation:pageIn .5s cubic-bezier(.22,1,.36,1)}
+  .page.active{display:block}
+  @keyframes pageIn{from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:translateY(0)}}
+
+  .page-head{margin-bottom:30px; padding-bottom:22px; border-bottom:2px solid var(--navy)}
+  .page-head .kicker{
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+    letter-spacing:.26em; color:var(--gold);
+  }
+  .page-head h2{margin-top:10px; font-size:30px; font-weight:900; color:var(--navy); letter-spacing:.02em}
+  .page-head .lead{margin-top:12px; font-size:14.5px; line-height:1.9; color:var(--sub)}
+
+  h3.sec{
+    margin:38px 0 16px; font-size:18px; font-weight:900; color:var(--navy);
+    display:flex; align-items:center; gap:12px;
+  }
+  h3.sec::before{content:""; width:6px; height:20px; border-radius:3px; background:var(--gold)}
+  p.body{font-size:14px; line-height:2; color:#333c52; margin:10px 0}
+  p.body b{color:var(--navy)}
+  .hl{background:linear-gradient(transparent 62%, rgba(252,163,17,.4) 62%); font-weight:700; color:var(--navy)}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; margin:16px 0;
+    box-shadow:0 4px 18px rgba(20,33,61,.05);
+  }
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+
+  /* 表格 */
+  table.spec{width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 18px rgba(20,33,61,.05)}
+  table.spec th{background:var(--navy); color:#fff; text-align:left; padding:12px 16px; font-weight:700; letter-spacing:.06em; font-size:12px}
+  table.spec td{padding:11px 16px; border-bottom:1px solid var(--line); color:#333c52; line-height:1.7}
+  table.spec tr:last-child td{border-bottom:none}
+  table.spec td:first-child{font-weight:700; color:var(--navy); white-space:nowrap}
+  table.spec code{font-family:'JetBrains Mono',monospace; font-size:12px; background:#eef1f7; padding:2px 7px; border-radius:5px; color:#b3541e}
+
+  /* 代码块 */
+  pre.code{
+    background:var(--code-bg); color:#d7e0f5; border-radius:12px;
+    padding:18px 20px; margin:14px 0; overflow-x:auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.85;
+    box-shadow:0 8px 26px rgba(16,24,43,.25);
+  }
+  pre.code .cm{color:#5f6f96}       /* 注释 */
+  pre.code .kw{color:#fca311}       /* 关键参数 */
+  pre.code .st{color:#7ee2a8}       /* 字符串 */
+
+  /* 提示框 */
+  .tip, .pit{
+    border-radius:12px; padding:16px 20px; margin:14px 0;
+    font-size:13.5px; line-height:1.9; display:flex; gap:14px;
+  }
+  .tip{background:#eef7f1; border:1px solid #cbe8d8; color:#1c5c40}
+  .pit{background:#fdf0ef; border:1px solid #f3cfcc; color:#8c2f2b}
+  .tip .ic, .pit .ic{flex:none; width:26px; height:26px; border-radius:8px; display:grid; place-items:center; font-weight:900; font-size:14px; color:#fff}
+  .tip .ic{background:var(--ok)} .pit .ic{background:var(--warn)}
+  .tip b, .pit b{display:block; margin-bottom:2px}
+
+  /* 步骤条 */
+  .steps{counter-reset:step; margin:16px 0}
+  .step{
+    position:relative; padding:18px 20px 18px 66px; margin:12px 0;
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 4px 18px rgba(20,33,61,.05);
+  }
+  .step::before{
+    counter-increment:step; content:counter(step,decimal-leading-zero);
+    position:absolute; left:18px; top:18px;
+    width:34px; height:34px; border-radius:10px;
+    background:var(--navy); color:#fff; font-family:'JetBrains Mono',monospace;
+    font-weight:700; font-size:13px; display:grid; place-items:center;
+  }
+  .step h4{font-size:15px; font-weight:900; color:var(--navy); margin-bottom:6px}
+  .step p{font-size:13px; line-height:1.9; color:#4a5468}
+
+  /* 图片 */
+  figure{margin:18px 0}
+  figure img{width:100%; border-radius:14px; border:1px solid var(--line); box-shadow:0 10px 30px rgba(20,33,61,.1); display:block}
+  figcaption{margin-top:10px; font-size:12px; color:var(--sub); text-align:center; letter-spacing:.04em}
+  .fig-row{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  .fig-row figure{margin:8px 0}
+
+  /* SVG 图卡片 */
+  .diagram{background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; margin:18px 0; box-shadow:0 4px 18px rgba(20,33,61,.05)}
+  .diagram .cap{margin-top:12px; font-size:12px; color:var(--sub); text-align:center}
+
+  /* 徽章 */
+  .tag{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.1em; padding:4px 10px; border-radius:999px; margin-right:6px}
+  .tag.g{background:rgba(252,163,17,.15); color:#b27408}
+  .tag.n{background:rgba(20,33,61,.09); color:var(--navy)}
+  .tag.r{background:rgba(214,69,65,.12); color:var(--warn)}
+
+  /* 分页器 */
+  .pager{display:flex; justify-content:space-between; margin-top:44px; max-width:920px; margin-left:auto; margin-right:auto}
+  .pager button{
+    border:1px solid var(--line); background:#fff; color:var(--navy);
+    font-family:inherit; font-size:13px; font-weight:700;
+    padding:12px 22px; border-radius:12px; cursor:pointer;
+    transition:all .25s; box-shadow:0 4px 14px rgba(20,33,61,.06);
+  }
+  .pager button:hover:not(:disabled){background:var(--navy); color:#fff; transform:translateY(-2px)}
+  .pager button:disabled{opacity:.35; cursor:default}
+
+  @media (max-width:900px){
+    .layout{flex-direction:column}
+    .sidebar{width:100%; height:auto; position:static}
+    .main{padding:28px 20px 60px}
+    .grid2,.grid3,.fig-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ================= 左侧目录 ================= -->
+  <aside class="sidebar">
+    <div class="side-brand">
+      <div class="kicker">TECH PLAYBOOK</div>
+      <h1>动态视频背景<br>加载整体方案</h1>
+      <p>鼠标驱动视频时间轴交互<br>从生成到上线的完整图文教程</p>
+    </div>
+    <nav class="toc" id="toc">
+      <div class="group">方案篇</div>
+      <a data-page="0" class="active"><span class="no">01</span>方案总览</a>
+      <a data-page="1"><span class="no">02</span>架构与流程</a>
+      <a data-page="2"><span class="no">03</span>提示词手册</a>
+      <div class="group">实战篇</div>
+      <a data-page="3"><span class="no">04</span>视频规格与转码</a>
+      <a data-page="4"><span class="no">05</span>加载与交互代码</a>
+      <a data-page="5"><span class="no">06</span>多端适配方案</a>
+      <div class="group">避坑与上手</div>
+      <a data-page="6"><span class="no">07</span>踩坑指南</a>
+      <a data-page="7"><span class="no">08</span>小白实操教程</a>
+      <a data-page="8"><span class="no">09</span>效果展示</a>
+    </nav>
+    <div class="side-foot">动态视频背景加载方案<br>独立静态手册 · Version 1.0 · 2026</div>
+  </aside>
+
+  <!-- ================= 右侧正文 ================= -->
+  <main class="main" id="main">
+
+  <!-- ========== 第 1 页：方案总览 ========== -->
+  <section class="page active" id="page-0">
+    <div class="page-head">
+      <div class="kicker">01 / OVERVIEW</div>
+      <h2>方案总览：我们要做什么</h2>
+      <p class="lead">一句话概括：<b>把一段"人物转身"的视频当作可拖动的胶片，鼠标左右移动 = 用手搓动胶片</b>，从而实现"鼠标往哪移，人物往哪看"的丝滑交互。</p>
+    </div>
+
+    <h3 class="sec">效果是什么样的</h3>
+    <p class="body">页面背景是一幅山巅侠客的画面。它不自动播放——<span class="hl">视频完全静止，时间轴由你的鼠标接管</span>：鼠标向左滑，人物上半身、头部和眼神缓缓转向画面左侧；向右滑，则转向右侧。天空、云彩、机位、站位全程不变。</p>
+    <div class="fig-row">
+      <figure><img src="assets/frame-left.jpg" alt=""><figcaption>鼠标在左 → 人物朝左</figcaption></figure>
+      <figure><img src="assets/frame-mid.jpg" alt=""><figcaption>鼠标居中 → 人物背影</figcaption></figure>
+      <figure><img src="assets/frame-right.jpg" alt=""><figcaption>鼠标在右 → 人物朝右</figcaption></figure>
+    </div>
+
+    <h3 class="sec">为什么不能直接"播放"</h3>
+    <p class="body">普通视频是"放电影"：时间轴自己往前走。而我们要的是"拉胶片"：<b>时间轴完全听鼠标指挥</b>，鼠标不动画面就静止。所以技术上有三个关键词：</p>
+    <div class="grid3">
+      <div class="card"><span class="tag g">核心 1</span><p class="body" style="margin-top:8px"><b>不自动播放</b><br>视频 muted + playsInline + preload="auto"，并显式 pause()。</p></div>
+      <div class="card"><span class="tag g">核心 2</span><p class="body" style="margin-top:8px"><b>鼠标映射时间轴</b><br>鼠标 X 坐标 ÷ 屏幕宽度 = 视频进度百分比。</p></div>
+      <div class="card"><span class="tag g">核心 3</span><p class="body" style="margin-top:8px"><b>平滑 seek</b><br>用插值 + 队列防抖动，杜绝机械感和卡顿。</p></div>
+    </div>
+
+    <h3 class="sec">整条链路一图看懂</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 860 210" width="100%" font-family="inherit">
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0,0 L8,4.5 L0,9 Z" fill="#fca311"/>
+          </marker>
+        </defs>
+        <!-- 五个环节 -->
+        <g font-size="13" font-weight="700">
+          <rect x="10" y="70" width="140" height="70" rx="12" fill="#14213d"/>
+          <text x="80" y="100" fill="#fff" text-anchor="middle">① AI 生成视频</text>
+          <text x="80" y="122" fill="#8b98b8" text-anchor="middle" font-size="11" font-weight="500">提示词 + 转身运镜</text>
+
+          <rect x="185" y="70" width="140" height="70" rx="12" fill="#14213d"/>
+          <text x="255" y="100" fill="#fff" text-anchor="middle">② 转码处理</text>
+          <text x="255" y="122" fill="#8b98b8" text-anchor="middle" font-size="11" font-weight="500">H.264 + 密集关键帧</text>
+
+          <rect x="360" y="70" width="140" height="70" rx="12" fill="#14213d"/>
+          <text x="430" y="100" fill="#fff" text-anchor="middle">③ 页面加载</text>
+          <text x="430" y="122" fill="#8b98b8" text-anchor="middle" font-size="11" font-weight="500">进度条 + 预缓冲</text>
+
+          <rect x="535" y="70" width="140" height="70" rx="12" fill="#14213d"/>
+          <text x="605" y="100" fill="#fff" text-anchor="middle">④ 鼠标监听</text>
+          <text x="605" y="122" fill="#8b98b8" text-anchor="middle" font-size="11" font-weight="500">X 坐标 → 目标时间</text>
+
+          <rect x="710" y="70" width="140" height="70" rx="12" fill="#fca311"/>
+          <text x="780" y="100" fill="#14213d" text-anchor="middle">⑤ 平滑 Seek</text>
+          <text x="780" y="122" fill="#7a5205" text-anchor="middle" font-size="11" font-weight="500">插值 + 队列渲染</text>
+        </g>
+        <g stroke="#fca311" stroke-width="2.5">
+          <line x1="152" y1="105" x2="181" y2="105" marker-end="url(#ar)"/>
+          <line x1="327" y1="105" x2="356" y2="105" marker-end="url(#ar)"/>
+          <line x1="502" y1="105" x2="531" y2="105" marker-end="url(#ar)"/>
+          <line x1="677" y1="105" x2="706" y2="105" marker-end="url(#ar)"/>
+        </g>
+        <text x="430" y="30" text-anchor="middle" font-size="12" fill="#5b6478" letter-spacing="3">GENERATE → TRANSCODE → LOAD → LISTEN → SEEK</text>
+        <text x="430" y="185" text-anchor="middle" font-size="12" fill="#5b6478">五个环节环环相扣，任何一环做错都会卡、糊、或方向反</text>
+      </svg>
+      <div class="cap">图 1-1 · 动态视频背景的五环链路</div>
+    </div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>给小白的一句话</b>你不需要懂视频编码原理，只要记住：<b>AI 负责出片，FFmpeg 负责"翻译"成浏览器喜欢的格式，JS 负责把鼠标动作翻译成时间轴位置</b>。本教程每一环都给了可直接复制的命令和代码。</div></div>
+  </section>
+
+  <!-- ========== 第 2 页：架构与流程 ========== -->
+  <section class="page" id="page-1">
+    <div class="page-head">
+      <div class="kicker">02 / ARCHITECTURE</div>
+      <h2>架构与流程</h2>
+      <p class="lead">看懂两张图，就理解了整个方案 80% 的内容：一张讲"系统由哪几块组成"，一张讲"鼠标移动的一瞬间发生了什么"。</p>
+    </div>
+
+    <h3 class="sec">架构图：页面里的四层</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 860 330" width="100%" font-family="inherit">
+        <!-- 层 1 -->
+        <rect x="30" y="20" width="800" height="62" rx="12" fill="#f0f3f9" stroke="#e6e9f0"/>
+        <text x="50" y="45" font-size="13" font-weight="900" fill="#14213d">呈现层 UI Layer</text>
+        <text x="50" y="66" font-size="11.5" fill="#5b6478">标题文案 · 导航 · 卡片 · 加载进度条 · 鼠标光斑（纯 HTML/CSS，与视频解耦）</text>
+        <!-- 层 2 -->
+        <rect x="30" y="98" width="800" height="62" rx="12" fill="#fdf3e0" stroke="#f3dcae"/>
+        <text x="50" y="123" font-size="13" font-weight="900" fill="#b27408">交互层 Interaction</text>
+        <text x="50" y="144" font-size="11.5" fill="#8a6a20">mousemove 监听 → 计算位移/坐标 → 换算目标时间 targetTime（含方向映射与 clamp）</text>
+        <!-- 层 3 -->
+        <rect x="30" y="176" width="800" height="62" rx="12" fill="#14213d"/>
+        <text x="50" y="201" font-size="13" font-weight="900" fill="#fca311">平滑引擎 Smooth Engine ★</text>
+        <text x="50" y="222" font-size="11.5" fill="#b9c4dd">rAF 指数插值（去机械感） + seek 串行队列（防 seek-flooding） + seeked 回调追赶</text>
+        <!-- 层 4 -->
+        <rect x="30" y="254" width="800" height="62" rx="12" fill="#f0f3f9" stroke="#e6e9f0"/>
+        <text x="50" y="279" font-size="13" font-weight="900" fill="#14213d">媒体层 Media</text>
+        <text x="50" y="300" font-size="11.5" fill="#5b6478">&lt;video muted playsinline preload="auto"&gt; · H.264 密集关键帧 · 浏览器解码器</text>
+        <text x="430" y="326" text-anchor="middle" font-size="11" fill="#8b98b8">★ 平滑引擎是本方案的灵魂，第 5 页有完整代码</text>
+      </svg>
+      <div class="cap">图 2-1 · 四层架构：上层做任何改动都不影响下层</div>
+    </div>
+
+    <h3 class="sec">流程图：一次鼠标移动的旅程</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 860 380" width="100%" font-family="inherit">
+        <defs>
+          <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0,0 L8,4.5 L0,9 Z" fill="#14213d"/>
+          </marker>
+        </defs>
+        <g font-size="12.5" font-weight="700">
+          <rect x="330" y="14" width="200" height="44" rx="22" fill="#14213d"/>
+          <text x="430" y="41" fill="#fff" text-anchor="middle">用户移动鼠标</text>
+
+          <rect x="330" y="84" width="200" height="44" rx="10" fill="#fff" stroke="#e6e9f0"/>
+          <text x="430" y="111" fill="#14213d" text-anchor="middle">读取 mouseX 坐标</text>
+
+          <rect x="330" y="154" width="200" height="44" rx="10" fill="#fff" stroke="#e6e9f0"/>
+          <text x="430" y="181" fill="#14213d" text-anchor="middle">换算 targetTime 并 clamp</text>
+
+          <rect x="330" y="224" width="200" height="44" rx="10" fill="#fdf3e0" stroke="#f3dcae"/>
+          <text x="430" y="251" fill="#b27408" text-anchor="middle">rAF 插值出 smoothTime</text>
+
+          <polygon points="430,290 540,326 430,362 320,326" fill="#fff" stroke="#e6e9f0"/>
+          <text x="430" y="322" fill="#14213d" text-anchor="middle" font-size="11.5">正在 seek 中？</text>
+          <text x="430" y="340" fill="#5b6478" text-anchor="middle" font-size="10" font-weight="500">差值 &gt; 半帧才执行</text>
+        </g>
+        <g stroke="#14213d" stroke-width="2" fill="none">
+          <line x1="430" y1="58" x2="430" y2="80" marker-end="url(#ar2)"/>
+          <line x1="430" y1="128" x2="430" y2="150" marker-end="url(#ar2)"/>
+          <line x1="430" y1="198" x2="430" y2="220" marker-end="url(#ar2)"/>
+          <line x1="430" y1="268" x2="430" y2="288" marker-end="url(#ar2)"/>
+        </g>
+        <!-- 分支 -->
+        <g font-size="11.5" font-weight="700">
+          <rect x="580" y="304" width="180" height="44" rx="10" fill="#14213d"/>
+          <text x="670" y="331" fill="#fca311" text-anchor="middle">否 → video.currentTime 赋值</text>
+          <rect x="100" y="304" width="180" height="44" rx="10" fill="#fff" stroke="#e6e9f0"/>
+          <text x="190" y="331" fill="#5b6478" text-anchor="middle">是 → 等 seeked 再追赶</text>
+        </g>
+        <g stroke="#14213d" stroke-width="2" fill="none">
+          <line x1="540" y1="326" x2="576" y2="326" marker-end="url(#ar2)"/>
+          <line x1="320" y1="326" x2="284" y2="326" marker-end="url(#ar2)"/>
+        </g>
+      </svg>
+      <div class="cap">图 2-2 · 鼠标事件 → 时间轴的完整决策流</div>
+    </div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>为什么要"等 seeked"</b>浏览器的 seek 是异步的，一帧 seek 没完成就塞下一个，会排队拥堵（叫 seek-flooding），画面反而卡。所以我们一次只发一个 seek，完成后再追最新目标——就像等电梯，而不是狂按按钮。</div></div>
+  </section>
+
+  <!-- ========== 第 3 页：提示词手册 ========== -->
+  <section class="page" id="page-2">
+    <div class="page-head">
+      <div class="kicker">03 / PROMPTS</div>
+      <h2>提示词手册：让 AI 生成"可交互"的视频</h2>
+      <p class="lead">这是最容易被忽视的一环：<b>视频本身的拍法决定了交互上限</b>。机位动了、人走位了，后面代码写得再好也救不回来。</p>
+    </div>
+
+    <h3 class="sec">四条铁律（写进提示词里）</h3>
+    <table class="spec">
+      <tr><th>铁律</th><th>原因</th><th>提示词关键词</th></tr>
+      <tr><td>机位锁定</td><td>镜头一动，"鼠标控制"的错觉就破了</td><td><code>locked tripod shot</code> / <code>static camera</code> / <code>fixed camera, no camera movement</code></td></tr>
+      <tr><td>只转上半身</td><td>全身移动会破坏构图和站位</td><td><code>only upper body, head and gaze turn</code> / <code>feet stay planted</code></td></tr>
+      <tr><td>环境静止</td><td>云飘、草动会在来回 seek 时鬼畜</td><td><code>frozen background</code> / <code>still sky and clouds</code></td></tr>
+      <tr><td>匀速慢转</td><td>转太快，鼠标轻微移动就"甩头"</td><td><code>slow continuous turn</code> / <code>smooth constant-speed rotation</code></td></tr>
+    </table>
+
+    <h3 class="sec">完整提示词模板（可直接复制）</h3>
+    <p class="body">中文版（适合国产视频模型）：</p>
+    <pre class="code"><span class="st">一位古装侠客立于山巅岩石之上，晚霞漫天，云海翻涌于远方山谷。
+固定三脚架机位，镜头完全静止，无推拉摇移。
+人物双脚站位不动，只有上半身、头部、面部朝向和眼神，
+从面向画面右侧，匀速缓慢地转身到面向画面左侧。
+天空、云彩、地面、草叶全部静止，整体构图保持不变。
+电影感，史诗氛围，暖橙色调，4K 高清。</span></pre>
+    <p class="body">英文版（适合 Runway / Pika / Kling 国际版等）：</p>
+    <pre class="code"><span class="st">A lone swordsman in flowing robes standing on a mountain peak at sunset,
+sea of clouds in the valley below. Locked tripod shot, completely static
+camera, no camera movement. His feet stay planted; only his upper body,
+head, face direction and gaze slowly and smoothly turn from facing right
+to facing left at constant speed. Sky, clouds, ground and grass remain
+frozen. Composition unchanged. Cinematic, epic, warm orange tones, 4K.</span></pre>
+
+    <h3 class="sec">负向提示词（防止 AI 自由发挥）</h3>
+    <pre class="code"><span class="st">camera movement, zoom, pan, dolly, walking, footsteps moving,
+blowing grass, moving clouds, motion blur, flickering, morphing face,
+extra limbs, scene change, cut, transition</span></pre>
+
+    <div class="pit"><span class="ic">!</span><div><b>最常见的翻车</b>AI 很爱"加戏"：让衣袂飘动、让云流动。单看成片很美，但做成交互视频后，来回 seek 时这些元素会来回倒放，非常诡异。<b>背景越"死"，交互越真</b>。</div></div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>生成时长建议</b>4~6 秒最佳。太短转身仓促，太长文件变大且鼠标要滑很久才能转完。帧率 24fps 或 30fps 均可。</div></div>
+  </section>
+
+  <!-- ========== 第 4 页：视频规格与转码 ========== -->
+  <section class="page" id="page-3">
+    <div class="page-head">
+      <div class="kicker">04 / TRANSCODE</div>
+      <h2>视频规格与转码</h2>
+      <p class="lead">AI 生成的原始视频<b>不能直接上线</b>——编码格式、关键帧密度、体积都不对。这一步用一条 FFmpeg 命令全部搞定。</p>
+    </div>
+
+    <h3 class="sec">目标规格一览</h3>
+    <table class="spec">
+      <tr><th>项目</th><th>推荐值</th><th>说明</th></tr>
+      <tr><td>分辨率</td><td><code>1920×1080</code>（16:9）</td><td>桌面主流比例；人物放右侧 2/3 安全区</td></tr>
+      <tr><td>编码</td><td><code>H.264 (libx264)</code></td><td>全浏览器通吃；<b>不要用 HEVC/H.265</b>，Chrome/Firefox 多数放不了</td></tr>
+      <tr><td>像素格式</td><td><code>yuv420p</code></td><td>浏览器兼容性最好的色彩格式</td></tr>
+      <tr><td>关键帧间隔</td><td><code>-g 5</code>（每 5 帧一个）</td><td><b>本方案的生命线</b>，详见下方坑位说明</td></tr>
+      <tr><td>B 帧</td><td><code>-bf 0</code>（关闭）</td><td>避免双向预测帧导致的 seek 延迟</td></tr>
+      <tr><td>音频</td><td><code>-an</code>（剔除）</td><td>静音视频不需要音轨，省体积</td></tr>
+      <tr><td>moov 前置</td><td><code>+faststart</code></td><td>元数据放文件头，边下边播</td></tr>
+      <tr><td>质量</td><td><code>-crf 15~19</code></td><td>数字越小越清晰体积越大；背景视频 18 左右即可</td></tr>
+    </table>
+
+    <h3 class="sec">一条命令完成转码</h3>
+    <pre class="code"><span class="cm"># 把 input.mp4 转成本方案可用的网页视频</span>
+ffmpeg -y -i input.mp4 \
+  <span class="kw">-c:v libx264</span> <span class="kw">-pix_fmt yuv420p</span> \
+  <span class="kw">-crf 18</span> <span class="kw">-preset medium</span> \
+  <span class="kw">-g 5 -keyint_min 5 -sc_threshold 0 -bf 0</span> \
+  <span class="kw">-movflags +faststart</span> \
+  <span class="kw">-an</span> \
+  output.mp4</pre>
+
+    <h3 class="sec">关键帧：本方案最大的隐形坑</h3>
+    <p class="body">视频 seek（跳转）时，浏览器只能<b>精确落到关键帧</b>，普通帧需要从最近的关键帧逐帧推算。AI 生成的视频往往<span class="hl">整个文件只有 1 个关键帧</span>——这意味着每次 seek 都要从第 0 帧算到目标帧，鼠标一动就卡成 PPT。</p>
+    <div class="diagram">
+      <svg viewBox="0 0 860 150" width="100%" font-family="inherit">
+        <text x="30" y="26" font-size="12.5" font-weight="900" fill="#d64541">✗ 原始视频：只有开头 1 个关键帧，seek 到任意位置都要从头推算</text>
+        <g>
+          <rect x="30" y="40" width="14" height="26" rx="3" fill="#d64541"/>
+          <g fill="#f3cfcc">
+            <rect x="50" y="40" width="14" height="26" rx="3"/><rect x="70" y="40" width="14" height="26" rx="3"/>
+            <rect x="90" y="40" width="14" height="26" rx="3"/><rect x="110" y="40" width="14" height="26" rx="3"/>
+            <rect x="130" y="40" width="14" height="26" rx="3"/><rect x="150" y="40" width="14" height="26" rx="3"/>
+            <rect x="170" y="40" width="14" height="26" rx="3"/><rect x="190" y="40" width="14" height="26" rx="3"/>
+            <rect x="210" y="40" width="14" height="26" rx="3"/><rect x="230" y="40" width="14" height="26" rx="3"/>
+            <rect x="250" y="40" width="14" height="26" rx="3"/><rect x="270" y="40" width="14" height="26" rx="3"/>
+          </g>
+        </g>
+        <text x="30" y="100" font-size="12.5" font-weight="900" fill="#1f9d6b">✓ 转码后：每 5 帧一个关键帧，任何 seek 最多推算 4 帧，毫秒级完成</text>
+        <g>
+          <rect x="30" y="114" width="14" height="26" rx="3" fill="#1f9d6b"/>
+          <rect x="50" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/><rect x="70" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/>
+          <rect x="90" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/><rect x="110" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/>
+          <rect x="130" y="114" width="14" height="26" rx="3" fill="#1f9d6b"/>
+          <rect x="150" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/><rect x="170" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/>
+          <rect x="190" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/><rect x="210" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/>
+          <rect x="230" y="114" width="14" height="26" rx="3" fill="#1f9d6b"/>
+          <rect x="250" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/><rect x="270" y="114" width="14" height="26" rx="3" fill="#cbe8d8"/>
+        </g>
+        <text x="430" y="146" text-anchor="middle" font-size="10.5" fill="#8b98b8">深色 = 关键帧（可直接跳转）　浅色 = 普通帧（需推算）</text>
+      </svg>
+      <div class="cap">图 4-1 · 关键帧密度对比：-g 5 是丝滑 seek 的前提</div>
+    </div>
+
+    <div class="pit"><span class="ic">!</span><div><b>验证方法</b>转码后用 <code style="font-family:'JetBrains Mono',monospace">ffprobe -select_streams v -show_entries frame=pict_type -of csv output.mp4 | grep I | wc -l</code> 数一下 I 帧（关键帧）数量，5 秒视频应有 30 个以上；如果只有 1~2 个，说明参数没生效。</div></div>
+  </section>
+
+  <!-- ========== 第 5 页：加载与交互代码 ========== -->
+  <section class="page" id="page-4">
+    <div class="page-head">
+      <div class="kicker">05 / CODE</div>
+      <h2>加载与交互代码</h2>
+      <p class="lead">本页给出完整可运行的核心代码，逐段讲解。直接复制即可用，小白也能看懂每一行在干嘛。</p>
+    </div>
+
+    <h3 class="sec">第一步：HTML 视频标签</h3>
+    <pre class="code">&lt;<span class="kw">video</span> id=<span class="st">"heroVideo"</span>
+       <span class="kw">muted</span>            <span class="cm">// 静音（自动播放策略 & 用户体验双重要求）</span>
+       <span class="kw">playsinline</span>      <span class="cm">// iOS Safari 必须，否则强制全屏播放</span>
+       <span class="kw">preload="auto"</span>   <span class="cm">// 提前缓冲，鼠标一动就能响应</span>
+       src=<span class="st">"turn.mp4"</span>&gt;
+&lt;/video&gt;
+<span class="cm">// 注意：不写 autoplay！我们不需要它播放。</span></pre>
+
+    <h3 class="sec">第二步：鼠标坐标 → 目标时间</h3>
+    <pre class="code"><span class="kw">let</span> targetTime = 0;   <span class="cm">// 鼠标想去的时间点</span>
+<span class="kw">let</span> smoothTime = 0;   <span class="cm">// 平滑后的实际渲染时间</span>
+
+window.addEventListener(<span class="st">"mousemove"</span>, (e) =&gt; {
+  <span class="kw">if</span> (!video.duration) <span class="kw">return</span>;
+  <span class="cm">// 鼠标 X 占比 0~1，映射到整条时间轴；方向反了就写 1 - ratio</span>
+  <span class="kw">const</span> ratio = 1 - e.clientX / window.innerWidth;
+  targetTime = Math.max(0, Math.min(video.duration, ratio * video.duration));
+}, { passive: <span class="kw">true</span> });</pre>
+    <div class="tip"><span class="ic">✓</span><div><b>方向反了怎么办</b>如果实际效果是"鼠标往左人却往右"，把 <code style="font-family:'JetBrains Mono',monospace">ratio</code> 改成 <code style="font-family:'JetBrains Mono',monospace">1 - ratio</code> 即可——这取决于你的视频是"从左往右转"还是"从右往左转"拍的。</div></div>
+
+    <h3 class="sec">第三步：平滑引擎（灵魂代码）</h3>
+    <pre class="code"><span class="kw">let</span> seeking = <span class="kw">false</span>;
+<span class="kw">const</span> SEEK_EPS = 1 / 48;  <span class="cm">// 小于半帧不动，防空转</span>
+
+<span class="kw">function</span> tick() {
+  <span class="cm">// ① 指数平滑：每帧向目标靠近 14%，快而不冲，无机械感</span>
+  smoothTime += (targetTime - smoothTime) * <span class="kw">0.14</span>;
+
+  <span class="cm">// ② 串行 seek：上一个没完成就不发下一个</span>
+  <span class="kw">if</span> (!seeking && Math.abs(smoothTime - video.currentTime) &gt; SEEK_EPS) {
+    seeking = <span class="kw">true</span>;
+    video.currentTime = smoothTime;
+  }
+  requestAnimationFrame(tick);
+}
+
+<span class="cm">// ③ seek 完成放行；期间目标变了，下一帧自动追赶最新值</span>
+video.addEventListener(<span class="st">"seeked"</span>, () =&gt; seeking = <span class="kw">false</span>);
+requestAnimationFrame(tick);</pre>
+
+    <h3 class="sec">第四步：加载进度条</h3>
+    <pre class="code"><span class="cm">// 监听真实缓冲进度</span>
+video.addEventListener(<span class="st">"progress"</span>, () =&gt; {
+  <span class="kw">if</span> (video.buffered.length && video.duration) {
+    real = video.buffered.end(video.buffered.length - 1) / video.duration;
+  }
+});
+<span class="cm">// 展示进度平滑追赶真实进度，到 100% 隐藏加载层</span>
+shown += (real - shown) * 0.12;
+barFill.style.width = Math.round(shown * 100) + <span class="st">"%"</span>;</pre>
+
+    <h3 class="sec">为什么这样就"丝滑"了</h3>
+    <table class="spec">
+      <tr><th>手段</th><th>解决的问题</th></tr>
+      <tr><td>rAF 插值 0.14</td><td>鼠标事件是离散的，直接赋值会一格一格跳；插值让时间像水一样流过去</td></tr>
+      <tr><td>串行 seek 队列</td><td>防止 seek 堆积（seek-flooding），浏览器不会卡顿假死</td></tr>
+      <tr><td>SEEK_EPS 半帧阈值</td><td>目标已到位就不再发 seek，CPU 解码器不空转</td></tr>
+      <tr><td>密集关键帧（第 4 页）</td><td>每次 seek 最多推算 4 帧，毫秒级完成</td></tr>
+    </table>
+  </section>
+
+  <!-- ========== 第 6 页：多端适配 ========== -->
+  <section class="page" id="page-5">
+    <div class="page-head">
+      <div class="kicker">06 / RESPONSIVE</div>
+      <h2>多端适配方案</h2>
+      <p class="lead">同一个视频要在宽屏显示器、笔记本、平板、手机上都好看，核心矛盾只有一个：<b>窗口比例 ≠ 视频比例</b>。</p>
+    </div>
+
+    <h3 class="sec">桌面端：cover 铺满 + 安全区构图</h3>
+    <p class="body">桌面用 <code style="font-family:'JetBrains Mono',monospace">object-fit: cover</code> 让视频铺满全屏，多余部分裁掉。裁切不可避免，所以<b>构图时就要留安全区</b>：</p>
+    <div class="diagram">
+      <svg viewBox="0 0 860 300" width="100%" font-family="inherit">
+        <!-- 视频原始比例框 -->
+        <rect x="180" y="20" width="500" height="250" rx="8" fill="#f0f3f9" stroke="#14213d" stroke-width="2"/>
+        <text x="430" y="44" text-anchor="middle" font-size="12" font-weight="900" fill="#14213d">视频画面 16:9</text>
+        <!-- 安全区 -->
+        <rect x="230" y="60" width="400" height="170" rx="6" fill="none" stroke="#fca311" stroke-width="2" stroke-dasharray="7 5"/>
+        <text x="430" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#b27408">安全区：关键内容（人物）必须放这里</text>
+        <!-- 人物位置示意 -->
+        <circle cx="560" cy="130" r="16" fill="#14213d"/>
+        <rect x="548" y="146" width="24" height="46" rx="8" fill="#14213d"/>
+        <text x="560" y="216" text-anchor="middle" font-size="10.5" fill="#5b6478">人物 · 右侧 2/3 处</text>
+        <!-- 裁切标注 -->
+        <text x="120" y="150" text-anchor="middle" font-size="10.5" fill="#d64541" font-weight="700">窄屏会裁掉 ←</text>
+        <text x="740" y="150" text-anchor="middle" font-size="10.5" fill="#d64541" font-weight="700">→ 窄屏会裁掉</text>
+        <text x="430" y="290" text-anchor="middle" font-size="10.5" fill="#5b6478">超宽屏裁上下，窄屏裁左右 —— 四周各留 ~10% 冗余</text>
+      </svg>
+      <div class="cap">图 6-1 · 安全区示意：重要内容放中央，边缘留给裁切</div>
+    </div>
+
+    <h3 class="sec">移动端：三个必须处理的差异</h3>
+    <table class="spec">
+      <tr><th>差异</th><th>对策</th></tr>
+      <tr><td>没有鼠标</td><td>改用 <code>touchmove</code> / 陀螺仪 <code>deviceorientation</code>，或退化为"轻点屏幕左右半区转身"</td></tr>
+      <tr><td>iOS 强制全屏</td><td>必须写 <code>playsinline</code> + <code>webkit-playsinline</code>，否则视频跳出页面全屏播放</td></tr>
+      <tr><td>流量与性能</td><td>移动端提供 720p 小体积版本，用 <code>&lt;source media&gt;</code> 或 JS 按屏宽切换</td></tr>
+    </table>
+
+    <h3 class="sec">比例兜底：不想裁切时</h3>
+    <p class="body">如果画面一像素都不想被裁（例如客户提供的成品图），可以放弃 cover，改用<b>原比例完整呈现 + 模糊延展填充</b>：中间是严格原始比例的画面，四周空隙用同一张图的放大模糊版填满，视觉连续无黑边。本方案的作品集主页就预留了这种写法。</p>
+    <div class="tip"><span class="ic">✓</span><div><b>怎么选</b>追求沉浸感选 cover 铺满（推荐）；追求构图完整选原比例 + 模糊延展。两者不要混用。</div></div>
+  </section>
+
+  <!-- ========== 第 7 页：踩坑指南 ========== -->
+  <section class="page" id="page-6">
+    <div class="page-head">
+      <div class="kicker">07 / PITFALLS</div>
+      <h2>踩坑指南</h2>
+      <p class="lead">以下 8 个坑全部是真实项目中踩过的，按"踩坑概率"从高到低排列。每个坑都给出症状、原因和解药。</p>
+    </div>
+
+    <div class="pit"><span class="ic">1</span><div><b>鼠标一动就卡成 PPT（概率 ★★★★★）</b><b>症状：</b>鼠标滑动时画面 1 秒才动一下。<b>原因：</b>视频只有 1 个关键帧，每次 seek 都从头推算。<b>解药：</b>转码加 <code style="font-family:'JetBrains Mono',monospace">-g 5 -keyint_min 5 -sc_threshold 0 -bf 0</code>（见第 4 页）。</div></div>
+
+    <div class="pit"><span class="ic">2</span><div><b>视频在浏览器里黑屏/无法解码（★★★★☆）</b><b>症状：</b>本地能播，网页里黑屏。<b>原因：</b>AI 工具常导出 HEVC(H.265)，Chrome/Firefox 多数设备不支持。<b>解药：</b>必须转码为 H.264 + yuv420p。</div></div>
+
+    <div class="pit"><span class="ic">3</span><div><b>转身方向和鼠标相反（★★★★☆）</b><b>症状：</b>鼠标往左，人往右看。<b>原因：</b>视频拍摄方向与映射方向不一致。<b>解药：</b>把 <code style="font-family:'JetBrains Mono',monospace">ratio</code> 换成 <code style="font-family:'JetBrains Mono',monospace">1 - ratio</code>，一行搞定，不用重新生成视频。</div></div>
+
+    <div class="pit"><span class="ic">4</span><div><b>画面一顿一顿、有机械感（★★★★☆）</b><b>症状：</b>人物跟随很"硬"，像机器人。<b>原因：</b>直接把鼠标事件映射到 currentTime，事件是离散的。<b>解药：</b>加 rAF 指数插值（系数 0.1~0.15），让时间"流"过去而不是"跳"过去。</div></div>
+
+    <div class="pit"><span class="ic">5</span><div><b>快速甩鼠标后页面假死（★★★☆☆）</b><b>症状：</b>疯狂晃动鼠标几秒后页面卡住。<b>原因：</b>seek-flooding——seek 请求堆积。<b>解药：</b>串行 seek 队列 + seeked 回调放行 + 120ms 兜底解锁。</div></div>
+
+    <div class="pit"><span class="ic">6</span><div><b>iPhone 上视频突然全屏（★★★☆☆）</b><b>症状：</b>iOS Safari 里视频跳出页面全屏播放。<b>原因：</b>缺少 playsinline。<b>解药：</b>同时写 <code style="font-family:'JetBrains Mono',monospace">playsinline</code> 和 <code style="font-family:'JetBrains Mono',monospace">webkit-playsinline</code>。</div></div>
+
+    <div class="pit"><span class="ic">7</span><div><b>背景云/草在来回倒放（★★★☆☆）</b><b>症状：</b>转身正常，但云和草随鼠标来回倒放，很诡异。<b>原因：</b>生成视频时背景有运动元素。<b>解药：</b>只能重新生成——提示词里强调 frozen background（见第 3 页）。</div></div>
+
+    <div class="pit"><span class="ic">8</span><div><b>AI 超分提清晰度失败（★★☆☆☆）</b><b>症状：</b>想用 Real-ESRGAN 逐帧高清化，跑不动。<b>原因：</b>无 GPU 环境跑 153 帧要几十分钟甚至装不上依赖。<b>解药：</b>优先用 FFmpeg 的 <code style="font-family:'JetBrains Mono',monospace">scale=1920:1080:flags=lanczos</code> 高质量缩放 + 低 CRF；真要 AI 超分，找有 GPU 的机器离线跑。</div></div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>排查口诀</b>卡 → 查关键帧；黑 → 查编码；反 → 改 ratio；硬 → 加插值；死 → 查队列；全屏 → 加 playsinline。</div></div>
+  </section>
+
+  <!-- ========== 第 8 页：小白实操教程 ========== -->
+  <section class="page" id="page-7">
+    <div class="page-head">
+      <div class="kicker">08 / TUTORIAL</div>
+      <h2>小白实操教程：30 分钟从零到上线</h2>
+      <p class="lead">不需要任何编程基础，跟着步骤一步步来。所有命令和代码在第 3~5 页都有成品可复制。</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h4>生成转身视频</h4>
+        <p>打开你常用的 AI 视频工具（可灵 / Runway / Pika 等），粘贴第 3 页的提示词模板，生成一段 4~6 秒、16:9 的"人物匀速转身"视频。生成 2~3 条，挑背景最干净、转身最匀速的一条。</p>
+      </div>
+      <div class="step">
+        <h4>安装 FFmpeg</h4>
+        <p>Windows：官网下载解压，把 bin 目录加入环境变量；Mac：<code style="font-family:'JetBrains Mono',monospace">brew install ffmpeg</code>；Linux：<code style="font-family:'JetBrains Mono',monospace">apt install ffmpeg</code>。装好后命令行输入 <code style="font-family:'JetBrains Mono',monospace">ffmpeg -version</code> 有输出即成功。</p>
+      </div>
+      <div class="step">
+        <h4>转码视频</h4>
+        <p>把视频重命名为 input.mp4，打开命令行进入该目录，粘贴第 4 页的转码命令，得到 output.mp4。用 ffprobe 验证关键帧数量（第 4 页底部有命令）。</p>
+      </div>
+      <div class="step">
+        <h4>搭建页面骨架</h4>
+        <p>新建 index.html，写入视频标签（第 5 页第一步），视频文件放在同目录的 assets 文件夹。用浏览器打开，能看到第一帧画面即成功。</p>
+      </div>
+      <div class="step">
+        <h4>接入鼠标交互</h4>
+        <p>把第 5 页第二、三步的 JS 代码粘进 <code style="font-family:'JetBrains Mono',monospace">&lt;script&gt;</code> 标签。刷新页面，左右移动鼠标——人物应该开始转身了。方向反了就改 ratio（第 5 页有说明）。</p>
+      </div>
+      <div class="step">
+        <h4>加上加载进度条</h4>
+        <p>粘入第 5 页第四步代码，配一条 CSS 进度条样式。这样首次访问时用户看到加载进度，而不是黑屏等待。</p>
+      </div>
+      <div class="step">
+        <h4>三端自测</h4>
+        <p>按第 6、7 页 checklist 过一遍：Chrome/Safari/Edge 各开一次；手机扫码打开；把窗口拉宽拉窄看裁切；疯狂甩鼠标 10 秒看是否假死。全部通过即可部署。</p>
+      </div>
+    </div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>完成标准</b>鼠标轻移人物缓缓转头、急甩不卡、方向一致、加载有进度、手机不全屏——五条全中，恭喜毕业。</div></div>
+  </section>
+
+  <!-- ========== 第 9 页：效果展示 ========== -->
+  <section class="page" id="page-8">
+    <div class="page-head">
+      <div class="kicker">09 / SHOWCASE</div>
+      <h2>效果展示</h2>
+      <p class="lead">以下素材全部来自本方案的实际项目：晚霞山巅 + 古装侠客的鼠标跟随转身主页。</p>
+    </div>
+
+    <h3 class="sec">最终上线效果（高清静态帧）</h3>
+    <figure><img src="assets/hero.png" alt=""><figcaption>图 9-1 · 主页背景高清帧：人物位于右侧 2/3 安全区，左侧留给标题与卡片</figcaption></figure>
+
+    <h3 class="sec">转身过程三态</h3>
+    <div class="fig-row">
+      <figure><img src="assets/frame-left.jpg" alt=""><figcaption>时间轴前段 · 朝右</figcaption></figure>
+      <figure><img src="assets/frame-mid.jpg" alt=""><figcaption>时间轴中段 · 背影</figcaption></figure>
+      <figure><img src="assets/frame-right.jpg" alt=""><figcaption>时间轴后段 · 朝左</figcaption></figure>
+    </div>
+
+    <h3 class="sec">关键指标</h3>
+    <div class="grid3">
+      <div class="card" style="text-align:center"><p class="body" style="font-size:26px;font-weight:900;color:var(--navy);margin:6px 0">5.1s</p><p class="body" style="margin:0">视频时长<br>122 帧 @24fps</p></div>
+      <div class="card" style="text-align:center"><p class="body" style="font-size:26px;font-weight:900;color:var(--navy);margin:6px 0">25+</p><p class="body" style="margin:0">关键帧数量<br>每 5 帧一个</p></div>
+      <div class="card" style="text-align:center"><p class="body" style="font-size:26px;font-weight:900;color:var(--navy);margin:6px 0">~10MB</p><p class="body" style="margin:0">1080p 成片体积<br>CRF 15 高质量</p></div>
+    </div>
+
+    <div class="tip"><span class="ic">✓</span><div><b>想看活的？</b>本手册为独立静态文档，配套的作品集演示站需单独部署访问，体验鼠标控制转身的完整效果。</div></div>
+  </section>
+
+  <!-- 分页器 -->
+  <div class="pager">
+    <button id="prevBtn">← 上一页</button>
+    <button id="nextBtn">下一页 →</button>
+  </div>
+</main>
+</div>
+
+<script>
+(function(){
+  const links = Array.from(document.querySelectorAll("#toc a"));
+  const pages = Array.from(document.querySelectorAll(".page"));
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  let cur = 0;
+
+  function go(i){
+    cur = Math.max(0, Math.min(pages.length - 1, i));
+    pages.forEach((p, idx) => p.classList.toggle("active", idx === cur));
+    links.forEach((l, idx) => l.classList.toggle("active", idx === cur));
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === pages.length - 1;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  links.forEach((l, idx) => l.addEventListener("click", () => go(idx)));
+  prevBtn.addEventListener("click", () => go(cur - 1));
+  nextBtn.addEventListener("click", () => go(cur + 1));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") go(cur - 1);
+    if (e.key === "ArrowRight") go(cur + 1);
+  });
+  go(0);
+})();
+</script>
+</body>
+</html>
+</div>
+</body>
+</html>

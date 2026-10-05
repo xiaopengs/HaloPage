@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloPage · 静态页面项目集合</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0e12'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23c7ff3e' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23e64b32'/%3E%3C/svg%3E">
+<style>
+  :root{--bg:#0d0e12;--panel:#15171e;--line:rgba(255,255,255,.09);--txt:#e9eaf0;--t2:#9aa1b5;--t3:#666d80;
+        --a:#c7ff3e;--b:#e64b32;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--txt);min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line);margin-bottom:44px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--a);margin-bottom:16px}
+  h1{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-.5px;line-height:1.15;margin-bottom:14px}
+  .sub{color:var(--t2);font-size:15px;line-height:1.85;max-width:660px}
+  .sub b{color:var(--txt)}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .m{font-family:var(--mono);font-size:11.5px;color:var(--t2);border:1px solid var(--line);
+     border-radius:999px;padding:6px 13px}
+  .grid{display:grid;gap:20px}
+  .card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);
+        text-decoration:none;color:inherit;display:flex;transition:transform .25s,border-color .25s}
+  .card:hover{transform:translateY(-3px);border-color:rgba(199,255,62,.45)}
+  .shot{width:290px;flex:none;background:#0a0b0e}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .info{padding:22px 24px;flex:1;min-width:0}
+  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;color:var(--a);
+       border:1px solid rgba(199,255,62,.3);border-radius:999px;padding:4px 10px;display:inline-block;margin-bottom:11px}
+  h2{font-size:19px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .st{font-family:var(--mono);font-size:10.5px;color:var(--t3);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+  .info p{font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:14px}
+  .path{font-family:var(--mono);font-size:11.5px;color:var(--t3);
+        background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:9px 12px;
+        display:inline-block;margin-bottom:13px}
+  .path b{color:var(--a);font-weight:500}
+  .links{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{font-size:12.5px;padding:8px 15px;border-radius:9px;border:1px solid var(--line);
+       color:var(--t2);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+  .btn:hover{color:var(--txt);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.26)}
+  .btn.p{background:rgba(199,255,62,.14);border-color:rgba(199,255,62,.42);color:#dcff8a;font-weight:600}
+  .btn.p:hover{background:rgba(199,255,62,.24);color:#efffc0}
+  .btn svg{width:13px;height:13px;fill:currentColor}
+  h3{font-size:15px;font-weight:700;margin:44px 0 16px;padding-bottom:11px;border-bottom:1px solid var(--line);
+     display:flex;align-items:center;gap:9px}
+  h3 .n{font-family:var(--mono);font-size:11.5px;color:var(--t3);font-weight:400}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--t3);font-weight:400}
+  td code{font-family:var(--mono);font-size:11.5px;color:var(--a);background:rgba(199,255,62,.07);padding:2px 7px;border-radius:5px}
+  td.n{font-family:var(--mono);font-size:12.5px;color:var(--t2);text-align:right}
+  a{color:var(--a)}
+  .note{font-size:12.5px;color:var(--t3);line-height:1.9;background:rgba(255,255,255,.03);
+       border:1px solid var(--line);border-left:2px solid var(--a);border-radius:0 12px 12px 0;padding:16px 20px;margin-top:20px}
+  @media(max-width:720px){
+    .card{flex-direction:column}
+    .shot{width:100%;height:170px}
+    th:nth-child(3),td:nth-child(3){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">HALO / 1PANEL / NGINX · STATIC PAGES</div>
+    <h1>HaloPage 静态页面项目集合</h1>
+    <p class="sub">一组可直接部署到 Halo、1Panel、Nginx 静态目录的纯静态小项目 —— 无后端、无 API Key、单文件或轻量目录即可运行。</p>
+    <div class="meta">
+      <span class="m">5 个项目</span>
+      <span class="m">纯静态 · 零后端</span>
+      <span class="m">JavaScript + React</span>
+      <span class="m">更新于 2026-09-19</span>
+    </div>
+  </header>
+
+  <h3>可在线体验 <span class="n">/ 5 PROJECTS</span></h3>
+  <div class="grid">
+
+    <a class="card" href="PickleballLeague/index.html">
+      <div class="shot"><img src="docs-screenshots/01-pickleball.jpg" alt="赛点青 匹克球循环赛记录器"></div>
+      <div class="info">
+        <span class="tag">🏸 赛事记分</span>
+        <h2>赛点青 · 匹克球循环赛 <span class="st">PICKLEBALLLEAGUE</span></h2>
+        <p>六人团建匹克球单打循环赛记录器：自动生成 15 场赛程、录入比分实时更新排名、全部完成后生成冠军海报。固定 3 男 3 女阵容，11 分制需领先 2 分。</p>
+        <div class="path">部署路径 <b>/static/pickleball/</b></div>
+        <div class="links">
+          <span class="btn p">▶ 进入项目</span>
+          <span class="btn">线上示例 halopage-pmnzigqu.manus.space</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="EatHelper/index.html">
+      <div class="shot"><img src="docs-screenshots/02-eathelper.jpg" alt="今天吃什么"></div>
+      <div class="info">
+        <span class="tag">🍜 生活工具</span>
+        <h2>今天吃什么 <span class="st">EATHELPER</span></h2>
+        <p>按菜系随机推荐菜品，支持收藏与浏览器定位；调用免费 OpenStreetMap / Overpass API 查询周边美食。适合微信内分享，无需后端与 API Key。</p>
+        <div class="path">部署路径 <b>/static/eat/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="Yunzhou/index.html">
+      <div class="shot"><img src="docs-screenshots/03-yunzhou.jpg" alt="云舟 作品集"></div>
+      <div class="info">
+        <span class="tag">🎬 交互动效</span>
+        <h2>云舟 · 个人作品集 <span class="st">YUNZHOU</span></h2>
+        <p>鼠标 / 触摸驱动视频时间轴交互主页，人物随指针转身；晚霞暖色调玻璃拟态 UI。附《视频加载教程》动态视频背景方案与图文讲解。</p>
+        <div class="path">部署路径 <b>/static/yunzhou/</b></div>
+        <div class="links">
+          <span class="btn p">▶ 进入项目</span>
+          <span class="btn">视频加载教程</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="soul-init/index.html">
+      <div class="shot"><img src="docs-screenshots/04-soul-init.jpg" alt="Agent 装配台"></div>
+      <div class="info">
+        <span class="tag">🤖 Agent 工具</span>
+        <h2>Agent Harness Builder <span class="st">SOUL-INIT</span></h2>
+        <p>基于 QQ 音乐 Harness Engineering 理论构建的 Agent 装配台：6 个角色的 Harness 管线、每角色 5 阶段强制门禁、39 个 Skill 按阶段装配并生成完整配置。</p>
+        <div class="path">部署路径 <b>/static/soul-init/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="https://ac8e20005c1f2185e.app.workbuddy.host" target="_blank" rel="noopener">
+      <div class="shot"><img src="docs-screenshots/wb-01-overview.jpg" alt="研发工作台"></div>
+      <div class="info">
+        <span class="tag">📊 研发管理</span>
+        <h2>项目级研发工作台 <span class="st">REQUIREMENT-WORKBENCH</span></h2>
+        <p>覆盖研发全生命周期的一体化工作台：10 个阶段、12 个页面、一条可追溯的跨阶段证据链。React 19 + TypeScript 6 + Vite 8，需构建后部署，本仓库仅保留源码。</p>
+        <div class="path">部署路径 <b>构建后部署 · 需 npm run build</b></div>
+        <div class="links">
+          <span class="btn p">↗ 打开在线演示</span>
+          <span class="btn">查看仓库源码</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <h3>项目一览 <span class="n">/ AT A GLANCE</span></h3>
+  <table>
+    <thead><tr><th>项目</th><th>技术形态</th><th>后端</th><th class="n">体积</th></tr></thead>
+    <tbody>
+      <tr><td>赛点青 匹克球</td><td><code>HTML + CSS + JS</code></td><td>不需要</td><td class="n">~60 KB</td></tr>
+      <tr><td>今天吃什么</td><td><code>单文件 HTML</code></td><td>不需要</td><td class="n">~23 KB</td></tr>
+      <tr><td>云舟 作品集</td><td><code>HTML + 视频/字体资源</code></td><td>不需要</td><td class="n">~1.5 MB</td></tr>
+      <tr><td>Agent 装配台</td><td><code>单文件 HTML</code></td><td>不需要</td><td class="n">~34 KB</td></tr>
+      <tr><td>研发工作台</td><td><code>React 19 + TS + Vite</code></td><td>不需要</td><td class="n">需构建</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>线上地址</b>：本快照已发布至 <a href="https://ac94b6715f7cb331d.app.workbuddy.host/halo-page/index.html" target="_blank" rel="noopener">ac94b6715f7cb331d.app.workbuddy.host/halo-page/</a>，门户首页在 <a href="https://ac94b6715f7cb331d.app.workbuddy.host" target="_blank" rel="noopener">站点根目录</a>。完整说明见同目录 <code>README.md</code>。
+  </div>
+
+  <div class="note">
+    <b>部署提示</b>：全部项目均为纯静态产物，复制到站点静态目录即可访问。以 Halo 为例，把项目文件夹放到 <code>/path/to/site/static/xxx/</code>，随后访问 <code>https://你的域名/static/xxx/</code>。1Panel / Nginx 同理，只需保证目录名与访问路径一致。
+  </div>
+</div>
+</body>
+</html>
