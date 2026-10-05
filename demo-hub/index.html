@@ -115,10 +115,18 @@
   .keys{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
   .keys kbd{font-family:var(--mono);font-size:10px;color:var(--txt2);border:1px solid var(--line);border-bottom-width:2px;
     border-radius:6px;padding:3.5px 8px;background:rgba(255,255,255,.04);letter-spacing:.3px}
-  .pq{border-left:2px solid;border-image:linear-gradient(to bottom,var(--pc),transparent) 1;padding:2px 0 2px 11px;margin-bottom:16px}
+  .pq{border-left:2px solid;border-image:linear-gradient(to bottom,var(--pc),transparent) 1;padding:2px 0 2px 11px;margin-bottom:16px;
+    position:relative;cursor:pointer;border-radius:0 9px 9px 0;transition:background .2s,padding-left .2s}
+  .pq:hover{background:color-mix(in srgb,var(--pc) 8%,transparent);padding-left:15px}
+  .pq::after{content:"点击查看全文";position:absolute;right:0;top:0;font-family:var(--mono);font-size:9px;
+    letter-spacing:.8px;color:var(--pc);opacity:0;transform:translateX(-4px);transition:.2s;white-space:nowrap}
+  .pq:hover::after{opacity:.75;transform:translateX(0)}
   .card[data-g="1"]{--pc:var(--a)}.card[data-g="2"]{--pc:var(--c)}.card[data-g="3"]{--pc:var(--b)}
-  .pq .pq-t{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:5px}
-  .pq p{font-size:11.3px;color:var(--txt3);line-height:1.7}
+  .pq .pq-t{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:5px;
+    display:flex;align-items:center;gap:6px}
+  .pq .pq-t svg{width:10px;height:10px;fill:currentColor;opacity:.8}
+  .pq p{font-size:11.3px;color:var(--txt3);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;
+    -webkit-box-orient:vertical;overflow:hidden}
   .play-btn{display:flex;align-items:center;justify-content:center;gap:9px;height:45px;border-radius:13px;border:none;
     cursor:pointer;font-size:14px;font-weight:600;color:#06121a;font-family:inherit;letter-spacing:1px;width:100%;
     background:linear-gradient(95deg,var(--pc),color-mix(in srgb,var(--pc) 55%,#fff));
@@ -246,6 +254,56 @@
   footer .mono{font-family:var(--mono);letter-spacing:1px}
 
   /* 播放层 */
+  /* 提示词全屏卡片 */
+  #pqModal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:24px}
+  #pqModal.on{display:flex}
+  #pqModal .pq-backdrop{position:absolute;inset:0;background:rgba(3,4,8,.82);backdrop-filter:blur(14px);
+    animation:fadeIn .22s ease}
+  #pqModal .pq-card{position:relative;width:min(760px,100%);max-height:min(84vh,720px);display:flex;flex-direction:column;
+    background:linear-gradient(168deg,color-mix(in srgb,var(--pc) 9%,#12141c),#0b0d13 62%);
+    border:1px solid color-mix(in srgb,var(--pc) 34%,var(--line));border-radius:22px;overflow:hidden;
+    box-shadow:0 30px 90px rgba(0,0,0,.66),0 0 0 1px color-mix(in srgb,var(--pc) 12%,transparent);
+    animation:popIn .28s cubic-bezier(.2,.9,.3,1.2)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes popIn{from{opacity:0;transform:translateY(22px) scale(.95)}to{opacity:1;transform:none}}
+  #pqModal .pq-head{flex:none;display:flex;align-items:flex-start;gap:14px;padding:24px 26px 18px;
+    border-bottom:1px solid var(--line)}
+  #pqModal .pq-ic{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;
+    background:color-mix(in srgb,var(--pc) 16%,transparent);border:1px solid color-mix(in srgb,var(--pc) 32%,transparent)}
+  #pqModal .pq-ht{flex:1;min-width:0}
+  #pqModal .pq-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:6px}
+  #pqModal .pq-h1{font-size:19px;font-weight:700;letter-spacing:-.2px;line-height:1.3;margin-bottom:4px}
+  #pqModal .pq-sub{font-size:12px;color:var(--txt3)}
+  #pqModal .pq-x{flex:none;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);cursor:pointer;
+    background:rgba(255,255,255,.05);color:var(--txt2);display:grid;place-items:center;transition:.2s}
+  #pqModal .pq-x:hover{background:rgba(255,255,255,.13);color:var(--txt);transform:rotate(90deg)}
+  #pqModal .pq-x svg{width:13px;height:13px;fill:currentColor}
+  #pqModal .pq-body{flex:1;overflow-y:auto;padding:24px 26px}
+  #pqModal .pq-label{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:10px}
+  #pqModal .pq-text{font-size:14.5px;line-height:2;color:var(--txt);background:rgba(0,0,0,.34);
+    border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:0 14px 14px 0;padding:20px 22px;
+    white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
+  #pqModal .pq-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+  #pqModal .pq-m{font-family:var(--mono);font-size:10.5px;color:var(--txt3);border:1px solid var(--line);
+    border-radius:999px;padding:5px 12px}
+  #pqModal .pq-foot{flex:none;display:flex;align-items:center;gap:10px;padding:16px 26px 22px;border-top:1px solid var(--line)}
+  #pqModal .pq-hint{flex:1;font-size:11.5px;color:var(--txt3);line-height:1.6}
+  #pqModal .pq-copy{flex:none;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;border-radius:12px;
+    border:none;cursor:pointer;font-size:13.5px;font-weight:600;font-family:inherit;color:#06121a;
+    background:linear-gradient(95deg,var(--pc),color-mix(in srgb,var(--pc) 55%,#fff));transition:.2s}
+  #pqModal .pq-copy:hover{transform:translateY(-2px);filter:brightness(1.08)}
+  #pqModal .pq-copy.ok{background:linear-gradient(95deg,#34d399,#10b981)}
+  #pqModal .pq-copy svg{width:14px;height:14px;fill:currentColor}
+  @media(max-width:600px){
+    #pqModal{padding:14px}
+    #pqModal .pq-head{padding:18px 18px 14px}
+    #pqModal .pq-ic{width:38px;height:38px;font-size:18px}
+    #pqModal .pq-body{padding:18px}
+    #pqModal .pq-text{font-size:13.5px;line-height:1.9;padding:16px}
+    #pqModal .pq-foot{flex-direction:column;align-items:stretch;padding:14px 18px 18px}
+    #pqModal .pq-copy{width:100%;justify-content:center}
+  }
+
   #player{position:fixed;inset:0;z-index:100;background:#000;display:none;flex-direction:column}
   #player.on{display:flex}
   .pbar{height:52px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;
@@ -327,11 +385,11 @@
 
   <div class="section-head" id="featured">
     <h2>① Claude Opus 5.5 · 精选三作</h2><span class="cnt">ONE-SHOT / 3 GAMES</span><div class="rule"></div>
-    <div class="hint">一句话提示词、单会话生成、零人工改动，直接部署上线。点击卡片可在页内直接开玩。</div>
+    <div class="hint">一句话提示词、单会话生成、零人工改动，直接部署上线。点击卡片可在页内直接开玩；点击卡片内的 <b style="color:var(--a)">ONE-SHOT PROMPT</b> 区块可查看并复制完整提示词。</div>
   </div>
   <section class="cards">
 
-    <div class="card" data-g="1" data-url="https://claude-opus-5-5.riba2534.cn/" data-name="鹈鹕骑自行车">
+    <div class="card" data-g="1" data-url="https://claude-opus-5-5.riba2534.cn/" data-name="鹈鹕骑自行车" data-emo="🚲" data-cat="THREE.JS · 3D 骑行" data-size="11 模块 · 800KB">
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -342,7 +400,7 @@
           <h3>鹈鹕骑自行车 <span class="mods">THREE.JS</span></h3>
           <p class="desc">戴头盔墨镜、系红围巾的鹈鹕在海岸公路上骑车抓鱼。围巾是布料物理模拟，昼夜循环从黄昏到星空月夜，海面有波浪与碎浪；14 个成就、5 种镜头、浏览器实时合成的音效音乐（节奏跟随踏频）。不操作时它会自动驾驶去追鱼。</p>
           <div class="keys"><kbd>W/S 加减速</kbd><kbd>A/D 变道</kbd><kbd>空格 跳跃</kbd><kbd>T 特技</kbd></div>
-          <div class="pq"><div class="pq-t">ONE-SHOT PROMPT</div><p>"生成一个鹈鹕骑自行车的 3D 页面，尽可能把你所有的能力全部都用上。然后上传到 CDN 上，把访问链接给我"</p></div>
+          <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"生成一个鹈鹕骑自行车的 3D 页面，尽可能把你所有的能力全部都用上。然后上传到 CDN 上，把访问链接给我"</p></div>
           <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
           <div class="card-foot"><span>320s 浸泡测试 · 零内存泄漏</span>
             <a href="https://claude-opus-5-5.riba2534.cn/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
@@ -350,7 +408,7 @@
       </div>
     </div>
 
-    <div class="card" data-g="2" data-url="https://claude-opus-5-5-cf-transport-ship.pages.dev/" data-name="穿越火线 · 运输船">
+    <div class="card" data-g="2" data-url="https://claude-opus-5-5-cf-transport-ship.pages.dev/" data-name="穿越火线 · 运输船" data-emo="🔫" data-cat="FPS · 团队枪战" data-size="18 模块 · 840KB">
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -361,7 +419,7 @@
           <h3>穿越火线 · 运输船 <span class="mods">FPS</span></h3>
           <p class="desc">还原 CF 经典地图「运输船」：模型先检索官方布局图与攻略核对结构——长条形甲板、两端船舱出生点、中部 V 形集装箱、两侧单向管道。完整 FPS 玩法：枪械弹道与后坐力、bots AI 对战、命中反馈与击杀播报、程序化合成的枪声音效，支持触屏。</p>
           <div class="keys"><kbd>WASD 移动</kbd><kbd>鼠标 射击</kbd><kbd>Bots AI</kbd><kbd>触屏支持</kbd></div>
-          <div class="pq"><div class="pq-t">ONE-SHOT PROMPT</div><p>"尽可能真实的还原穿越火线中的运输船地图，我需要一个真实的枪战游戏……做完之后上传到 CDN 上把链接发给我"</p></div>
+          <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"尽可能真实的还原穿越火线中的运输船地图，我需要一个真实的枪战游戏……做完之后上传到 CDN 上把链接发给我"</p></div>
           <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
           <div class="card-foot"><span>地图布局经官方攻略考据</span>
             <a href="https://claude-opus-5-5-cf-transport-ship.pages.dev/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
@@ -369,7 +427,7 @@
       </div>
     </div>
 
-    <div class="card" data-g="3" data-url="https://claude-opus-5-5-qqfeiche3d.pages.dev/" data-name="QQ 飞车">
+    <div class="card" data-g="3" data-url="https://claude-opus-5-5-qqfeiche3d.pages.dev/" data-name="QQ 飞车" data-emo="🏎️" data-cat="RACING · 竞速漂移" data-size="15 模块 · 700KB">
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -380,7 +438,7 @@
           <h3>QQ 飞车 <span class="mods">RACING</span></h3>
           <p class="desc">还原《QQ 飞车》的键位与漂移玩法：Shift 漂移、Ctrl 氮气、小喷与双喷、复位键。内置四张按官方地图风格设计的赛道——十一城（夜景 11 弯 + 发卡弯）、情迷爱琴海（爬坡连续弯）、法老金字塔（末端跳台）、雪地大冒险（8 字立交）。</p>
           <div class="keys"><kbd>Shift 漂移</kbd><kbd>Ctrl 氮气</kbd><kbd>小喷 / 双喷</kbd><kbd>R 复位</kbd></div>
-          <div class="pq"><div class="pq-t">ONE-SHOT PROMPT</div><p>"尽可能真实地还原 QQ 飞车中的游戏地图，包括各种键位以及漂移玩法……做完之后上传到 CDN 上把链接发给我"</p></div>
+          <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"尽可能真实地还原 QQ 飞车中的游戏地图，包括各种键位以及漂移玩法……做完之后上传到 CDN 上把链接发给我"</p></div>
           <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
           <div class="card-foot"><span>赛道俯视图脚本预检弯道</span>
             <a href="https://claude-opus-5-5-qqfeiche3d.pages.dev/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
@@ -425,6 +483,30 @@
   <div class="mono">各作品版权归其作者所有 · 作品为能力测试用途，与原厂商标无关</div>
 </footer>
 
+<div id="pqModal" role="dialog" aria-modal="true" aria-labelledby="pqH1">
+  <div class="pq-backdrop" data-pq-close></div>
+  <div class="pq-card">
+    <div class="pq-head">
+      <div class="pq-ic" id="pqIc">💬</div>
+      <div class="pq-ht">
+        <div class="pq-tag">ONE-SHOT PROMPT · 原始提示词</div>
+        <div class="pq-h1" id="pqH1">—</div>
+        <div class="pq-sub" id="pqSub">—</div>
+      </div>
+      <button class="pq-x" data-pq-close title="关闭 (Esc)"><svg viewBox="0 0 16 16"><path d="M4.1 3.2 8 7.1l3.9-3.9 1.1 1.1L9.1 8.2l3.9 3.9-1.1 1.1L8 9.3l-3.9 3.9-1.1-1.1 3.9-3.9L3 4.3z"/></svg></button>
+    </div>
+    <div class="pq-body">
+      <div class="pq-label">PROMPT</div>
+      <div class="pq-text" id="pqText">—</div>
+      <div class="pq-meta" id="pqMeta"></div>
+    </div>
+    <div class="pq-foot">
+      <div class="pq-hint" id="pqHint">这段提示词是作品从零生成的唯一输入，复制后可直接复现。</div>
+      <button class="pq-copy" id="pqCopy"><svg viewBox="0 0 16 16"><path d="M5.5 1h7A1.5 1.5 0 0 1 14 2.5v9h-1.5V2.5h-7zM2.5 3h6A1.5 1.5 0 0 1 10 4.5v9A1.5 1.5 0 0 1 8.5 15h-6A1.5 1.5 0 0 1 1 13.5v-9A1.5 1.5 0 0 1 2.5 3z"/></svg><span id="pqCopyTxt">复制提示词</span></button>
+    </div>
+  </div>
+</div>
+
 <div id="player" role="dialog" aria-modal="true">
   <div class="pbar">
     <button class="pb-back" id="btnBack"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M10.5 3 5.5 8l5 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>返回门户</span></button>
@@ -465,15 +547,67 @@ function openGame(url,name,accent){
 function closeGame(){player.classList.remove("on");frame.src="about:blank";document.body.style.overflow="";clearTimeout(loadTimer);}
 document.querySelectorAll(".card").forEach(function(card){
   var accent={"1":"#22d3ee","2":"#fb923c","3":"#a78bfa"}[card.dataset.g];
-  card.addEventListener("click",function(e){if(e.target.closest("[data-ext]"))return;
+  card.addEventListener("click",function(e){
+    if(e.target.closest("[data-ext]"))return;
+    if(e.target.closest(".pq")){openPrompt(card,accent);return;}
     openGame(card.dataset.url,card.dataset.name,accent);});
 });
+
+/* ONE-SHOT PROMPT：全屏卡片 */
+var pqModal=document.getElementById("pqModal"),pqIc=document.getElementById("pqIc"),
+    pqH1=document.getElementById("pqH1"),pqSub=document.getElementById("pqSub"),
+    pqText=document.getElementById("pqText"),pqMeta=document.getElementById("pqMeta"),
+    pqCopy=document.getElementById("pqCopy"),pqCopyTxt=document.getElementById("pqCopyTxt"),
+    pqCur="",copyTimer=null;
+
+function openPrompt(card,accent){
+  var pq=card.querySelector(".pq p");
+  if(!pq)return;
+  pqCur=pq.textContent.trim();
+  pqModal.style.setProperty("--pc",accent);
+  pqIc.textContent=card.dataset.emo||"💬";
+  pqH1.textContent=card.dataset.name||"";
+  pqSub.textContent=(card.dataset.cat||"")+" · ONE-SHOT 生成";
+  pqText.textContent=pqCur;
+  var words=pqCur.replace(/[，。、？！""]/g,"").length;
+  pqMeta.innerHTML='<span class="pq-m">'+words+' 字</span>'
+    +'<span class="pq-m">'+(card.dataset.size||"—")+'</span>'
+    +'<span class="pq-m">Claude Opus 5.5</span>'
+    +'<span class="pq-m">单会话 · 零人工改动</span>';
+  pqCopy.classList.remove("ok");pqCopyTxt.textContent="复制提示词";
+  pqModal.classList.add("on");document.body.style.overflow="hidden";
+  clearTimeout(copyTimer);
+}
+function closePrompt(){pqModal.classList.remove("on");
+  if(!player.classList.contains("on"))document.body.style.overflow="";}
 document.getElementById("btnBack").addEventListener("click",closeGame);
 document.getElementById("btnReload").addEventListener("click",function(){fload.classList.remove("off");
   flTxt.textContent="重新加载中…";frame.src=curUrl;});
 document.getElementById("btnNewWin").addEventListener("click",function(){window.open(curUrl,"_blank","noopener");});
 frame.addEventListener("load",function(){if(frame.src!=="about:blank"){setTimeout(function(){fload.classList.add("off");clearTimeout(loadTimer);},400);}});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"&&player.classList.contains("on"))closeGame();});
+document.addEventListener("keydown",function(e){if(e.key!=="Escape")return;
+  if(pqModal.classList.contains("on"))closePrompt();
+  else if(player.classList.contains("on"))closeGame();});
+
+/* 提示词弹层：关闭 + 复制 */
+function pqFallbackCopy(text,cb){
+  var ta=document.createElement("textarea");
+  ta.value=text;ta.style.position="fixed";ta.style.top="0";ta.style.left="0";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
+  try{document.execCommand("copy");cb();}catch(err){}
+  document.body.removeChild(ta);
+}
+pqModal.addEventListener("click",function(e){if(e.target.closest("[data-pq-close]"))closePrompt();});
+pqCopy.addEventListener("click",function(){
+  var text=pqCur,btn=pqCopy,txt=pqCopyTxt;
+  function ok(){
+    btn.classList.add("ok");txt.textContent="已复制 ✓";
+    clearTimeout(copyTimer);copyTimer=setTimeout(function(){btn.classList.remove("ok");txt.textContent="复制提示词";},1900);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(ok,function(){pqFallbackCopy(text,ok);});
+  }else pqFallbackCopy(text,ok);
+});
 
 /* ===== Astra 案例库 ===== */
 (function(){
