@@ -90,10 +90,16 @@
   .card[data-g="3"]:hover{box-shadow:0 24px 60px -22px rgba(167,139,250,.45)}
   .card-inner{position:relative;height:100%;border-radius:21px;overflow:hidden;
     background:linear-gradient(175deg,#10131f,#0a0c15 60%,#0c0e19);display:flex;flex-direction:column}
+  /* 覆盖全卡的外链层：让整卡成为真实链接（支持中键/右键新标签、不被弹窗拦截） */
+  .card-link{position:absolute;inset:0;z-index:3;border-radius:22px;text-indent:-9999px;overflow:hidden}
+  .card-link:focus-visible{outline:2px solid var(--a);outline-offset:3px}
+  /* 卡片内的独立交互元素浮到链接层之上 */
+  .pq,.play-btn,.card-foot{position:relative;z-index:4}
   .card-scene{height:148px;position:relative;overflow:hidden;display:grid;place-items:center}
   .card[data-g="1"] .card-scene{background:linear-gradient(180deg,#07222b,#0a3a44 45%,#123a35)}
   .card[data-g="2"] .card-scene{background:linear-gradient(180deg,#2b1207,#3d1a08 50%,#271008)}
   .card[data-g="3"] .card-scene{background:linear-gradient(180deg,#1b1030,#2a1442 50%,#190f2e)}
+  .card[data-g="4"] .card-scene{background:linear-gradient(180deg,#241a06,#3a2a0a 50%,#1c1305)}
   .scene-glow{position:absolute;width:200px;height:200px;border-radius:50%;filter:blur(48px);opacity:.55}
   .card[data-g="1"] .scene-glow{background:var(--a);top:-70px;left:-50px}
   .card[data-g="2"] .scene-glow{background:var(--c);bottom:-80px;right:-50px}
@@ -122,6 +128,8 @@
     letter-spacing:.8px;color:var(--pc);opacity:0;transform:translateX(-4px);transition:.2s;white-space:nowrap}
   .pq:hover::after{opacity:.75;transform:translateX(0)}
   .card[data-g="1"]{--pc:var(--a)}.card[data-g="2"]{--pc:var(--c)}.card[data-g="3"]{--pc:var(--b)}
+  .card[data-g="4"]{--pc:#fbbf24}
+  .card-scene .keyart{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%}
   .pq .pq-t{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:5px;
     display:flex;align-items:center;gap:6px}
   .pq .pq-t svg{width:10px;height:10px;fill:currentColor;opacity:.8}
@@ -129,6 +137,7 @@
     -webkit-box-orient:vertical;overflow:hidden}
   .play-btn{display:flex;align-items:center;justify-content:center;gap:9px;height:45px;border-radius:13px;border:none;
     cursor:pointer;font-size:14px;font-weight:600;color:#06121a;font-family:inherit;letter-spacing:1px;width:100%;
+    text-decoration:none;box-sizing:border-box;
     background:linear-gradient(95deg,var(--pc),color-mix(in srgb,var(--pc) 55%,#fff));
     box-shadow:0 8px 24px -8px color-mix(in srgb,var(--pc) 70%,transparent);transition:.2s}
   .play-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
@@ -376,7 +385,7 @@
       以及 <b>Awesome GPT-6 Astra</b> 社区收录的 165 个游戏与交互作品——全部保留作者署名与开源地址。
     </p>
     <div class="stats">
-      <div class="stat"><div class="num">168</div><div class="lbl">收录作品总数</div></div>
+      <div class="stat"><div class="num">169</div><div class="lbl">收录作品总数</div></div>
       <div class="stat"><div class="num" id="stShot">165</div><div class="lbl">配图覆盖率</div></div>
       <div class="stat"><div class="num" id="stLive">69</div><div class="lbl">实测在线可玩</div></div>
       <div class="stat"><div class="num" id="stOs">20</div><div class="lbl">附带源码地址</div></div>
@@ -384,12 +393,13 @@
   </section>
 
   <div class="section-head" id="featured">
-    <h2>① Claude Opus 5.5 · 精选三作</h2><span class="cnt">ONE-SHOT / 3 GAMES</span><div class="rule"></div>
-    <div class="hint">一句话提示词、单会话生成、零人工改动，直接部署上线。点击卡片可在页内直接开玩；点击卡片内的 <b style="color:var(--a)">ONE-SHOT PROMPT</b> 区块可查看并复制完整提示词。</div>
+    <h2>① 精选体验</h2><span class="cnt">4 WORKS</span><div class="rule"></div>
+    <div class="hint">前三作由一句话提示词 one-shot 生成、零人工改动直接上线；第四作为独立 WebGPU 作品。点击卡片会在<b style="color:var(--a)">新标签页</b>打开试玩，点击卡片内的 <b style="color:var(--a)">ONE-SHOT PROMPT</b> 区块可查看并复制完整提示词。</div>
   </div>
   <section class="cards">
 
     <div class="card" data-g="1" data-url="https://claude-opus-5-5.riba2534.cn/" data-name="鹈鹕骑自行车" data-emo="🚲" data-cat="THREE.JS · 3D 骑行" data-size="11 模块 · 800KB">
+      <a class="card-link" href="https://claude-opus-5-5.riba2534.cn/" target="_blank" rel="noopener" aria-label="在新标签页打开试玩"></a>
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -401,7 +411,7 @@
           <p class="desc">戴头盔墨镜、系红围巾的鹈鹕在海岸公路上骑车抓鱼。围巾是布料物理模拟，昼夜循环从黄昏到星空月夜，海面有波浪与碎浪；14 个成就、5 种镜头、浏览器实时合成的音效音乐（节奏跟随踏频）。不操作时它会自动驾驶去追鱼。</p>
           <div class="keys"><kbd>W/S 加减速</kbd><kbd>A/D 变道</kbd><kbd>空格 跳跃</kbd><kbd>T 特技</kbd></div>
           <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"生成一个鹈鹕骑自行车的 3D 页面，尽可能把你所有的能力全部都用上。然后上传到 CDN 上，把访问链接给我"</p></div>
-          <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
+          <a class="play-btn" href="https://claude-opus-5-5.riba2534.cn/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验</a>
           <div class="card-foot"><span>320s 浸泡测试 · 零内存泄漏</span>
             <a href="https://claude-opus-5-5.riba2534.cn/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
         </div>
@@ -409,6 +419,7 @@
     </div>
 
     <div class="card" data-g="2" data-url="https://claude-opus-5-5-cf-transport-ship.pages.dev/" data-name="穿越火线 · 运输船" data-emo="🔫" data-cat="FPS · 团队枪战" data-size="18 模块 · 840KB">
+      <a class="card-link" href="https://claude-opus-5-5-cf-transport-ship.pages.dev/" target="_blank" rel="noopener" aria-label="在新标签页打开试玩"></a>
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -420,7 +431,7 @@
           <p class="desc">还原 CF 经典地图「运输船」：模型先检索官方布局图与攻略核对结构——长条形甲板、两端船舱出生点、中部 V 形集装箱、两侧单向管道。完整 FPS 玩法：枪械弹道与后坐力、bots AI 对战、命中反馈与击杀播报、程序化合成的枪声音效，支持触屏。</p>
           <div class="keys"><kbd>WASD 移动</kbd><kbd>鼠标 射击</kbd><kbd>Bots AI</kbd><kbd>触屏支持</kbd></div>
           <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"尽可能真实的还原穿越火线中的运输船地图，我需要一个真实的枪战游戏……做完之后上传到 CDN 上把链接发给我"</p></div>
-          <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
+          <a class="play-btn" href="https://claude-opus-5-5-cf-transport-ship.pages.dev/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验</a>
           <div class="card-foot"><span>地图布局经官方攻略考据</span>
             <a href="https://claude-opus-5-5-cf-transport-ship.pages.dev/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
         </div>
@@ -428,6 +439,7 @@
     </div>
 
     <div class="card" data-g="3" data-url="https://claude-opus-5-5-qqfeiche3d.pages.dev/" data-name="QQ 飞车" data-emo="🏎️" data-cat="RACING · 竞速漂移" data-size="15 模块 · 700KB">
+      <a class="card-link" href="https://claude-opus-5-5-qqfeiche3d.pages.dev/" target="_blank" rel="noopener" aria-label="在新标签页打开试玩"></a>
       <div class="card-inner">
         <div class="card-scene">
           <div class="scene-glow"></div><div class="scene-lines"></div>
@@ -439,9 +451,27 @@
           <p class="desc">还原《QQ 飞车》的键位与漂移玩法：Shift 漂移、Ctrl 氮气、小喷与双喷、复位键。内置四张按官方地图风格设计的赛道——十一城（夜景 11 弯 + 发卡弯）、情迷爱琴海（爬坡连续弯）、法老金字塔（末端跳台）、雪地大冒险（8 字立交）。</p>
           <div class="keys"><kbd>Shift 漂移</kbd><kbd>Ctrl 氮气</kbd><kbd>小喷 / 双喷</kbd><kbd>R 复位</kbd></div>
           <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"尽可能真实地还原 QQ 飞车中的游戏地图，包括各种键位以及漂移玩法……做完之后上传到 CDN 上把链接发给我"</p></div>
-          <button class="play-btn" data-play><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>开始体验</button>
+          <a class="play-btn" href="https://claude-opus-5-5-qqfeiche3d.pages.dev/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验</a>
           <div class="card-foot"><span>赛道俯视图脚本预检弯道</span>
             <a href="https://claude-opus-5-5-qqfeiche3d.pages.dev/" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-g="4" data-url="https://littleprince.dev" data-name="小王子：星辰之旅" data-emo="🌹" data-cat="WebGPU · 星际漫游" data-size="独立作品">
+      <a class="card-link" href="https://littleprince.dev" target="_blank" rel="noopener" aria-label="在新标签页打开小王子：星辰之旅"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="prince-keyart.jpg" alt="小王子：星辰之旅" loading="lazy">
+          <span class="chip l">WebGPU · 实时渲染</span><span class="chip r">水彩 · 星球漫游</span>
+        </div>
+        <div class="card-body">
+          <h3>小王子：星辰之旅 <span class="mods">WEBGPU</span></h3>
+          <p class="desc">「在一颗比房子大不了多少的星球上，住着一位小王子。」以 WebGPU 实时渲染的互动星空场景：水彩质感的 B-612 星球、玻璃罩里的玫瑰与守望的火山，经典意象化为可漫游的光影世界。建议桌面端 Chrome / Edge 打开。</p>
+          <div class="keys"><kbd>WebGPU 加速</kbd><kbd>实时渲染</kbd><kbd>建议桌面端</kbd></div>
+          <a class="play-btn" href="https://littleprince.dev" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验</a>
+          <div class="card-foot"><span>littleprince.dev · 独立作品</span>
+            <a href="https://littleprince.dev" target="_blank" rel="noopener" data-ext>新窗口 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
         </div>
       </div>
     </div>
@@ -546,11 +576,12 @@ function openGame(url,name,accent){
 }
 function closeGame(){player.classList.remove("on");frame.src="about:blank";document.body.style.overflow="";clearTimeout(loadTimer);}
 document.querySelectorAll(".card").forEach(function(card){
-  var accent={"1":"#22d3ee","2":"#fb923c","3":"#a78bfa"}[card.dataset.g];
+  var accent={"1":"#22d3ee","2":"#fb923c","3":"#a78bfa","4":"#fbbf24"}[card.dataset.g];
+  // 整卡跳转由 .card-link 这个真实 <a target="_blank"> 承担，
+  // 这里只处理卡片内的 ONE-SHOT PROMPT 弹窗（点击不应触发跳转）。
   card.addEventListener("click",function(e){
-    if(e.target.closest("[data-ext]"))return;
-    if(e.target.closest(".pq")){openPrompt(card,accent);return;}
-    openGame(card.dataset.url,card.dataset.name,accent);});
+    if(e.target.closest(".pq")){openPrompt(card,accent);}
+  });
 });
 
 /* ONE-SHOT PROMPT：全屏卡片 */
