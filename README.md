@@ -29,10 +29,11 @@
 | 3 | 云舟 · 个人作品集 | [`Yunzhou/`](Yunzhou/) | HTML + 视频/字体资源 | 不需要 | ~1.5 MB |
 | 4 | Agent 装配台 | [`soul-init/`](soul-init/) | 单文件 HTML | 不需要 | ~34 KB |
 | 5 | 项目级研发工作台 | [`requirement-workbench/`](requirement-workbench/) | React 19 + TS 6 + Vite 8 | 不需要 | 需构建 |
-| 6 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
+| 6 | 錦鯉の池 · 可交互日式锦鲤池 | [`KoiPond/`](KoiPond/) | 单文件 HTML + Canvas 2D | 不需要 | ~111 KB |
+| 7 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
 
 > 第 5 个项目为构建型应用，仓库**仅保留源码**（未含 `dist/` 与 `node_modules/`），请按下方说明自行构建。
-> 第 6 个是独立的展示门户，收录 169 个作品（精选 4 款 + Astra 案例库 165 项），与上述 5 个静态小项目无依赖关系。
+> 第 7 个是独立的展示门户，收录 169 个作品（精选 4 款 + Astra 案例库 165 项），与上述 6 个静态小项目无依赖关系。
 
 ---
 
@@ -97,6 +98,12 @@
 | 风险 | 移动端总览 |
 |:--|:--|
 | ![风险](docs-screenshots/wb-12-risks.jpg) | ![移动端总览](docs-screenshots/wb-13-mobile-overview.jpg) |
+
+### 錦鯉の池
+
+春夏秋冬四套庭院景色同池切换，鱼尾只留轻浅的圆形扩散波纹。
+
+![錦鯉の池 四季](KoiPond/seasons.jpg)
 
 ### AI Demo 展示门户（demo-hub）
 
@@ -187,7 +194,18 @@ npm run build    # 产出 dist/
 
 **环境要求**：Node.js ≥ 20.19（推荐 22.x）、现代浏览器。
 
-### 6. AI Demo 展示门户（demo-hub）
+### 6. 錦鯉の池（KoiPond）
+
+可交互的俯视锦鲤池：
+
+- 春樱、夏荷、秋枫、冬雪四套庭院景色，约 1.15 秒交叉淡入，睡莲、漂浮物、粒子与光线同步更新
+- 轻点水面撒饵，锦鲤转向聚拢抢食；轻点鱼查看品种、全长与水深；拖动水面划出涟漪
+- 鱼尾只留下向外扩散的圆形波纹，颜色轻浅，深水鱼更弱，不抢主画面
+- 单文件、离线可用，无后端、无外部依赖
+
+**技术栈**：原生 HTML / CSS / JavaScript + Canvas 2D，单文件约 111 KB。
+
+### 7. AI Demo 展示门户（demo-hub）
 
 一个独立的纯静态单页门户，汇集 **169 个作品**（精选 4 款 + Astra 案例库 165 项）：
 
@@ -251,7 +269,14 @@ HaloPage/
 │       ├── data/                   #    数据模型与示例数据
 │       └── styles/                 #    tokens / ui / layout / pages
 │
-├── demo-hub/                       # ⑥ AI Demo 展示门户（独立）
+├── KoiPond/                        # ⑥ 錦鯉の池 · 可交互日式锦鲤池
+│   ├── index.html                  #    单文件应用（HTML+CSS+JS 内联）
+│   ├── preview.gif                 #    全景动态预览（含四季切换）
+│   ├── swim.gif                    #    游动与尾圈近景
+│   ├── seasons.jpg                 #    四季对照图
+│   └── README.md
+│
+├── demo-hub/                       # ⑦ AI Demo 展示门户（独立）
 │   ├── index.html                  #    门户主页（精选 + 案例库 + iframe 体验层）
 │   ├── astra-data.js               #    案例库数据源（165 项）
 │   ├── README.md                   #    门户说明
@@ -288,7 +313,7 @@ cp -r PickleballLeague/* /path/to/site/static/pickleball/
 https://你的域名/static/pickleball/
 ```
 
-其余项目同理，把目录名换成 `eat`、`yunzhou`、`soul-init`。
+其余项目同理，把目录名换成 `eat`、`yunzhou`、`soul-init`、`koi-pond`。
 
 ### 1Panel / Nginx
 
@@ -303,6 +328,7 @@ https://你的域名/static/pickleball/
 | 云舟 | `/static/yunzhou/` | `你的域名/static/yunzhou/` |
 | 云舟教程 | `/static/yunzhou/视频加载教程/` | `你的域名/static/yunzhou/视频加载教程/` |
 | Agent 装配台 | `/static/soul-init/` | `你的域名/static/soul-init/` |
+| 錦鯉の池 | `/static/koi-pond/` | `你的域名/static/koi-pond/` |
 
 ### 本地预览
 
@@ -333,6 +359,7 @@ python3 -m http.server 8000
 | 今天吃什么 | [`EatHelper/`](https://github.com/xiaopengs/HaloPage/tree/main/EatHelper) |
 | 云舟 作品集 | [`Yunzhou/`](https://github.com/xiaopengs/HaloPage/tree/main/Yunzhou) |
 | Agent 装配台 | [`soul-init/`](https://github.com/xiaopengs/HaloPage/tree/main/soul-init) |
+| 錦鯉の池 | [`KoiPond/`](https://github.com/xiaopengs/HaloPage/tree/main/KoiPond) |
 | 研发工作台 | [`requirement-workbench/`](https://github.com/xiaopengs/HaloPage/tree/main/requirement-workbench) |
 | AI Demo 门户 | [`demo-hub/`](https://github.com/xiaopengs/HaloPage/tree/main/demo-hub) |
 
