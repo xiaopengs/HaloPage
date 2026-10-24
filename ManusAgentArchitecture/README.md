@@ -8,6 +8,7 @@
 - Agent Loop 与传统 ReAct 的对比：循环结构、显式推理、上下文、工具约束、执行环境、错误恢复和并行扩展。
 - 证据边界：区分官方明确能力、结构推断和未公开内部实现。
 - 端侧 Agent Runtime 与端云协同：沙箱、三层记忆、长任务恢复、通信总线、Placement & Task Dispatcher、Local-first / Cloud-first / Hybrid。
+- 端侧沙箱与 Capability Broker 详细伪代码：能力策略、短时令牌、沙箱创建、网络/路径约束、审计、端云 handoff 和可恢复执行。
 
 ## 使用
 
