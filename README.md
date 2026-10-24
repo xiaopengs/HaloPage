@@ -214,6 +214,7 @@ npm run build    # 产出 dist/
 - 明确区分官方事实、结构推断和未公开内部实现
 - 端侧专题：端侧沙箱、Session / Memory / Artifact、长任务 checkpoint、通信路由总线、端云 Placement 与 ADK 对照
 - 伪代码专题：Capability Broker、能力令牌、沙箱资源限制、审计、端云 handoff 和可恢复任务执行
+- 长任务专题：分级持久化、事件日志、Checkpoint、向量记忆、混合检索、恢复、压缩淘汰和端云同步
 
 **技术栈**：单文件 HTML + 内联 CSS / SVG / JavaScript，无框架、无构建、无外部依赖。
 

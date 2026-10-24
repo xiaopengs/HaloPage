@@ -9,6 +9,7 @@
 - 证据边界：区分官方明确能力、结构推断和未公开内部实现。
 - 端侧 Agent Runtime 与端云协同：沙箱、三层记忆、长任务恢复、通信总线、Placement & Task Dispatcher、Local-first / Cloud-first / Hybrid。
 - 端侧沙箱与 Capability Broker 详细伪代码：能力策略、短时令牌、沙箱创建、网络/路径约束、审计、端云 handoff 和可恢复执行。
+- 分级记忆与长时间任务伪代码：Canonical Event Log、Reducer、Checkpoint、MemoryRecord、本地向量检索、压缩淘汰、断点恢复、调度和端云同步。
 
 ## 使用
 
