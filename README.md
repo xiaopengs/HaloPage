@@ -31,7 +31,7 @@
 | 5 | 项目级研发工作台 | [`requirement-workbench/`](requirement-workbench/) | React 19 + TS 6 + Vite 8 | 不需要 | 需构建 |
 | 6 | 錦鯉の池 · 可交互日式锦鲤池 | [`KoiPond/`](KoiPond/) | 单文件 HTML + Canvas 2D | 不需要 | ~111 KB |
 | 7 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
-| 8 | Manus 整体架构与 ReAct 对比 | [`ManusAgentArchitecture/`](ManusAgentArchitecture/) | 单文件 HTML + 内联 SVG/JS | 不需要 | ~23 KB |
+| 8 | Manus 整体架构与 ReAct 对比 | [`ManusAgentArchitecture/`](ManusAgentArchitecture/) | 单文件 HTML + 内联 SVG/JS | 不需要 | ~37 KB |
 
 > 第 5 个项目为构建型应用，仓库**仅保留源码**（未含 `dist/` 与 `node_modules/`），请按下方说明自行构建。
 > 第 7 个是独立的展示门户，收录 169 个作品（精选 4 款 + Astra 案例库 165 项），与上述 6 个静态小项目无依赖关系。
@@ -212,6 +212,7 @@ npm run build    # 产出 dist/
 - Agent Loop 与传统 ReAct 的对比：循环结构、显式推理、上下文、工具约束、执行环境、错误恢复和并行扩展
 - 点击架构节点可查看说明，支持运行数据流动画、聚焦 Agent Loop / 运行环境和标签页切换
 - 明确区分官方事实、结构推断和未公开内部实现
+- 端侧专题：端侧沙箱、Session / Memory / Artifact、长任务 checkpoint、通信路由总线、端云 Placement 与 ADK 对照
 
 **技术栈**：单文件 HTML + 内联 CSS / SVG / JavaScript，无框架、无构建、无外部依赖。
 
