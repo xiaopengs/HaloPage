@@ -1,0 +1,10 @@
+node_modules/
+dist/
+app/server/public/
+app/server/data/
+app/server/uploads/
+app/server/backups/
+.env
+.env.local
+*.log
+.DS_Store

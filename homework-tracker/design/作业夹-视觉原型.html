@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F7F9FC" />
+  <title>作业夹 · 一周作业，一夹收好</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #F7F9FC;
+      --card: #FFFFFF;
+      --ink: #20304A;
+      --slate: #66758C;
+      --rule: #DDE5EF;
+      --redpen: #C84636;
+      --redpen-dark: #AC392C;
+      --redpen-soft: #FBEFEC;
+      --done: #238A68;
+      --chinese: #C4455E;
+      --math: #356FD6;
+      --english: #7656C9;
+      --science: #16877A;
+      --morality: #A96F18;
+      --other: #66758C;
+      --radius-card: 16px;
+      --radius-input: 12px;
+      --shadow-edit: 0 18px 48px rgba(32, 48, 74, .10);
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(var(--rule), var(--rule)) 0 0 / 100% 1px no-repeat,
+        var(--paper);
+      font-family: "Noto Sans SC", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(32, 48, 74, .34);
+      outline-offset: 3px;
+    }
+    .num { font-family: "Space Grotesk", "Noto Sans SC", sans-serif; font-variant-numeric: tabular-nums; }
+    .muted { color: var(--slate); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    [hidden] { display: none !important; }
+
+    .app-shell { max-width: 1120px; margin: 0 auto; padding: 0 16px 104px; animation: arrive .45s ease-out both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .app-header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-mark { width: 34px; height: 38px; flex: 0 0 auto; color: var(--ink); }
+    .brand-name { font-size: 20px; line-height: 1.2; font-weight: 800; letter-spacing: -.02em; }
+    .brand-note { display: none; color: var(--slate); font-size: 12px; margin-top: 2px; }
+    .child-switch { display: flex; align-items: center; gap: 8px; color: var(--slate); font-size: 13px; }
+    .child-switch select {
+      appearance: none; border: 1px solid var(--rule); border-radius: 999px; background: var(--card);
+      color: var(--ink); font-weight: 700; padding: 8px 30px 8px 14px; min-height: 40px;
+      background-image: linear-gradient(45deg, transparent 50%, var(--slate) 50%), linear-gradient(135deg, var(--slate) 50%, transparent 50%);
+      background-position: calc(100% - 16px) 17px, calc(100% - 11px) 17px;
+      background-size: 5px 5px; background-repeat: no-repeat;
+    }
+    .desktop-nav { display: none; }
+
+    .view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 20px 0 18px; }
+    .view-title { margin: 0; font-size: 24px; line-height: 1.3; font-weight: 800; letter-spacing: -.02em; }
+    .view-subtitle { margin: 5px 0 0; color: var(--slate); font-size: 13px; max-width: 46ch; }
+    .week-total { color: var(--slate); font-size: 13px; white-space: nowrap; padding-bottom: 2px; }
+
+    .week-nav {
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
+      padding: 10px 0 18px; border-top: 1px solid var(--rule);
+    }
+    .week-button {
+      min-height: 44px; border: 0; background: transparent; color: var(--ink); font-weight: 700; padding: 8px 4px;
+    }
+    .week-button:hover { color: var(--redpen); }
+    .week-button.next { text-align: right; }
+    .week-button.prev { text-align: left; }
+    .week-range { text-align: center; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+    .week-range small { display: block; color: var(--slate); font-family: "Noto Sans SC", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0; }
+    .back-week { display: block; margin: -8px auto 14px; border: 0; background: transparent; color: var(--redpen); font-size: 13px; font-weight: 700; min-height: 36px; }
+
+    .board-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .day-card {
+      display: grid; grid-template-columns: 64px minmax(0, 1fr); background: var(--card);
+      border: 1px solid var(--rule); border-radius: var(--radius-card); overflow: hidden;
+    }
+    .date-rail { padding: 17px 8px 14px 14px; border-right: 1px solid var(--rule); }
+    .date-number { display: block; font-size: 34px; line-height: 1.05; font-weight: 700; letter-spacing: -.055em; }
+    .date-weekday { display: block; margin-top: 5px; color: var(--slate); font-size: 12px; font-weight: 500; }
+    .day-card.is-today .date-rail { background: var(--redpen-soft); }
+    .day-card.is-today .date-number { color: var(--redpen); }
+    .day-body { min-width: 0; padding: 14px 14px 14px 16px; }
+    .day-meta { min-height: 24px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .today-label { color: var(--redpen); font-size: 12px; font-weight: 700; }
+    .day-count { color: var(--slate); font-size: 12px; white-space: nowrap; }
+    .empty-day { margin: 5px 0 3px; color: var(--slate); font-size: 13px; }
+    .empty-day button { border: 0; padding: 0 0 0 6px; background: transparent; color: var(--redpen); font-weight: 700; }
+    .subject-group + .subject-group { margin-top: 12px; }
+    .subject-name { display: flex; align-items: center; gap: 7px; margin: 0 0 5px; font-size: 13px; font-weight: 700; color: var(--subject); }
+    .subject-name::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--subject); }
+    .homework-list { list-style: none; margin: 0; padding: 0; }
+    .homework-item { position: relative; display: flex; align-items: flex-start; gap: 9px; padding: 7px 0 7px 11px; }
+    .homework-item::before { content: ""; position: absolute; left: 0; top: 11px; bottom: 11px; width: 2px; border-radius: 2px; background: var(--subject); }
+    .check {
+      flex: 0 0 auto; width: 24px; height: 24px; margin-top: 1px; border: 1.5px solid var(--rule); border-radius: 7px;
+      background: var(--card); color: transparent; display: grid; place-items: center; padding: 0;
+    }
+    .check svg { width: 15px; height: 15px; }
+    .homework-item.done .check { border-color: var(--done); background: var(--done); color: white; }
+    .homework-text { min-width: 0; overflow-wrap: anywhere; line-height: 1.55; }
+    .homework-item.done .homework-text { color: var(--slate); text-decoration: line-through; text-decoration-thickness: 1px; }
+    .homework-item.fresh { animation: fresh 1.8s ease-out; }
+    @keyframes fresh { 0%, 35% { background: #FFF4DF; } 100% { background: transparent; } }
+
+    /* 记作业：便签输入卡 */
+    .record-layout { display: grid; gap: 18px; }
+    .record-card {
+      position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius-card);
+      padding: 22px 18px 18px; box-shadow: var(--shadow-edit);
+    }
+    .record-card::before { content: ""; position: absolute; top: 0; left: 22px; right: 22px; height: 3px; background: var(--redpen); border-radius: 0 0 3px 3px; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px 12px; }
+    .field { min-width: 0; }
+    .field.subject-field { grid-column: 1 / -1; }
+    .field-label { display: block; margin-bottom: 7px; color: var(--ink); font-size: 13px; font-weight: 700; }
+    .text-input {
+      width: 100%; min-height: 44px; border: 1px solid var(--rule); border-radius: var(--radius-input);
+      background: var(--card); color: var(--ink); padding: 9px 12px;
+    }
+    .text-input:focus { border-color: var(--ink); }
+    .subject-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .subject-chip {
+      min-height: 38px; border: 1px solid transparent; border-radius: 999px; padding: 7px 13px;
+      background: var(--chip-bg); color: var(--chip); font-size: 13px; font-weight: 700;
+    }
+    .subject-chip[aria-pressed="true"] { border-color: var(--chip); box-shadow: inset 0 0 0 1px var(--chip); }
+    .subject-chip[aria-pressed="true"]::before { content: "✓ "; }
+    .date-row { display: flex; gap: 7px; }
+    .date-row .text-input { min-width: 0; padding-inline: 8px; font-size: 13px; }
+    .today-button { flex: 0 0 auto; border: 1px solid var(--rule); border-radius: var(--radius-input); background: var(--paper); color: var(--ink); padding: 0 11px; font-size: 13px; font-weight: 700; }
+    .textarea-field { margin-top: 18px; }
+    .textarea-wrap { position: relative; }
+    .homework-input {
+      display: block; width: 100%; min-height: 154px; resize: vertical; border: 1px solid var(--rule);
+      border-radius: var(--radius-input); outline: none; padding: 15px 14px; color: var(--ink);
+      background-color: #FCFDFE;
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 30px, rgba(221,229,239,.62) 30px, rgba(221,229,239,.62) 31px);
+      line-height: 31px; font-size: 15px;
+    }
+    .homework-input:focus { border-color: var(--ink); background-color: var(--card); }
+    .homework-input::placeholder { color: #8996A9; }
+    .input-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 7px; color: var(--slate); font-size: 12px; }
+    .line-count { color: var(--ink); font-weight: 700; white-space: nowrap; }
+    .quick-phrases { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .quick-phrase { min-height: 34px; border: 1px dashed var(--rule); border-radius: 8px; background: transparent; color: var(--slate); padding: 5px 9px; font-size: 12px; }
+    .quick-phrase:hover { border-color: var(--slate); color: var(--ink); }
+    .form-error { min-height: 22px; margin: 9px 0 0; color: var(--redpen); font-size: 13px; font-weight: 500; }
+    .save-button {
+      width: 100%; min-height: 50px; border: 0; border-radius: 12px; background: var(--redpen); color: white;
+      font-size: 16px; font-weight: 800; letter-spacing: .01em;
+    }
+    .save-button:hover { background: var(--redpen-dark); }
+    .save-button:active { transform: translateY(1px); }
+    .save-note { margin: 8px 0 0; color: var(--slate); text-align: center; font-size: 12px; }
+    .photo-assist { display: flex; gap: 12px; align-items: flex-start; padding: 15px 16px; border: 1px dashed var(--rule); border-radius: var(--radius-card); }
+    .photo-assist svg { flex: 0 0 auto; width: 24px; color: var(--slate); }
+    .photo-assist h3 { margin: 0 0 3px; font-size: 14px; }
+    .photo-assist p { margin: 0; color: var(--slate); font-size: 12px; }
+    .photo-assist button { margin-left: auto; flex: 0 0 auto; border: 0; background: transparent; color: var(--redpen); font-size: 13px; font-weight: 700; padding: 4px; }
+    .record-preview { display: none; }
+
+    .tabbar {
+      position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1fr;
+      padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96);
+      border-top: 1px solid var(--rule); backdrop-filter: blur(12px);
+    }
+    .tab { min-height: 52px; border: 0; border-radius: 12px; background: transparent; color: var(--slate); font-weight: 700; }
+    .tab[aria-current="page"] { color: var(--redpen); background: var(--redpen-soft); }
+    .tab-icon { display: block; font-size: 18px; line-height: 1.2; margin-bottom: 2px; }
+    .tab-text { font-size: 12px; }
+
+    .toast {
+      position: fixed; z-index: 50; left: 50%; bottom: 92px; transform: translateX(-50%);
+      max-width: calc(100vw - 32px); padding: 11px 16px; border-radius: 10px; background: var(--ink); color: white;
+      font-size: 13px; font-weight: 500; box-shadow: 0 10px 30px rgba(32,48,74,.2);
+    }
+
+    @media (min-width: 640px) {
+      .app-shell { padding-inline: 24px; }
+      .brand-note { display: block; }
+      .board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .record-card { padding: 26px; }
+      .form-grid { grid-template-columns: minmax(150px, .7fr) minmax(240px, 1.3fr); }
+      .subject-chips { gap: 7px; }
+    }
+    @media (min-width: 900px) {
+      .app-shell { padding: 0 32px 56px; }
+      .app-header { min-height: 88px; }
+      .desktop-nav { display: flex; gap: 6px; margin-left: auto; margin-right: 20px; }
+      .desktop-nav .tab { min-height: 42px; padding: 6px 16px; }
+      .desktop-nav .tab-icon { display: none; }
+      .tabbar { display: none; }
+      .board-grid { gap: 16px; }
+      .date-number { font-size: 40px; }
+      .date-rail { padding-left: 16px; }
+      .record-layout { grid-template-columns: minmax(0, 1.5fr) minmax(280px, .8fr); align-items: start; }
+      .record-preview { display: block; border-left: 1px solid var(--rule); padding-left: 24px; }
+      .record-preview h2 { margin: 0 0 6px; font-size: 18px; }
+      .record-preview p { margin: 0 0 16px; color: var(--slate); font-size: 13px; }
+      .preview-list { list-style: none; margin: 0; padding: 0; }
+      .preview-list li { padding: 11px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+      .preview-list strong { display: block; margin-bottom: 3px; }
+      .toast { bottom: 30px; }
+    }
+    @media (min-width: 1080px) { .board-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 34 38" fill="none" aria-hidden="true">
+          <path d="M7 4.5h20v29H7z" stroke="currentColor" stroke-width="2" />
+          <path d="M12 2v6M22 2v6M12 14h10M12 20h10M12 26h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M24 27l2.5 2.5L31 24" stroke="#C84636" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <div><div class="brand-name">作业夹</div><div class="brand-note">一周作业，一夹收好</div></div>
+      </div>
+      <nav class="desktop-nav" aria-label="主导航">
+        <button class="tab" data-view="board" aria-current="page">周看板</button>
+        <button class="tab" data-view="record">记作业</button>
+      </nav>
+      <label class="child-switch">孩子
+        <select id="childSelect" aria-label="选择孩子"></select>
+      </label>
+    </header>
+
+    <main>
+      <section id="boardView" aria-labelledby="boardTitle">
+        <div class="view-head">
+          <div><h1 class="view-title" id="boardTitle">这周作业</h1><p class="view-subtitle">按天翻开，按科打勾。</p></div>
+          <div class="week-total num" id="weekTotal"></div>
+        </div>
+        <div class="week-nav" aria-label="切换周">
+          <button class="week-button prev" id="prevWeek">‹ 上一周</button>
+          <div class="week-range num" id="weekRange"></div>
+          <button class="week-button next" id="nextWeek">下一周 ›</button>
+        </div>
+        <button class="back-week" id="backWeek" hidden>回到本周</button>
+        <div class="board-grid" id="boardGrid"></div>
+      </section>
+
+      <section id="recordView" aria-labelledby="recordTitle" hidden>
+        <div class="view-head">
+          <div><h1 class="view-title" id="recordTitle">记作业</h1><p class="view-subtitle">每行保存为一条，识别结果也会预填到这里核对。</p></div>
+        </div>
+        <div class="record-layout">
+          <div>
+            <form class="record-card" id="homeworkForm" novalidate>
+              <div class="form-grid">
+                <div class="field">
+                  <label class="field-label" for="recordChild">孩子</label>
+                  <select class="text-input" id="recordChild"></select>
+                </div>
+                <div class="field">
+                  <label class="field-label" for="recordDate">日期</label>
+                  <div class="date-row"><input class="text-input num" type="date" id="recordDate" required /><button class="today-button" type="button" id="todayButton">今天</button></div>
+                </div>
+                <div class="field subject-field">
+                  <span class="field-label" id="subjectLabel">学科</span>
+                  <div class="subject-chips" id="subjectChips" role="group" aria-labelledby="subjectLabel"></div>
+                </div>
+              </div>
+              <div class="field textarea-field">
+                <label class="field-label" for="homeworkInput">手动输入作业</label>
+                <div class="textarea-wrap">
+                  <textarea class="homework-input" id="homeworkInput" rows="5" placeholder="每行一条作业，例如：&#10;数学练习册第 32 页&#10;背诵英语第 3 单元单词" aria-describedby="inputHint formError"></textarea>
+                </div>
+                <div class="input-meta"><span id="inputHint">每行一条，空行会自动忽略</span><span class="line-count num" id="lineCount">将保存 0 条</span></div>
+                <div class="quick-phrases" aria-label="快捷短语">
+                  <button class="quick-phrase" type="button" data-text="练习册第 页">练习册第_页</button>
+                  <button class="quick-phrase" type="button" data-text="抄写第 课生字">抄写第_课</button>
+                  <button class="quick-phrase" type="button" data-text="订正今天的错题">订正错题</button>
+                  <button class="quick-phrase" type="button" data-text="背诵并家长签字">背诵并签字</button>
+                </div>
+              </div>
+              <p class="form-error" id="formError" role="alert"></p>
+              <button class="save-button" type="submit">保存到周看板</button>
+              <p class="save-note">保存后会归入所选孩子、日期和学科</p>
+            </form>
+            <div class="photo-assist" style="margin-top:16px">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.7"/></svg>
+              <div><h3>拍照识别</h3><p>正式版识别后预填到上方输入框，核对后再保存。</p></div>
+              <button type="button" id="photoDemo">了解入口</button>
+            </div>
+          </div>
+          <aside class="record-preview" aria-label="本周预览">
+            <h2>保存后到哪里？</h2><p>作业会贴进对应日期，并按学科归类。这里预览当前孩子本周已有内容。</p>
+            <ul class="preview-list" id="previewList"></ul>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="tabbar" aria-label="主导航">
+    <button class="tab" data-view="board" aria-current="page"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-text">周看板</span></button>
+    <button class="tab" data-view="record"><span class="tab-icon" aria-hidden="true">＋</span><span class="tab-text">记作业</span></button>
+  </nav>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script>
+    const SUBJECTS = [
+      { id: 'chinese', name: '语文', color: '#C4455E', bg: '#FBECEF' },
+      { id: 'math', name: '数学', color: '#356FD6', bg: '#EBF1FD' },
+      { id: 'english', name: '英语', color: '#7656C9', bg: '#F1EDFB' },
+      { id: 'science', name: '科学', color: '#16877A', bg: '#E7F5F2' },
+      { id: 'morality', name: '道德与法治', color: '#A96F18', bg: '#FBF3E4' },
+      { id: 'other', name: '其他', color: '#66758C', bg: '#EEF2F6' }
+    ];
+    const CHILDREN = [{ id: 'dabao', name: '大宝', grade: '三年级' }, { id: 'erbao', name: '二宝', grade: '一年级' }];
+    const STORE_KEY = 'homework-binder-prototype-v1';
+    const WEEKDAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => [...document.querySelectorAll(s)];
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const parseDate = s => new Date(`${s}T12:00:00`);
+    const mondayOf = d => { const x = new Date(d); const day = x.getDay() || 7; x.setDate(x.getDate() - day + 1); x.setHours(12,0,0,0); return x; };
+    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+    const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
+    const subjectOf = id => SUBJECTS.find(s => s.id === id) || SUBJECTS[5];
+    const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const today = new Date(); today.setHours(12,0,0,0);
+    const thisMonday = mondayOf(today);
+    let state = { childId: 'dabao', weekOffset: 0, view: 'board', subjectId: null, homeworks: [] };
+
+    function seed() {
+      const d0 = dateStr(thisMonday), d1 = dateStr(addDays(thisMonday, 1)), dt = dateStr(today);
+      return [
+        { id: uid(), childId: 'dabao', date: d0, subjectId: 'chinese', content: '抄写第 8 课生字，每个两遍', done: true },
+        { id: uid(), childId: 'dabao', date: d0, subjectId: 'math', content: '数学练习册第 30 页，口算 20 题', done: true },
+        { id: uid(), childId: 'dabao', date: d1, subjectId: 'english', content: '背诵第 3 单元单词，家长签字', done: false },
+        { id: uid(), childId: 'dabao', date: dt, subjectId: 'chinese', content: '朗读课文第 2 段三遍', done: false },
+        { id: uid(), childId: 'dabao', date: dt, subjectId: 'math', content: '订正今天的错题', done: false },
+        { id: uid(), childId: 'dabao', date: dt, subjectId: 'science', content: '观察一种植物，记录它的叶子形状', done: false },
+        { id: uid(), childId: 'erbao', date: dt, subjectId: 'chinese', content: '拼音第 6 页，读给家长听', done: false }
+      ];
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      state.homeworks = Array.isArray(saved) ? saved : seed();
+    } catch { state.homeworks = seed(); }
+    const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state.homeworks)); } catch {} };
+
+    function showView(view) {
+      state.view = view;
+      $('#boardView').hidden = view !== 'board';
+      $('#recordView').hidden = view !== 'record';
+      $$('.tab').forEach(b => b.getAttribute('data-view') === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+      if (view === 'record') { updateLineCount(); renderPreview(); }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    function showToast(text) {
+      const t = $('#toast'); t.textContent = text; t.hidden = false;
+      clearTimeout(showToast.timer); showToast.timer = setTimeout(() => { t.hidden = true; }, 2400);
+    }
+    function renderChildOptions() {
+      const html = CHILDREN.map(c => `<option value="${c.id}">${c.name} · ${c.grade}</option>`).join('');
+      $('#childSelect').innerHTML = html; $('#recordChild').innerHTML = html;
+      $('#childSelect').value = state.childId; $('#recordChild').value = state.childId;
+    }
+    function renderSubjects() {
+      $('#subjectChips').innerHTML = SUBJECTS.map(s => `<button type="button" class="subject-chip" style="--chip:${s.color};--chip-bg:${s.bg}" data-subject="${s.id}" aria-pressed="${state.subjectId === s.id}">${s.name}</button>`).join('');
+    }
+
+    function renderBoard() {
+      const monday = addDays(thisMonday, state.weekOffset * 7);
+      const sunday = addDays(monday, 6);
+      $('#weekRange').innerHTML = `${monday.getMonth()+1}/${monday.getDate()}—${sunday.getMonth()+1}/${sunday.getDate()}<small>${state.weekOffset === 0 ? '本周' : state.weekOffset < 0 ? `${Math.abs(state.weekOffset)} 周前` : `${state.weekOffset} 周后`}</small>`;
+      $('#backWeek').hidden = state.weekOffset === 0;
+      const weekItems = state.homeworks.filter(h => h.childId === state.childId && parseDate(h.date) >= monday && parseDate(h.date) <= sunday);
+      $('#weekTotal').textContent = `${weekItems.length} 条 · 已完成 ${weekItems.filter(x => x.done).length}`;
+      $('#boardGrid').innerHTML = Array.from({ length: 7 }, (_, i) => {
+        const d = addDays(monday, i), ds = dateStr(d), isToday = ds === dateStr(today);
+        const items = weekItems.filter(h => h.date === ds);
+        const groups = SUBJECTS.map(s => ({ subject: s, items: items.filter(h => h.subjectId === s.id) })).filter(g => g.items.length);
+        const body = groups.length ? groups.map(g => `
+          <div class="subject-group" style="--subject:${g.subject.color}">
+            <h3 class="subject-name">${g.subject.name}</h3>
+            <ul class="homework-list">${g.items.map(item => `
+              <li class="homework-item ${item.done ? 'done' : ''}" data-item="${item.id}">
+                <button class="check" data-check="${item.id}" aria-label="${item.done ? '标记为未完成' : '标记为已完成'}：${escapeHtml(item.content)}" aria-pressed="${item.done}">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8 3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button><span class="homework-text">${escapeHtml(item.content)}</span>
+              </li>`).join('')}</ul>
+          </div>`).join('') : `<p class="empty-day">这一天还没有作业。<button type="button" data-record-date="${ds}">记作业</button></p>`;
+        return `<article class="day-card ${isToday ? 'is-today' : ''}">
+          <div class="date-rail"><span class="date-number num">${pad(d.getDate())}</span><span class="date-weekday">${WEEKDAYS[i]}</span></div>
+          <div class="day-body"><div class="day-meta"><span class="today-label">${isToday ? '今天' : `${d.getMonth()+1} 月`}</span><span class="day-count num">${items.length ? `${items.filter(x=>x.done).length}/${items.length} 已完成` : '0 条'}</span></div>${body}</div>
+        </article>`;
+      }).join('');
+    }
+
+    function renderPreview() {
+      const monday = thisMonday, sunday = addDays(monday, 6);
+      const items = state.homeworks.filter(h => h.childId === state.childId && parseDate(h.date) >= monday && parseDate(h.date) <= sunday).slice(0, 5);
+      $('#previewList').innerHTML = items.length ? items.map(h => `<li><strong>${parseDate(h.date).getMonth()+1}/${parseDate(h.date).getDate()} · ${subjectOf(h.subjectId).name}</strong>${escapeHtml(h.content)}</li>`).join('') : '<li>本周还没有作业。保存第一条后，会出现在这里。</li>';
+    }
+    function lines() { return $('#homeworkInput').value.split('\n').map(s => s.trim()).filter(Boolean); }
+    function updateLineCount() { $('#lineCount').textContent = `将保存 ${lines().length} 条`; }
+
+    $$('.tab').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+    $('#childSelect').addEventListener('change', e => { state.childId = e.target.value; $('#recordChild').value = state.childId; renderBoard(); });
+    $('#recordChild').addEventListener('change', e => { state.childId = e.target.value; $('#childSelect').value = state.childId; renderPreview(); });
+    $('#prevWeek').addEventListener('click', () => { state.weekOffset--; renderBoard(); });
+    $('#nextWeek').addEventListener('click', () => { state.weekOffset++; renderBoard(); });
+    $('#backWeek').addEventListener('click', () => { state.weekOffset = 0; renderBoard(); });
+    $('#todayButton').addEventListener('click', () => { $('#recordDate').value = dateStr(today); });
+    $('#subjectChips').addEventListener('click', e => {
+      const b = e.target.closest('[data-subject]'); if (!b) return;
+      state.subjectId = b.dataset.subject; $('#formError').textContent = ''; renderSubjects();
+    });
+    $('#homeworkInput').addEventListener('input', () => { updateLineCount(); $('#formError').textContent = ''; });
+    $$('.quick-phrase').forEach(b => b.addEventListener('click', () => {
+      const ta = $('#homeworkInput');
+      ta.value = ta.value.trim() ? `${ta.value.trim()}\n${b.dataset.text}` : b.dataset.text;
+      ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); updateLineCount();
+    }));
+    $('#photoDemo').addEventListener('click', () => showToast('正式版：拍照识别后预填到输入框，核对再保存。'));
+    $('#boardGrid').addEventListener('click', e => {
+      const check = e.target.closest('[data-check]');
+      if (check) {
+        const item = state.homeworks.find(h => h.id === check.dataset.check);
+        if (item) { item.done = !item.done; persist(); renderBoard(); }
+        return;
+      }
+      const rec = e.target.closest('[data-record-date]');
+      if (rec) { $('#recordDate').value = rec.dataset.recordDate; showView('record'); }
+    });
+    $('#homeworkForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const content = lines();
+      if (!state.subjectId) { $('#formError').textContent = '先选择学科，再保存作业。'; return; }
+      if (!content.length) { $('#formError').textContent = '先写一条作业，每行一条。'; $('#homeworkInput').focus(); return; }
+      if (!$('#recordDate').value) { $('#formError').textContent = '先选择作业日期。'; return; }
+      const newIds = [];
+      content.forEach(text => {
+        const id = uid(); newIds.push(id);
+        state.homeworks.push({ id, childId: state.childId, date: $('#recordDate').value, subjectId: state.subjectId, content: text, done: false });
+      });
+      persist();
+      const targetMonday = mondayOf(parseDate($('#recordDate').value));
+      state.weekOffset = Math.round((targetMonday - thisMonday) / (7 * 86400000));
+      $('#homeworkInput').value = ''; updateLineCount(); $('#formError').textContent = '';
+      showView('board'); renderBoard();
+      newIds.forEach(id => document.querySelector(`[data-item="${id}"]`)?.classList.add('fresh'));
+      showToast(`已保存 ${newIds.length} 条到周看板`);
+    });
+
+    renderChildOptions(); renderSubjects();
+    $('#recordDate').value = dateStr(today);
+    renderBoard(); updateLineCount();
+  </script>
+</body>
+</html>

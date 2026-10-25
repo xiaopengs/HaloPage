@@ -1,0 +1,38 @@
+/* 作业夹设计令牌：颜色、字体、间距、圆角 */
+:root {
+  --paper: #F7F9FC;
+  --card: #FFFFFF;
+  --ink: #20304A;
+  --ink-soft: #3A4C68;
+  --slate: #66758C;
+  --rule: #DDE5EF;
+  --rule-strong: #C9D5E3;
+  --redpen: #C84636;
+  --redpen-dark: #AC392C;
+  --redpen-soft: #FBEFEC;
+  --warn-soft: #FBF3E4;
+  --warn: #A96F18;
+  --done: #238A68;
+  --done-soft: #E8F4EF;
+
+  --chinese: #C4455E;
+  --chinese-bg: #FBECEF;
+  --math: #356FD6;
+  --math-bg: #EBF1FD;
+  --english: #7656C9;
+  --english-bg: #F1EDFB;
+  --science: #16877A;
+  --science-bg: #E7F5F2;
+  --morality: #A96F18;
+  --morality-bg: #FBF3E4;
+  --other: #66758C;
+  --other-bg: #EEF2F6;
+
+  --font-cn: "Noto Sans SC", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-num: "Space Grotesk", "Noto Sans SC", sans-serif;
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --shadow-float: 0 18px 48px rgba(32, 48, 74, .12);
+  --shadow-modal: 0 24px 64px rgba(20, 32, 52, .18);
+  color-scheme: light;
+}

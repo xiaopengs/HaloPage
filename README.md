@@ -2,7 +2,7 @@
 
 静态页面小项目集合，用于部署到 Halo / 1Panel / Nginx 的 `/static/xxx/` 路径下。
 
-> 全部项目均为 **纯静态产物** —— 无后端、无 API Key、无数据库，复制即用。
+> 除第 9 项「作业夹」为**全栈应用**（Node + SQLite，需运行后端）外，其余项目均为 **纯静态产物** —— 无后端、无 API Key、无数据库，复制即用。
 > 另收录一个独立的 AI Demo 展示门户 [`demo-hub/`](demo-hub/)（169 个作品：精选 4 款 + Astra 案例库 165 项）。
 
 ---
@@ -32,9 +32,11 @@
 | 6 | 錦鯉の池 · 双场景（锦鲤池 / 海岛浅滩） | [`KoiPond/`](KoiPond/) + [`OceanShallows/`](OceanShallows/) | 单文件 HTML + Canvas 2D + WebGL | 不需要 | ~840 KB |
 | 7 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
 | 8 | Manus 整体架构与 ReAct 对比 | [`ManusAgentArchitecture/`](ManusAgentArchitecture/) | 单文件 HTML + 内联 SVG/JS | 不需要 | ~37 KB |
+| 9 | 作业夹 · 多孩作业记录 | [`homework-tracker/`](homework-tracker/) | Vue 3 + Vite + Node/Express + SQLite | **需要（Node 22）** | 需构建 |
 
 > 第 5 个项目为构建型应用，仓库**仅保留源码**（未含 `dist/` 与 `node_modules/`），请按下方说明自行构建。
 > 第 7 个是独立的展示门户，收录 169 个作品（精选 4 款 + Astra 案例库 165 项），与上述 6 个静态小项目无依赖关系。
+> 第 9 个是全栈应用，仓库保留源码；启动方式见 [`homework-tracker/README.md`](homework-tracker/README.md)。
 
 ---
 
@@ -49,6 +51,8 @@
 | 云舟视频加载教程 | <https://thinkspc.fun/video-loading-tutorial/> | 作者部署 |
 | Agent 装配台 | <https://thinkspc.fun/static/soul-init/> | 作者部署 |
 | 研发工作台 | <https://ac8e20005c1f2185e.app.workbuddy.host> | 在线演示 |
+
+> 作业夹为私有部署，演示地址与访问凭据不在仓库公开；本地启动方式见项目 README。
 
 ---
 
@@ -107,6 +111,16 @@
 | 锦鲤池 | 海岛浅滩 |
 |:--|:--|
 | ![錦鯉の池 四季](KoiPond/seasons.jpg) | ![海岛浅滩](OceanShallows/preview.jpg) |
+
+### 作业夹 · 多孩作业记录（homework-tracker）
+
+课程表式周看板与逐行手动录入；红笔色只用于保存、今天与确认。
+
+| 手机周看板 | 手动录入 |
+|:--|:--|
+| ![作业夹 手机周看板](homework-tracker/design/上线-手机周看板.png) | ![作业夹 手动录入](homework-tracker/design/上线-手机记作业.png) |
+
+![作业夹 桌面周看板](homework-tracker/design/上线-桌面周看板.png)
 
 ### AI Demo 展示门户（demo-hub）
 
@@ -237,6 +251,18 @@ npm run build    # 产出 dist/
 
 详见 [`demo-hub/README.md`](demo-hub/README.md)。
 
+### 9. 作业夹 · 多孩作业记录（homework-tracker）
+
+面向家长的作业记录应用：拍照识别或逐行手动输入，按「每周 → 每天 → 学科」查看，完成后打勾。
+
+- **全栈**：Vue 3 + Vite 前端，Node.js 22 + Express 5 + `node:sqlite` 后端，无外部数据库
+- **手动批量录入**：每行一条，选好孩子/日期/学科后一次保存（事务接口，1–50 条）
+- **识别降级链**：Qwen-VL → OpenAI 兼容端点 → 手动兜底；识别只预填，人工确认后入库
+- **周看板**：ISO 周 × 7 天 × 学科分组，今天高亮、完成计数、完成勾选
+- **隐私设计**：家长账号；孩子仅称呼/年级；照片按用户隔离；隐私政策含儿童个人信息专章
+
+> ⚠️ 这是仓库中唯一的全栈项目，不能当静态页直接打开。需要 Node 22 运行后端，启动方式、环境变量与接口见 [`homework-tracker/README.md`](homework-tracker/README.md)。
+
 ---
 
 ## 目录结构
@@ -310,6 +336,13 @@ HaloPage/
 │   ├── README.md                   #    门户说明
 │   └── shots/                      #    165 张作品截图
 │
+├── homework-tracker/               # ⑨ 作业夹 · 多孩作业记录（全栈，需 Node）
+│   ├── app/                        #    Vue 3 前端 + Node/Express 后端
+│   ├── docs/                       #    5 阶段交付文档（7 份）
+│   ├── design/                     #    视觉方案、交互原型、上线截图
+│   ├── 全栈系统交付全案.md
+│   └── README.md                   #    启动、配置与数据说明
+│
 └── docs-screenshots/               # 界面截图（15 张）
     ├── 01-pickleball.jpg           #    以下 7 张为无头浏览器实机抓取
     ├── 02-eathelper.jpg
@@ -325,7 +358,7 @@ HaloPage/
 
 ## 部署方式
 
-全部项目均为**纯静态产物**，无构建步骤（研发工作台除外），复制到站点静态目录即可。
+除「作业夹」（全栈，需 Node 22 + 前端构建，见其 README）外，其余项目均为**纯静态产物**，无构建步骤（研发工作台除外），复制到站点静态目录即可。
 
 ### Halo
 
@@ -398,6 +431,7 @@ python3 -m http.server 8000
 | 錦鯉の池 · 双场景 | [`KoiPond/`](https://github.com/xiaopengs/HaloPage/tree/main/KoiPond) + [`OceanShallows/`](https://github.com/xiaopengs/HaloPage/tree/main/OceanShallows) |
 | 研发工作台 | [`requirement-workbench/`](https://github.com/xiaopengs/HaloPage/tree/main/requirement-workbench) |
 | AI Demo 门户 | [`demo-hub/`](https://github.com/xiaopengs/HaloPage/tree/main/demo-hub) |
+| 作业夹 · 多孩作业记录 | [`homework-tracker/`](https://github.com/xiaopengs/HaloPage/tree/main/homework-tracker) |
 
 ### 文档与规范
 
