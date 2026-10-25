@@ -1,6 +1,6 @@
 # 錦鯉の池 · 双场景（锦鲤池 / 海岛浅滩）
 
-一个纯静态的俯视双场景小项目：在日式锦鲤池与热带海岛浅滩之间一键切换。两个场景各自是单文件 HTML，离线可用，无后端、无外部依赖。
+一个纯静态的俯视双场景小项目：在日式锦鲤池与热带海岛浅滩之间一键切换。两个场景各自是单文件 HTML，分别位于 `KoiPond/` 与 `OceanShallows/`，离线可用，无后端、无外部依赖。
 
 右上角 `錦鯉 / 海島` 切换场景：锦鲤池保留四季庭院，海岛浅滩可以投鱼入海、撒饵、拖动和缩放。
 
@@ -18,7 +18,7 @@
 
 ### 海島 · Ocean Shallows
 
-![海岛浅滩](island.jpg)
+![海岛浅滩](../OceanShallows/preview.jpg)
 
 - **投鱼入海**：点击底部鱼种按钮，把鹰鳐、燕鱼、黄金吊、海月水母、绿海龟、海星抛入礁湖，落水时溅起水花、泡沫与扩散波纹。
 - **撒饵**：轻点水面撒下饵料，鱼群会游向饵料。
@@ -55,19 +55,19 @@
 ## 文件
 
 - `index.html` — 锦鲤池单文件页面。
-- `island.html` — 海岛浅滩单文件页面。
+- `../OceanShallows/index.html` — 海岛浅滩单文件页面。
 - `seasons.jpg` — 锦鲤池四季对照。
-- `island.jpg` — 海岛浅滩预览。
+- `../OceanShallows/preview.jpg` — 海岛浅滩预览。
 - `preview.gif` — 锦鲤池全景动态预览。
 - `swim.gif` — 锦鲤游动与尾圈近景。
 
 ## 部署
 
-把整个 `KoiPond/` 目录放到静态目录，例如：
+将 `KoiPond/` 与 `OceanShallows/` 两个目录放到同一个静态父目录下，例如：
 
 ```bash
-mkdir -p /path/to/site/static/koi-pond
-cp -r KoiPond/* /path/to/site/static/koi-pond/
+mkdir -p /path/to/site/static
+cp -r KoiPond OceanShallows /path/to/site/static/
 ```
 
-访问 `https://your-domain/static/koi-pond/`，右上角即可切换海岛场景（`island.html`）。也可直接双击 `index.html` 本地打开。
+访问 `https://your-domain/static/KoiPond/` 或 `https://your-domain/static/OceanShallows/`，右上角即可双向切换。两个目录需保持同级，切换链接使用相对路径。也可直接双击 `KoiPond/index.html` 本地打开。
