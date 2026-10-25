@@ -137,6 +137,42 @@ body{
   .hint{display:none}
 }
 
+/* ---------- scene switch ---------- */
+.scene-switch{
+  position:fixed;z-index:6;
+  top:calc(22px + env(safe-area-inset-top));
+  right:calc(22px + env(safe-area-inset-right));
+  display:flex;align-items:center;gap:2px;padding:4px;
+  border-radius:999px;
+  background:var(--glass);
+  border:1px solid var(--line);
+  box-shadow:0 12px 42px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(16px) saturate(1.1);
+  -webkit-backdrop-filter:blur(16px) saturate(1.1);
+}
+.scene-opt{
+  display:flex;align-items:center;justify-content:center;
+  min-width:46px;height:30px;padding:0 10px;border-radius:999px;
+  color:rgba(233,226,210,.62);
+  text-decoration:none;
+  font-size:10px;letter-spacing:.14em;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.scene-opt:hover{background:rgba(255,255,255,.08);color:#f3ead7}
+.scene-opt.active{background:rgba(222,196,148,.16);color:#f6ecd6}
+.scene-opt:focus-visible{outline:1px solid rgba(240,226,196,.7);outline-offset:2px}
+@media (max-width:520px){
+  .scene-switch{top:calc(18px + env(safe-area-inset-top));right:calc(18px + env(safe-area-inset-right));padding:3px}
+  .scene-opt{min-width:40px;height:28px;padding:0 8px;font-size:9px}
+}
+@media (max-width:360px){
+  .scene-opt{min-width:36px;padding:0 6px;font-size:8.5px;letter-spacing:.08em}
+}
+@media (max-height:460px){
+  .scene-switch{top:calc(10px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));transform:scale(.9);transform-origin:top right}
+}
+
 </style>
 </head>
 <body>
@@ -149,6 +185,11 @@ body{
   <div class="seal">鯉</div>
   <div class="caption">静寂の庭</div>
 </header>
+
+<nav class="scene-switch" aria-label="场景切换">
+  <a class="scene-opt active" href="index.html" aria-current="page">錦鯉</a>
+  <a class="scene-opt" href="island.html">海島</a>
+</nav>
 
 <div class="hint" id="hint">水面をタップして餌を撒く · 魚をタップして観察</div>
 

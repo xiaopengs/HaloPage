@@ -29,7 +29,7 @@
 | 3 | 云舟 · 个人作品集 | [`Yunzhou/`](Yunzhou/) | HTML + 视频/字体资源 | 不需要 | ~1.5 MB |
 | 4 | Agent 装配台 | [`soul-init/`](soul-init/) | 单文件 HTML | 不需要 | ~34 KB |
 | 5 | 项目级研发工作台 | [`requirement-workbench/`](requirement-workbench/) | React 19 + TS 6 + Vite 8 | 不需要 | 需构建 |
-| 6 | 錦鯉の池 · 可交互日式锦鲤池 | [`KoiPond/`](KoiPond/) | 单文件 HTML + Canvas 2D | 不需要 | ~111 KB |
+| 6 | 錦鯉の池 · 双场景（锦鲤池 / 海岛浅滩） | [`KoiPond/`](KoiPond/) | 单文件 HTML + Canvas 2D + WebGL | 不需要 | ~840 KB |
 | 7 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
 | 8 | Manus 整体架构与 ReAct 对比 | [`ManusAgentArchitecture/`](ManusAgentArchitecture/) | 单文件 HTML + 内联 SVG/JS | 不需要 | ~37 KB |
 
@@ -100,11 +100,13 @@
 |:--|:--|
 | ![风险](docs-screenshots/wb-12-risks.jpg) | ![移动端总览](docs-screenshots/wb-13-mobile-overview.jpg) |
 
-### 錦鯉の池
+### 錦鯉の池 · 双场景
 
-春夏秋冬四套庭院景色同池切换，鱼尾只留轻浅的圆形扩散波纹。
+春夏秋冬四套庭院景色，右上角一键切换到海岛浅滩。
 
-![錦鯉の池 四季](KoiPond/seasons.jpg)
+| 锦鲤池 | 海岛浅滩 |
+|:--|:--|
+| ![錦鯉の池 四季](KoiPond/seasons.jpg) | ![海岛浅滩](KoiPond/island.jpg) |
 
 ### AI Demo 展示门户（demo-hub）
 
@@ -195,16 +197,17 @@ npm run build    # 产出 dist/
 
 **环境要求**：Node.js ≥ 20.19（推荐 22.x）、现代浏览器。
 
-### 6. 錦鯉の池（KoiPond）
+### 6. 錦鯉の池 · 双场景（KoiPond）
 
-可交互的俯视锦鲤池：
+可交互的俯视双场景：
 
-- 春樱、夏荷、秋枫、冬雪四套庭院景色，约 1.15 秒交叉淡入，睡莲、漂浮物、粒子与光线同步更新
-- 轻点水面撒饵，锦鲤转向聚拢抢食；轻点鱼查看品种、全长与水深；拖动水面划出涟漪
+- **錦鯉の池**：春樱、夏荷、秋枫、冬雪四套庭院景色，约 1.15 秒交叉淡入；轻点水面撒饵，轻点鱼查看品种与水深，拖动划出涟漪
+- **海島 · Ocean Shallows**：6 种海洋生物点击投放入海，落水溅起水花、泡沫与波纹；支持撒饵、拖动/双指缩放、重置视角
+- **场景切换**：右上角 `錦鯉 / 海島` 双向切换，两个页面均可独立离线打开
 - 鱼尾只留下向外扩散的圆形波纹，颜色轻浅，深水鱼更弱，不抢主画面
-- 单文件、离线可用，无后端、无外部依赖
+- 海岛水面包含深度渐变、太阳光带、动态焦散、岸线泡沫与多层波光，并针对手机做了纹理降采样、实体上限与上下文丢失恢复
 
-**技术栈**：原生 HTML / CSS / JavaScript + Canvas 2D，单文件约 111 KB。
+**技术栈**：锦鲤池为原生 HTML / CSS / JavaScript + Canvas 2D，单文件约 113 KB；海岛为 Three.js WebGL 单文件约 727 KB。均无后端、无外部依赖。
 
 ### 8. Manus 整体架构与 ReAct 对比（ManusAgentArchitecture）
 基于 Manus 官方公开资料与 ReAct 原论文制作的交互式架构 explainer：
@@ -284,11 +287,13 @@ HaloPage/
 │       ├── data/                   #    数据模型与示例数据
 │       └── styles/                 #    tokens / ui / layout / pages
 │
-├── KoiPond/                        # ⑥ 錦鯉の池 · 可交互日式锦鲤池
-│   ├── index.html                  #    单文件应用（HTML+CSS+JS 内联）
-│   ├── preview.gif                 #    全景动态预览（含四季切换）
-│   ├── swim.gif                    #    游动与尾圈近景
-│   ├── seasons.jpg                 #    四季对照图
+├── KoiPond/                        # ⑥ 錦鯉の池 · 双场景
+│   ├── index.html                  #    锦鲤池单文件（HTML+CSS+JS 内联）
+│   ├── island.html                 #    海岛浅滩单文件（Three.js 内联）
+│   ├── preview.gif                 #    锦鲤池全景动态预览（含四季切换）
+│   ├── swim.gif                    #    锦鲤游动与尾圈近景
+│   ├── seasons.jpg                 #    锦鲤池四季对照图
+│   ├── island.jpg                  #    海岛浅滩预览
 │   └── README.md
 │
 ├── ManusAgentArchitecture/        # ⑧ Manus 架构与 ReAct 对比
@@ -347,7 +352,7 @@ https://你的域名/static/pickleball/
 | 云舟 | `/static/yunzhou/` | `你的域名/static/yunzhou/` |
 | 云舟教程 | `/static/yunzhou/视频加载教程/` | `你的域名/static/yunzhou/视频加载教程/` |
 | Agent 装配台 | `/static/soul-init/` | `你的域名/static/soul-init/` |
-| 錦鯉の池 | `/static/koi-pond/` | `你的域名/static/koi-pond/` |
+| 錦鯉の池 / 海岛 | `/static/koi-pond/` | `你的域名/static/koi-pond/`（海岛为 `island.html`） |
 
 ### 本地预览
 
@@ -378,7 +383,7 @@ python3 -m http.server 8000
 | 今天吃什么 | [`EatHelper/`](https://github.com/xiaopengs/HaloPage/tree/main/EatHelper) |
 | 云舟 作品集 | [`Yunzhou/`](https://github.com/xiaopengs/HaloPage/tree/main/Yunzhou) |
 | Agent 装配台 | [`soul-init/`](https://github.com/xiaopengs/HaloPage/tree/main/soul-init) |
-| 錦鯉の池 | [`KoiPond/`](https://github.com/xiaopengs/HaloPage/tree/main/KoiPond) |
+| 錦鯉の池 · 双场景 | [`KoiPond/`](https://github.com/xiaopengs/HaloPage/tree/main/KoiPond) |
 | 研发工作台 | [`requirement-workbench/`](https://github.com/xiaopengs/HaloPage/tree/main/requirement-workbench) |
 | AI Demo 门户 | [`demo-hub/`](https://github.com/xiaopengs/HaloPage/tree/main/demo-hub) |
 
