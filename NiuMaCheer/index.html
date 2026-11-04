@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f6efe4">
+<title>牛马鼓励器 · 今天也在好好搬砖</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233f3d7e'/%3E%3Ctext x='16' y='22' font-size='17' font-family='sans-serif' font-weight='700' fill='%23fdf9f0' text-anchor='middle'%3E%E7%89%9B%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#3f3d7e;
+    --ink-soft:#5f5a56;
+    --muted:#a49a8c;
+    --money:#b4482b;
+    --cta:#3a2b22;
+    --line:#eae2d3;
+    --paper:#fdfbf6;
+    --cream:#fbf3dd;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    min-height:100vh;
+    color:var(--ink-soft);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #fdf3df 0%, rgba(253,243,223,0) 60%),
+      radial-gradient(900px 600px at 100% 0%, #f4e7ef 0%, rgba(244,231,239,0) 55%),
+      radial-gradient(900px 700px at 50% 120%, #e9efe4 0%, rgba(233,239,228,0) 60%),
+      #f6efe4;
+    padding:28px 16px 40px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .app{
+    position:relative;z-index:1;
+    width:100%;max-width:472px;
+    background:var(--paper);
+    border-radius:28px;
+    padding:18px 20px 14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 30px 60px -34px rgba(74,58,40,.45),0 2px 6px rgba(74,58,40,.05);
+  }
+  /* top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0 14px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .logo{
+    width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fdf9f0;
+    display:grid;place-items:center;font-size:15px;font-weight:700;flex:none;
+    box-shadow:0 3px 8px rgba(63,61,126,.25);
+  }
+  .brand-name{font-size:15px;font-weight:600;color:#4a453f;letter-spacing:.3px;white-space:nowrap}
+  .top-actions{display:flex;gap:6px;flex:none}
+  .ghost-btn{
+    font:inherit;font-size:12px;color:#8a8072;background:transparent;
+    border:1px solid #e7dfd0;border-radius:9px;padding:7px 11px;cursor:pointer;
+    transition:.18s;white-space:nowrap;
+  }
+  .ghost-btn:hover{color:#5c554b;border-color:#d6cbb7;background:#faf6ec}
+  .ghost-btn[aria-pressed="true"]{color:var(--ink);border-color:#c9c5e4;background:#f1f0fa}
+  /* head */
+  .stamp{
+    font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.4px;
+    font-variant-numeric:tabular-nums;margin:2px 0 14px;
+  }
+  h1{
+    font-size:34px;line-height:1.12;font-weight:800;color:var(--ink);
+    letter-spacing:1px;margin-bottom:8px;
+  }
+  .count{font-size:13.5px;color:#6b655c;line-height:1.6;min-height:22px}
+  .count b{font-weight:600;color:#4b4740;font-variant-numeric:tabular-nums}
+  .focus-line{display:none;font-size:13.5px;color:#6b655c;align-items:center;gap:8px}
+  .focus-dot{width:7px;height:7px;border-radius:50%;background:#7c9b6a;box-shadow:0 0 0 4px rgba(124,155,106,.16);animation:pulse 2.4s ease-in-out infinite}
+  /* donkey */
+  .chase{
+    margin-top:18px;border-radius:18px;position:relative;overflow:hidden;
+    background:linear-gradient(165deg,#fdf7e6 0%,#fbf1d8 58%,#f8ecd0 100%);
+    border:1px solid #f0e3c3;
+    box-shadow:0 10px 24px -22px rgba(120,95,45,.55) inset;
+  }
+  .chase::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120px 60px at 82% 20%,rgba(255,255,255,.55),transparent 70%)}
+  .chase-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:11px 14px 0;position:relative;z-index:2;
+  }
+  .chase-title{font-size:11.5px;color:#9a8a66;letter-spacing:.5px}
+  .chase-title i{font-style:normal;color:#b9a87f}
+  .pause-btn{
+    font:inherit;font-size:11px;color:#a1906c;background:transparent;border:0;
+    cursor:pointer;padding:4px 2px;letter-spacing:.4px;white-space:nowrap;
+  }
+  .pause-btn:hover{color:#6e5f40}
+  .scene{height:130px;margin-top:0;position:relative;z-index:1}
+  .donkeySvg{width:100%;height:100%;display:block;overflow:visible}
+  .donkey{animation:bob 1.15s ease-in-out infinite;transform-origin:50% 92%}
+  .leg{transform-box:fill-box;transform-origin:50% 0;animation:step .7s ease-in-out infinite}
+  .leg.front1{animation-delay:-.31s}
+  .leg.back{animation-delay:-.31s}
+  .leg.front2{animation-delay:0s}
+  .leg.back2{animation-delay:0s}
+  .tail{transform-box:fill-box;transform-origin:95% 0;animation:tail 1.9s ease-in-out infinite}
+  .carrot-group{transform-box:fill-box;transform-origin:50% 0;animation:sway 2.1s ease-in-out infinite}
+  .dust ellipse{animation:dust 1.5s ease-out infinite;opacity:0}
+  .dust ellipse:nth-child(2){animation-delay:.5s}
+  .dust ellipse:nth-child(3){animation-delay:1s}
+  .scene.paused .donkey,.scene.paused .leg,.scene.paused .tail,
+  .scene.paused .carrot-group,.scene.paused .dust ellipse{animation-play-state:paused}
+  /* earn */
+  .earn{padding:20px 4px 2px}
+  .label{font-size:11.5px;color:var(--muted);letter-spacing:1px}
+  .money{
+    margin-top:6px;font-size:44px;line-height:1.05;font-weight:800;color:var(--money);
+    font-variant-numeric:tabular-nums;letter-spacing:-.5px;
+    display:flex;align-items:baseline;gap:2px;transition:filter .35s,opacity .35s;
+  }
+  .money .yen{font-size:30px;font-weight:700;margin-right:1px;opacity:.95}
+  .money .dec{font-size:30px;font-weight:700;opacity:.92}
+  .wish{margin-top:12px;font-size:12.5px;line-height:1.75;color:#7c7468}
+  .wish b{font-weight:600;color:#5f574c}
+  .wish .go{color:var(--money);font-weight:600}
+  /* cta */
+  .focus-btn{
+    width:100%;margin-top:18px;border:0;border-radius:12px;cursor:pointer;
+    background:var(--cta);color:#f8f1e3;font:inherit;font-size:13.5px;font-weight:600;
+    letter-spacing:.6px;padding:13px 14px;
+    box-shadow:0 10px 18px -14px rgba(58,43,34,.9);
+    transition:transform .18s,background .18s;
+  }
+  .focus-btn:hover{background:#4a372b}
+  .focus-btn:active{transform:translateY(1px) scale(.995)}
+  /* progress */
+  .progress{padding:18px 4px 0}
+  .row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .progress .row span{font-size:12.5px;color:#7c7468}
+  .progress .row b{font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .sub{margin-top:4px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .bar{height:7px;margin-top:10px;border-radius:99px;background:#ece5d7;overflow:hidden}
+  .bar i{
+    display:block;height:100%;width:0%;border-radius:99px;
+    background:linear-gradient(90deg,#3f3d8f,#6a67c9);
+    transition:width .6s ease;
+  }
+  /* month */
+  .month{margin-top:20px;border-top:1px dashed var(--line);padding:14px 4px 2px}
+  .month .row span{font-size:12.5px;color:#7c7468}
+  .month .row b{font-size:23px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+  .fine{margin-top:9px;font-size:10.5px;line-height:1.9;color:#aea597;font-variant-numeric:tabular-nums}
+  .fine b{font-weight:600;color:#958c7f}
+  footer{margin-top:14px;text-align:center;font-size:10.5px;color:#c0b7a8;letter-spacing:1.2px}
+  /* focus mode */
+  body.focusing .count{display:none}
+  body.focusing .focus-line{display:flex}
+  body.focusing .money{filter:blur(8px);opacity:.45;user-select:none}
+  body.focusing .chase{filter:saturate(.75)}
+  body.focusing .scene{opacity:.6}
+  .focus-line b{font-variant-numeric:tabular-nums;color:#4b4740;font-weight:600}
+  /* sheet */
+  .sheet{
+    position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;
+    background:rgba(52,42,32,.34);backdrop-filter:blur(3px);
+    opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .sheet.open{opacity:1;pointer-events:auto}
+  .sheet-card{
+    width:100%;max-width:472px;background:var(--paper);
+    border-radius:22px 22px 0 0;padding:20px 20px 22px;
+    transform:translateY(18px);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    max-height:88vh;overflow:auto;
+  }
+  .sheet.open .sheet-card{transform:none}
+  .sheet-card h2{font-size:16px;color:#4a453f;font-weight:700;margin-bottom:4px}
+  .sheet-card .hint{font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f2ecdf}
+  .field:last-of-type{border-bottom:0}
+  .field label{font-size:13px;color:#6b655c}
+  .field .pair{display:flex;align-items:center;gap:6px}
+  .field input[type="time"],.field input[type="number"]{
+    font:inherit;font-size:13px;color:#4a453f;background:#faf6ec;border:1px solid #e9e1d2;
+    border-radius:8px;padding:6px 8px;width:92px;font-variant-numeric:tabular-nums;
+  }
+  .field input[type="number"]{width:76px;text-align:right}
+  .field .unit{font-size:12px;color:var(--muted)}
+  .field textarea{
+    font:inherit;font-size:12.5px;color:#4a453f;background:#faf6ec;border:1px solid #e9e1d2;
+    border-radius:8px;padding:7px 10px;width:100%;min-height:64px;resize:vertical;line-height:1.7;
+  }
+  .field.col{display:block}
+  .field.col label{display:block;margin-bottom:7px}
+  .sheet-actions{display:flex;gap:10px;margin-top:18px}
+  .sheet-actions button{
+    flex:1;font:inherit;font-size:13.5px;font-weight:600;border-radius:11px;padding:12px;cursor:pointer;
+    border:1px solid #e7dfd0;background:transparent;color:#8a8072;
+  }
+  .sheet-actions .save{background:var(--ink);border-color:var(--ink);color:#fdf9f0}
+  .sheet-actions .save:hover{background:#4a4890}
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);
+    background:rgba(58,43,34,.94);color:#f8f1e3;font-size:12.5px;letter-spacing:.3px;
+    padding:10px 16px;border-radius:99px;z-index:40;opacity:0;pointer-events:none;
+    transition:opacity .25s,transform .25s;max-width:88vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  body.pinned .topbar{
+    position:sticky;top:0;z-index:5;background:linear-gradient(var(--paper) 78%,rgba(253,251,246,0));
+    margin:0 -20px;padding:12px 20px 14px;
+  }
+  @keyframes step{
+    0%,100%{transform:rotate(11deg)}
+    50%{transform:rotate(-11deg)}
+  }
+  @keyframes bob{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-2.5px)}
+  }
+  @keyframes tail{
+    0%,100%{transform:rotate(-6deg)}
+    50%{transform:rotate(8deg)}
+  }
+  @keyframes sway{
+    0%,100%{transform:rotate(-4deg)}
+    50%{transform:rotate(4deg)}
+  }
+  @keyframes dust{
+    0%{opacity:0;transform:translate(0,0) scale(.6)}
+    25%{opacity:.5}
+    100%{opacity:0;transform:translate(-16px,-7px) scale(1.25)}
+  }
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  @media (min-width:720px){
+    body{padding:56px 24px 72px}
+    .app{padding:20px 24px 16px}
+    .sheet{align-items:center;padding:24px}
+    .sheet-card{border-radius:22px;max-width:448px;padding:22px}
+  }
+  @media (max-width:360px){
+    h1{font-size:30px}
+    .money{font-size:38px}
+    .app{padding:16px 14px 12px}
+    .scene{height:118px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">牛</span>
+      <span class="brand-name">牛马鼓励器</span>
+    </div>
+    <div class="top-actions">
+      <button class="ghost-btn" id="pinBtn" aria-pressed="false">置顶</button>
+      <button class="ghost-btn" id="setBtn">设置</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="stamp" id="stamp">2026-11-03 周二 16:44:01</p>
+    <h1 id="status">上班中</h1>
+    <p class="count" id="countLine">距离下班还有 <b id="countdown">1小时15分59秒</b></p>
+    <p class="focus-line" id="focusLine"><span class="focus-dot"></span>专注一会儿 · 还剩 <b id="focusLeft">25:00</b></p>
+
+    <section class="chase" aria-label="小驴追萝卜">
+      <div class="chase-head">
+        <span class="chase-title">小驴追萝卜 · <i>就差一点点</i></span>
+        <button class="pause-btn" id="pauseBtn" aria-pressed="false">暂停</button>
+      </div>
+      <div class="scene" id="scene">
+        <svg class="donkeySvg" viewBox="0 0 300 148" role="img" aria-label="一头小驴追着挂在杆子前的胡萝卜">
+          <g class="dust" fill="#d9c8a5">
+            <ellipse cx="124" cy="136" rx="10" ry="2.6"/>
+            <ellipse cx="162" cy="138" rx="8" ry="2.2"/>
+            <ellipse cx="198" cy="136" rx="9" ry="2.4"/>
+          </g>
+          <g class="donkey">
+            <!-- far legs -->
+            <g class="leg back"><rect x="128" y="92" width="5.5" height="38" rx="2.8" fill="#3b332c"/><rect x="126" y="127" width="10" height="5.5" rx="2.2" fill="#2b2520" opacity=".85"/></g>
+            <g class="leg front2"><rect x="186" y="92" width="5.5" height="38" rx="2.8" fill="#3b332c"/><rect x="184" y="127" width="10" height="5.5" rx="2.2" fill="#2b2520" opacity=".85"/></g>
+            <!-- tail -->
+            <g class="tail">
+              <path d="M114 84 q-13 7 -13 20 q0 8 4 11" fill="none" stroke="#4a4038" stroke-width="2.8" stroke-linecap="round"/>
+              <ellipse cx="104" cy="117" rx="3.2" ry="5.2" fill="#4a4038"/>
+            </g>
+            <!-- body -->
+            <path d="M112 82 q0 -18 27 -19 l41 0 q17 1 17 16 l0 4 q0 12 -14 12 l-55 0 q-16 0 -16 -13z" fill="#4a4038"/>
+            <!-- neck -->
+            <path d="M183 76 q2 -24 18 -34 l10 -6 q10 -5 12 5 l2 12 q1 8 -8 10 l-16 5 q-13 4 -18 8z" fill="#4a4038"/>
+            <!-- head -->
+            <path d="M205 48 q11 -6 20 -1 q9 5 12 12 q2 6 -6 8 l-22 3 q-9 1 -8 -8z" fill="#4a4038"/>
+            <!-- ears -->
+            <path d="M206 41 q-5 -22 1 -28 q5 -6 9 16 l1 12z" fill="#4a4038"/>
+            <path d="M215 40 q0 -23 7 -27 q7 -4 6 18 l0 11z" fill="#4a4038"/>
+            <!-- muzzle + eye -->
+            <ellipse cx="234" cy="59" rx="8" ry="5.8" fill="#372e28"/>
+            <circle cx="222" cy="53" r="1.8" fill="#f2e7d2"/>
+            <!-- near legs -->
+            <g class="leg back2"><rect x="138" y="93" width="5.5" height="36" rx="2.8" fill="#4a4038"/><rect x="136" y="126" width="10" height="6" rx="2.2" fill="#2b2520"/></g>
+            <g class="leg front1"><rect x="176" y="93" width="5.5" height="36" rx="2.8" fill="#4a4038"/><rect x="174" y="126" width="10" height="6" rx="2.2" fill="#2b2520"/></g>
+            <!-- carrot on a stick -->
+            <line x1="146" y1="66" x2="266" y2="20" stroke="#8b7a5e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="266" y1="20" x2="266" y2="50" stroke="#a3937a" stroke-width="1.2" stroke-dasharray="2 2.5"/>
+            <g transform="translate(266 50)">
+              <g class="carrot-group">
+                <path d="M0 0 q10 11 1 29 q-10 -18 -1 -29z" fill="#e2703a"/>
+                <path d="M0 -1 q-7 -7 -11 -8 q3 9 8 11z" fill="#7fa653"/>
+                <path d="M0 -1 q7 -7 11 -8 q-3 9 -8 11z" fill="#7fa653"/>
+                <path d="M-8 13 q4 3 8 4" stroke="#f0a274" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="earn">
+      <p class="label">今日已赚 · 估算</p>
+      <p class="money" id="money"><span class="yen">¥</span><span id="todayMoney">99.7388</span></p>
+      <p class="wish" id="wish">再工作 3小时9分，就够赚「自助烤肉」。</p>
+    </section>
+
+    <button class="focus-btn" id="focusBtn">隐藏倒计时 · 专注一会儿</button>
+
+    <section class="progress">
+      <div class="row"><span>今日工时进度</span><b id="pct">83.1%</b></div>
+      <p class="sub" id="worked">已工作 6.23 / 7.50 小时</p>
+      <div class="bar"><i id="barFill"></i></div>
+    </section>
+
+    <section class="month">
+      <div class="row"><span>本月累计</span><b id="monthMoney">¥219.74</b></div>
+      <p class="fine">
+        已过 <b id="daysPassed">1</b> 个工作日 · 今日按实时进度估算<br>
+        时薪 ¥<span id="wageOut">16.00</span> · 满勤日薪 ¥<span id="dailyOut">120.00</span><br>
+        按本月 <span id="workdaysOut">21</span> 个工作日估算，如遇节假日调整，请随时留意。
+      </p>
+    </section>
+  </main>
+
+  <footer>摸鱼有度 · 记得喝水</footer>
+</div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-card">
+    <h2 id="sheetTitle">设置</h2>
+    <p class="hint">改完点保存，页面会按新的作息和时薪重新计算。数据只存在这台设备的浏览器里。</p>
+    <div class="field">
+      <label for="fStart">上班时间</label>
+      <input type="time" id="fStart" value="09:30">
+    </div>
+    <div class="field">
+      <label for="fEnd">下班时间</label>
+      <input type="time" id="fEnd" value="18:00">
+    </div>
+    <div class="field">
+      <label>午休</label>
+      <div class="pair">
+        <input type="time" id="fLunchStart" value="12:00" aria-label="午休开始">
+        <span class="unit">至</span>
+        <input type="time" id="fLunchEnd" value="13:00" aria-label="午休结束">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fWage">时薪</label>
+      <div class="pair">
+        <span class="unit">¥</span>
+        <input type="number" id="fWage" min="1" max="9999" step="0.5" value="16">
+        <span class="unit">/ 小时</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="fPin">顶栏常驻</label>
+      <input type="checkbox" id="fPin" style="width:18px;height:18px;accent-color:#3f3d7e">
+    </div>
+    <div class="field col">
+      <label for="fWishes">想赚的东西 · 一行一个，名称和价格用空格隔开</label>
+      <textarea id="fWishes" spellcheck="false">冰奶茶 12
+电影票 45
+自助烤肉 150
+一顿火锅 200
+机械键盘 499</textarea>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" id="cancelBtn">取消</button>
+      <button type="button" class="save" id="saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var LS_KEY = 'niuma.cfg.v1';
+  var DEFAULTS = {
+    start: '09:30',
+    end: '18:00',
+    lunchStart: '12:00',
+    lunchEnd: '13:00',
+    wage: 16,
+    pinned: false,
+    wishes: '冰奶茶 12\n电影票 45\n自助烤肉 150\n一顿火锅 200\n机械键盘 499'
+  };
+
+  var WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+  var cfg = loadCfg();
+
+  function loadCfg() {
+    var out = {};
+    for (var k in DEFAULTS) out[k] = DEFAULTS[k];
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        var saved = JSON.parse(raw);
+        for (var j in out) if (saved[j] !== undefined) out[j] = saved[j];
+      }
+    } catch (e) { /* storage blocked: fall back to defaults */ }
+    return out;
+  }
+  function saveCfg() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
+
+  function toMin(str) {
+    var p = String(str).split(':');
+    return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0);
+  }
+  function monthDays(y, m) { return new Date(y, m + 1, 0).getDate(); }
+  function isWorkday(d) { var w = d.getDay(); return w !== 0 && w !== 6; }
+  function workdaysBetween(y, m, fromDay, toDay) {
+    var n = 0;
+    for (var d = fromDay; d <= toDay; d++) if (isWorkday(new Date(y, m, d))) n++;
+    return n;
+  }
+  function workdaysInMonth(y, m) { return workdaysBetween(y, m, 1, monthDays(y, m)); }
+
+  function schedule() {
+    var s = toMin(cfg.start), e = toMin(cfg.end);
+    var ls = toMin(cfg.lunchStart), le = toMin(cfg.lunchEnd);
+    if (le < ls) { var t = ls; ls = le; le = t; }
+    var lunch = Math.max(0, Math.min(le, e) - Math.max(ls, s));
+    var dailyH = Math.max(0.5, (e - s - lunch) / 60);
+    return { s: s, e: e, ls: ls, le: le, dailyH: dailyH, lunchMin: lunch };
+  }
+
+  function parseWishes(text) {
+    var list = [];
+    String(text || '').split(/\n+/).forEach(function (line) {
+      var t = line.trim();
+      if (!t) return;
+      var m = t.match(/^(.*?)[\s,，¥￥]*(\d+(?:\.\d+)?)\s*元?$/);
+      if (!m) return;
+      var name = m[1].replace(/[「」\s]+/g, ' ').trim();
+      var price = parseFloat(m[2]);
+      if (name && price > 0) list.push({ name: name, price: price });
+    });
+    list.sort(function (a, b) { return a.price - b.price; });
+    return list;
+  }
+
+  /* elapsed work minutes on a given day, up to `nowMin` (minutes since midnight) */
+  function workedMin(nowMin, sch) {
+    var upTo = Math.min(nowMin, sch.e);
+    if (upTo <= sch.s) return 0;
+    var worked = upTo - sch.s;
+    var overlap = Math.min(upTo, sch.le) - Math.max(sch.s, sch.ls);
+    if (overlap > 0) worked -= overlap;
+    return Math.max(0, Math.min(worked, sch.dailyH * 60));
+  }
+
+  function fmtDur(min) {
+    min = Math.max(0, Math.round(min));
+    var h = Math.floor(min / 60), m = min % 60;
+    if (h && m) return h + '小时' + m + '分';
+    if (h) return h + '小时';
+    return m + '分';
+  }
+  function fmtClock(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    var s = sec % 60;
+    if (h) return h + '小时' + m + '分' + s + '秒';
+    if (m) return m + '分' + s + '秒';
+    return s + '秒';
+  }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function money2(n) {
+    return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /* DOM */
+  var el = {
+    stamp: document.getElementById('stamp'),
+    status: document.getElementById('status'),
+    countLine: document.getElementById('countLine'),
+    countdown: document.getElementById('countdown'),
+    focusLine: document.getElementById('focusLine'),
+    focusLeft: document.getElementById('focusLeft'),
+    todayMoney: document.getElementById('todayMoney'),
+    wish: document.getElementById('wish'),
+    pct: document.getElementById('pct'),
+    worked: document.getElementById('worked'),
+    barFill: document.getElementById('barFill'),
+    monthMoney: document.getElementById('monthMoney'),
+    daysPassed: document.getElementById('daysPassed'),
+    wageOut: document.getElementById('wageOut'),
+    dailyOut: document.getElementById('dailyOut'),
+    workdaysOut: document.getElementById('workdaysOut'),
+    pinBtn: document.getElementById('pinBtn'),
+    setBtn: document.getElementById('setBtn'),
+    pauseBtn: document.getElementById('pauseBtn'),
+    scene: document.getElementById('scene'),
+    focusBtn: document.getElementById('focusBtn'),
+    money: document.getElementById('money')
+  };
+
+  var focus = { on: false, endAt: 0 };
+  var paused = false;
+
+  function nowParts() {
+    var d = new Date();
+    return {
+      d: d,
+      y: d.getFullYear(), m: d.getMonth(), day: d.getDate(), w: d.getDay(),
+      min: d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60,
+      secOfDay: d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()
+    };
+  }
+
+  function update() {
+    var n = nowParts();
+    var sch = schedule();
+    var weekday = isWorkday(n.d);
+    var dailyPay = sch.dailyH * cfg.wage;
+
+    el.stamp.textContent = n.y + '-' + pad(n.m + 1) + '-' + pad(n.day) + ' 周' + WEEK[n.w] + ' ' +
+      pad(n.d.getHours()) + ':' + pad(n.d.getMinutes()) + ':' + pad(n.d.getSeconds());
+
+    var workedH = 0, status, sub, remainSec = 0;
+    var dayStart = sch.s * 60, dayEnd = sch.e * 60;
+
+    if (!weekday) {
+      status = '周末快乐';
+      sub = '今天不上班，去看海、去发呆，都算正事。';
+      workedH = 0;
+    } else if (n.secOfDay < dayStart) {
+      status = '还没上班';
+      sub = '距离上班还有 <b>' + fmtClock(dayStart - n.secOfDay) + '</b>';
+      remainSec = dayStart - n.secOfDay;
+    } else if (n.secOfDay >= dayEnd) {
+      status = '下班了';
+      sub = '今天的砖搬完了，明天 ' + cfg.start + ' 见。';
+      workedH = sch.dailyH;
+    } else if (n.min >= sch.ls && n.min < sch.le) {
+      status = '午休中';
+      sub = '距离下午开工还有 <b>' + fmtClock(sch.le * 60 - n.secOfDay) + '</b>';
+      remainSec = sch.le * 60 - n.secOfDay;
+      workedH = (sch.ls - sch.s) / 60;
+    } else {
+      status = '上班中';
+      sub = '距离下班还有 <b>' + fmtClock(dayEnd - n.secOfDay) + '</b>';
+      remainSec = dayEnd - n.secOfDay;
+      workedH = workedMin(n.min, sch) / 60;
+    }
+
+    el.status.textContent = status;
+    if (status === '上班中' || status === '午休中' || status === '还没上班') {
+      el.countLine.innerHTML = sub;
+    } else {
+      el.countLine.innerHTML = sub;
+    }
+
+    var todayEarn = workedH * cfg.wage;
+
+    /* money: 4 decimals while counting, 2 when frozen */
+    if (status === '周末快乐' || status === '还没上班') {
+      el.todayMoney.textContent = '0.00';
+    } else if (status === '下班了') {
+      el.todayMoney.textContent = money2(todayEarn);
+    } else {
+      el.todayMoney.textContent = todayEarn.toFixed(4);
+    }
+
+    /* wish */
+    var wishes = parseWishes(cfg.wishes);
+    var next = null;
+    for (var i = 0; i < wishes.length; i++) { if (wishes[i].price > todayEarn + 0.001) { next = wishes[i]; break; } }
+    if (!wishes.length) {
+      el.wish.innerHTML = '在设置里写上想买的东西，搬砖会更有盼头。';
+    } else if (status === '周末快乐') {
+      el.wish.innerHTML = '今天不上班，先别算钱了，去晒晒太阳。';
+    } else if (status === '下班了') {
+      var best = null;
+      for (var k = 0; k < wishes.length; k++) if (wishes[k].price <= todayEarn) best = wishes[k];
+      el.wish.innerHTML = best
+        ? '今天的工资够「<b>' + escapeHtml(best.name) + '</b>」了，收工去兑现吧。'
+        : '今天的钱已经赚满，明天再接着攒。';
+    } else if (!next) {
+      el.wish.innerHTML = '今天的愿望都够啦，收工后去兑现吧。';
+    } else {
+      var needMin = (next.price - todayEarn) / cfg.wage * 60;
+      el.wish.innerHTML = '再工作 <span class="go">' + fmtDur(needMin) + '</span>，就够赚「<b>' + escapeHtml(next.name) + '</b>」。';
+    }
+
+    /* progress */
+    var pct = Math.max(0, Math.min(100, workedH / sch.dailyH * 100));
+    el.pct.textContent = pct.toFixed(1) + '%';
+    el.worked.textContent = '已工作 ' + workedH.toFixed(2) + ' / ' + sch.dailyH.toFixed(2) + ' 小时';
+    el.barFill.style.width = pct + '%';
+
+    /* month */
+    var passed = workdaysBetween(n.y, n.m, 1, n.day - 1);
+    var monthPay = passed * dailyPay + (weekday ? todayEarn : 0);
+    el.monthMoney.textContent = '¥' + money2(monthPay);
+    el.daysPassed.textContent = passed;
+    el.wageOut.textContent = Number(cfg.wage).toFixed(2);
+    el.dailyOut.textContent = dailyPay.toFixed(2);
+    el.workdaysOut.textContent = workdaysInMonth(n.y, n.m);
+
+    /* focus timer */
+    if (focus.on) {
+      var left = Math.max(0, focus.endAt - Date.now());
+      el.focusLeft.textContent = pad(Math.floor(left / 60000)) + ':' + pad(Math.floor(left % 60000 / 1000));
+      if (left <= 0) { setFocus(false); toast('专注结束，喝口水，伸个懒腰吧。'); }
+    }
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* pin */
+  function setPinned(v, silent) {
+    cfg.pinned = !!v;
+    document.body.classList.toggle('pinned', cfg.pinned);
+    el.pinBtn.setAttribute('aria-pressed', cfg.pinned ? 'true' : 'false');
+    el.pinBtn.textContent = cfg.pinned ? '已置顶' : '置顶';
+    saveCfg();
+    if (!silent) toast(cfg.pinned ? '顶栏会一直跟着你，方便随时看倒计时。' : '顶栏恢复普通滚动。');
+  }
+
+  /* pause donkey */
+  function setPaused(v, silent) {
+    paused = !!v;
+    el.scene.classList.toggle('paused', paused);
+    el.pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    el.pauseBtn.textContent = paused ? '继续' : '暂停';
+    if (!silent) toast(paused ? '小驴歇一会儿，你也可以。' : '小驴又开始追萝卜了。');
+  }
+
+  /* focus mode */
+  function setFocus(on) {
+    focus.on = !!on;
+    if (focus.on) focus.endAt = Date.now() + 25 * 60 * 1000;
+    document.body.classList.toggle('focusing', focus.on);
+    el.focusBtn.textContent = focus.on ? '结束专注 · 回到搬砖' : '隐藏倒计时 · 专注一会儿';
+    if (focus.on) {
+      el.focusLeft.textContent = '25:00';
+      toast('倒计时已经藏好，接下来的 25 分钟留给手头的事。');
+    }
+  }
+
+  var toastTimer;
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+  }
+
+  /* settings sheet */
+  var sheet = document.getElementById('sheet');
+  function openSheet() {
+    document.getElementById('fStart').value = cfg.start;
+    document.getElementById('fEnd').value = cfg.end;
+    document.getElementById('fLunchStart').value = cfg.lunchStart;
+    document.getElementById('fLunchEnd').value = cfg.lunchEnd;
+    document.getElementById('fWage').value = cfg.wage;
+    document.getElementById('fPin').checked = !!cfg.pinned;
+    document.getElementById('fWishes').value = cfg.wishes;
+    sheet.classList.add('open');
+    setTimeout(function () { document.getElementById('fStart').focus({ preventScroll: true }); }, 220);
+  }
+  function closeSheet() { sheet.classList.remove('open'); }
+
+  function validTime(v) { return /^\d{2}:\d{2}$/.test(v || ''); }
+
+  function saveSettings() {
+    var start = document.getElementById('fStart').value;
+    var end = document.getElementById('fEnd').value;
+    var ls = document.getElementById('fLunchStart').value;
+    var le = document.getElementById('fLunchEnd').value;
+    var wage = parseFloat(document.getElementById('fWage').value);
+    if (!validTime(start) || !validTime(end) || !validTime(ls) || !validTime(le)) { toast('时间格式不太对，再检查一下。'); return; }
+    if (toMin(end) <= toMin(start)) { toast('下班时间要晚于上班时间。'); return; }
+    if (toMin(le) <= toMin(ls)) { toast('午休结束要晚于午休开始。'); return; }
+    if (toMin(ls) >= toMin(end) || toMin(le) <= toMin(start)) { toast('午休要落在上班和下班之间。'); return; }
+    if (!(wage > 0)) { toast('时薪得大于 0。'); return; }
+    cfg.start = start; cfg.end = end;
+    cfg.lunchStart = ls; cfg.lunchEnd = le;
+    cfg.wage = wage;
+    cfg.wishes = document.getElementById('fWishes').value;
+    var pin = document.getElementById('fPin').checked;
+    saveCfg();
+    setPinned(pin, true);
+    closeSheet();
+    update();
+    toast('设置已保存，按新作息重新算过了。');
+  }
+
+  /* events */
+  el.pinBtn.addEventListener('click', function () { setPinned(!cfg.pinned); });
+  el.setBtn.addEventListener('click', openSheet);
+  document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+  document.getElementById('saveBtn').addEventListener('click', saveSettings);
+  sheet.addEventListener('click', function (e) { if (e.target === sheet) closeSheet(); });
+  el.pauseBtn.addEventListener('click', function () { setPaused(!paused); });
+  el.focusBtn.addEventListener('click', function () { setFocus(!focus.on); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet();
+    if (e.key === 'f' && !e.metaKey && !e.ctrlKey && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+      setFocus(!focus.on);
+    }
+  });
+
+  setPinned(cfg.pinned, true);
+  update();
+  setInterval(update, 1000);
+})();
+</script>
+</body>
+</html>
