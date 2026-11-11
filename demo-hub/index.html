@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>AI Demo Hub · 一句话提示词生成的游戏与交互作品</title>
-<meta name="description" content="Claude Opus 5.5 三个可玩 3D 游戏 + GPT-6 Astra 165 个游戏与交互案例合集，含作者与开源地址">
+<meta name="description" content="Claude Opus 5.5 三个可玩 3D 游戏 + GPT-6 Astra 165 个案例 + Claude Fable 5.1 流体交互 + Claude Fable 5.2 的 76 个视觉实验，含作者与开源地址">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2322d3ee'/></svg>">
 <style>
   :root {
@@ -76,6 +76,8 @@
   .section-head .cnt{font-family:var(--mono);font-size:11.5px;color:var(--txt3)}
   .section-head .rule{flex:1;height:1px;background:linear-gradient(to right,var(--line),transparent);min-width:30px}
   .section-head .hint{font-size:11.5px;color:var(--txt3);width:100%;line-height:1.8}
+  /* 锚点跳转留出 sticky header 的高度，避免标题被顶栏盖住 */
+  #featured,#f52,#astra{scroll-margin-top:86px}
 
   /* ===== 精选卡片 ===== */
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(298px,1fr));gap:20px}
@@ -88,6 +90,10 @@
   .card[data-g="1"]:hover{box-shadow:0 24px 60px -22px rgba(34,211,238,.45)}
   .card[data-g="2"]:hover{box-shadow:0 24px 60px -22px rgba(251,146,60,.45)}
   .card[data-g="3"]:hover{box-shadow:0 24px 60px -22px rgba(167,139,250,.45)}
+  .card[data-g="5"]:hover{box-shadow:0 24px 60px -22px rgba(198,255,61,.42)}
+  .card[data-g="6"]:hover{box-shadow:0 24px 60px -22px rgba(224,104,74,.42)}
+  .card[data-g="7"]:hover{box-shadow:0 24px 60px -22px rgba(123,224,212,.42)}
+  .card[data-g="8"]:hover{box-shadow:0 24px 60px -22px rgba(232,201,138,.40)}
   .card-inner{position:relative;height:100%;border-radius:21px;overflow:hidden;
     background:linear-gradient(175deg,#10131f,#0a0c15 60%,#0c0e19);display:flex;flex-direction:column}
   /* 覆盖全卡的外链层：让整卡成为真实链接（支持中键/右键新标签、不被弹窗拦截） */
@@ -100,10 +106,18 @@
   .card[data-g="2"] .card-scene{background:linear-gradient(180deg,#2b1207,#3d1a08 50%,#271008)}
   .card[data-g="3"] .card-scene{background:linear-gradient(180deg,#1b1030,#2a1442 50%,#190f2e)}
   .card[data-g="4"] .card-scene{background:linear-gradient(180deg,#241a06,#3a2a0a 50%,#1c1305)}
+  .card[data-g="5"] .card-scene{background:linear-gradient(180deg,#0b1a0c,#15280d 50%,#071009)}
+  .card[data-g="6"] .card-scene{background:linear-gradient(180deg,#0e1b24,#1b303c 45%,#0b1620)}
+  .card[data-g="7"] .card-scene{background:linear-gradient(180deg,#071b28,#0d3140 48%,#08131f)}
+  .card[data-g="8"] .card-scene{background:linear-gradient(180deg,#141a22,#20262f 48%,#10141c)}
   .scene-glow{position:absolute;width:200px;height:200px;border-radius:50%;filter:blur(48px);opacity:.55}
   .card[data-g="1"] .scene-glow{background:var(--a);top:-70px;left:-50px}
   .card[data-g="2"] .scene-glow{background:var(--c);bottom:-80px;right:-50px}
   .card[data-g="3"] .scene-glow{background:var(--b);top:-60px;right:-30px}
+  .card[data-g="5"] .scene-glow{background:#c6ff3d;bottom:-70px;left:-45px}
+  .card[data-g="6"] .scene-glow{background:#e0684a;top:-70px;right:-45px}
+  .card[data-g="7"] .scene-glow{background:#4fc9e8;top:-70px;left:-40px}
+  .card[data-g="8"] .scene-glow{background:#e8c98a;bottom:-70px;right:-40px}
   .scene-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
     background-size:100% 14px;mask-image:linear-gradient(to top,#000 20%,transparent 85%);
     -webkit-mask-image:linear-gradient(to top,#000 20%,transparent 85%)}
@@ -129,7 +143,28 @@
   .pq:hover::after{opacity:.75;transform:translateX(0)}
   .card[data-g="1"]{--pc:var(--a)}.card[data-g="2"]{--pc:var(--c)}.card[data-g="3"]{--pc:var(--b)}
   .card[data-g="4"]{--pc:#fbbf24}
+  .card[data-g="5"]{--pc:#c6ff3d}
+  .card[data-g="6"]{--pc:#f0e6d2}
+  .card[data-g="7"]{--pc:#7be0d4}
+  .card[data-g="8"]{--pc:#e8c98a}
+  /* 第六卡为浅色封面：角标加深底色、底部加过渡，保证浅底上的可读性与衔接 */
+  .card[data-g="6"] .chip{background:rgba(10,18,26,.82);color:#f0e6d2;border-color:rgba(240,230,210,.3)}
+  .card[data-g="6"] .card-scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;
+    background:linear-gradient(to bottom,transparent,#0d101b);pointer-events:none}
   .card-scene .keyart{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%}
+  /* 第七卡：深色流体封面，底部压一层过渡与正文衔接 */
+  .card[data-g="7"] .card-scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:36px;
+    background:linear-gradient(to bottom,transparent,#0a0c15);pointer-events:none}
+  /* Claude-Fable-5.2 类目：同一强调色，浅底封面加深角标、封面略高 */
+  .card[data-g="8"] .chip{background:rgba(8,12,20,.84);color:#f2e3c6;border-color:rgba(242,227,198,.28)}
+  .card[data-g="8"] .card-scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:44px;
+    background:linear-gradient(to bottom,transparent,#0a0c15);pointer-events:none}
+  .f52 .card-scene{height:172px}
+  .f52 .card-body .desc{font-size:12.4px}
+  .f52-more{text-align:center;margin-top:24px}
+  .f52-more a{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;color:var(--txt2);text-decoration:none;
+    border:1px solid var(--line);border-radius:999px;padding:11px 22px;transition:.25s}
+  .f52-more a:hover{color:var(--txt);border-color:rgba(232,201,138,.55);background:rgba(232,201,138,.07)}
   .pq .pq-t{font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--pc);margin-bottom:5px;
     display:flex;align-items:center;gap:6px}
   .pq .pq-t svg{width:10px;height:10px;fill:currentColor;opacity:.8}
@@ -366,7 +401,8 @@
     <div><b>AI DEMO HUB</b><span>ONE PROMPT · PLAYABLE WORKS</span></div>
   </div>
   <nav>
-    <a class="nav-a" href="#featured"><span>精选三作</span></a>
+    <a class="nav-a" href="#featured"><span>精选体验</span></a>
+    <a class="nav-a" href="#f52"><span>Fable 5.2 类目</span></a>
     <a class="nav-a" href="#astra"><span>Astra 案例库</span></a>
     <a class="nav-a" href="../index.html"><span>HaloPage 目录</span></a>
     <a class="nav-a" href="https://github.com/MartinDelophy/awesome-gpt-6-astra" target="_blank" rel="noopener">
@@ -381,11 +417,12 @@
     <div class="hero-badge"><span class="dot"></span>AI-GENERATED · PLAYABLE COLLECTION</div>
     <h1>一句话提示词<br>生成的 <span class="grad">可玩游戏与交互作品</span></h1>
     <p class="sub">
-      两个实测合集一站体验：<b>Claude Opus 5.5</b> 一句话 one-shot 生成的三个 3D 游戏，
-      以及 <b>Awesome GPT-6 Astra</b> 社区收录的 165 个游戏与交互作品——全部保留作者署名与开源地址。
+      四个来源一站体验：<b>Claude Opus 5.5</b> 一句话 one-shot 生成的三个 3D 游戏、
+      <b>Awesome GPT-6 Astra</b> 社区收录的 165 个游戏与交互作品、<b>Claude Fable 5.1</b> 的流体交互单作，
+      以及 <b>Claude Fable 5.2</b> 的 76 个视觉实验——全部保留作者署名与开源地址。
     </p>
     <div class="stats">
-      <div class="stat"><div class="num">169</div><div class="lbl">收录作品总数</div></div>
+      <div class="stat"><div class="num">175</div><div class="lbl">收录作品总数</div></div>
       <div class="stat"><div class="num" id="stShot">165</div><div class="lbl">配图覆盖率</div></div>
       <div class="stat"><div class="num" id="stLive">69</div><div class="lbl">实测在线可玩</div></div>
       <div class="stat"><div class="num" id="stOs">20</div><div class="lbl">附带源码地址</div></div>
@@ -393,8 +430,8 @@
   </section>
 
   <div class="section-head" id="featured">
-    <h2>① 精选体验</h2><span class="cnt">4 WORKS</span><div class="rule"></div>
-    <div class="hint">前三作由一句话提示词 one-shot 生成、零人工改动直接上线；第四作为独立 WebGPU 作品。点击卡片会在<b style="color:var(--a)">新标签页</b>打开试玩，点击卡片内的 <b style="color:var(--a)">ONE-SHOT PROMPT</b> 区块可查看并复制完整提示词。</div>
+    <h2>① 精选体验</h2><span class="cnt">7 WORKS</span><div class="rule"></div>
+    <div class="hint">前三作由一句话提示词 one-shot 生成、零人工改动直接上线；第四作为独立 WebGPU 作品；第五作 INKWAVE 为第三方开源同人复刻，非 AI 生成；第六作 Claude Fable 5.2 是外部合集入口，指向 76 个单文件视觉实验（生成艺术 / 物理 / 排印 / 界面），其中 3 件在下方 ② 类目单独收录，其余不重复计入本站计数；第七作 Claude Fable 5.1《Synesthesia》是同样一句话生成的单文件流体交互。点击卡片会在<b style="color:var(--a)">新标签页</b>打开试玩，带 <b style="color:var(--a)">ONE-SHOT PROMPT</b> 区块的卡片可点开查看并复制完整提示词。</div>
   </div>
   <section class="cards">
 
@@ -476,10 +513,135 @@
       </div>
     </div>
 
+    <div class="card" data-g="5" data-url="https://inkwave.pangogames.com/" data-name="INKWAVE" data-emo="🦑" data-cat="THREE.JS · 涂地对战" data-size="第三方开源">
+      <a class="card-link" href="https://inkwave.pangogames.com/" target="_blank" rel="noopener" aria-label="在新标签页打开 INKWAVE"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <div class="scene-glow"></div><div class="scene-lines"></div>
+          <span class="chip l">4v4 涂地 · 鱿鱼潜墨</span><span class="chip r">Three.js · 同人复刻</span>
+          <div class="card-emoji">🦑</div>
+        </div>
+        <div class="card-body">
+          <h3>INKWAVE <span class="mods">THREE.JS</span></h3>
+          <p class="desc">抖音爆火的《喷射战士》网页复刻版：4v4 涂地对战，墨汁涂地即计分；化为鱿鱼潜入己方墨汁可加速与回墨，还能爬墙、切换多把武器，支持联机与人机。纯 Three.js 实现，手机可触屏操作。同人玩法复刻，非任天堂官方作品。</p>
+          <div class="keys"><kbd>WASD 移动</kbd><kbd>左键 射击</kbd><kbd>Shift 潜墨</kbd><kbd>触屏支持</kbd></div>
+          <a class="play-btn" href="https://inkwave.pangogames.com/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验</a>
+          <div class="card-foot"><span>第三方开源 · 非 AI 生成</span>
+            <a href="https://inkwave.rswaver.com/" target="_blank" rel="noopener" data-ext>镜像</a>
+            <a href="https://github.com/jaydendavisnc/inkwave" target="_blank" rel="noopener" data-ext>GitHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card" data-g="6" data-url="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light" data-name="Claude Fable 5.2 · 76 个视觉实验" data-emo="🖋️" data-cat="76 STUDIES · 单文件 HTML" data-size="外部合集">
+      <a class="card-link" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light" target="_blank" rel="noopener" aria-label="在新标签页打开 Claude Fable 5.2 合集"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="fable-keyart.jpg" alt="Claude Fable 5.2 · 墨流实验 Suminagashi" loading="eager" decoding="async">
+          <span class="chip l">76 STUDIES · 生成艺术</span><span class="chip r">附原始提示词</span>
+        </div>
+        <div class="card-body">
+          <h3>Claude Fable 5.2 <span class="mods">76 WORKS</span></h3>
+          <p class="desc">76 个自包含视觉实验：墨流、飞艇时刻表、可颂解剖、灯塔夜巡……涵盖生成艺术、物理模拟、字体排印与交互界面，每个都是独立单文件 HTML，可单独在新标签打开。合集页支持按名称 / 编号 / 提示词搜索，展开卡片还能读到当时的原始生成提示词。</p>
+          <div class="keys"><kbd>搜索 名称 / 编号 / 提示词</kbd><kbd>展开 查看原始提示词</kbd><kbd>76 个单文件 HTML</kbd></div>
+          <a class="play-btn" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>浏览 76 个作品</a>
+          <div class="card-foot"><span>第三方合集 · Claude Fable 5.2 生成</span>
+            <a href="https://github.com/MiaAI-Lab/Claude-Fable-5.2-HTML-Files" target="_blank" rel="noopener" data-ext>GitHub <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card" data-g="7" data-url="https://miaai-lab.github.io/Claude-Fable-5.1-Beautiful-HTML/" data-name="Synesthesia · 能听见的流体" data-emo="🌊" data-cat="WEBGL 2 · 生成式流体与音乐" data-size="单文件 · 无依赖">
+      <a class="card-link" href="https://miaai-lab.github.io/Claude-Fable-5.1-Beautiful-HTML/" target="_blank" rel="noopener" aria-label="在新标签页打开 Synesthesia 流体交互"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="f51-synesthesia.jpg" alt="Synesthesia 实时流体模拟画面" loading="lazy" decoding="async">
+          <span class="chip l">WEBGL 2 · 实时流体</span><span class="chip r">一句话生成</span>
+        </div>
+        <div class="card-body">
+          <h3>Synesthesia <span class="mods">5.1</span></h3>
+          <p class="desc">「做出你能想到的最美 HTML 文件。」Claude Fable 5.1 一次写成：GPU 上的 Navier–Stokes 流体求解器、着色器链、五套生成式环境音乐引擎与六组配色，全部塞进一个零依赖的单文件 HTML。拖动即在光里作画，点按激起脉冲，空格撒一把色点，声音随笔触一起生长。需支持 WebGL 2 的桌面浏览器，首次交互后开启音频。</p>
+          <div class="keys"><kbd>拖动 上色</kbd><kbd>点按 脉冲</kbd><kbd>空格 Burst</kbd><kbd>P 配色</kbd><kbd>M 声音</kbd></div>
+          <div class="pq"><div class="pq-t"><svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>ONE-SHOT PROMPT · 点击查看全文</div><p>"Create the most beautiful HTML file you could think of. Something that when people see it, all they can say is 'WOW!!!' It must be visually impressive, beautiful, and just music to the eyes. Be thorough, but creative. Don't make mistakes."</p></div>
+          <a class="play-btn" href="https://miaai-lab.github.io/Claude-Fable-5.1-Beautiful-HTML/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口体验流体</a>
+          <div class="card-foot"><span>单文件 HTML · 无依赖 · WebGL 2</span>
+            <a href="https://github.com/MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML" target="_blank" rel="noopener" data-ext>GitHub <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
+
+  <div class="section-head" id="f52">
+    <h2>② Claude-Fable-5.2 · 类目精选</h2><span class="cnt">3 / 76 STUDIES</span><div class="rule"></div>
+    <div class="hint">从 <a href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light" target="_blank" rel="noopener" style="color:var(--a)">Claude Fable 5.2 的 76 个单文件视觉实验</a> 中挑出三件，分别走「界面排印」「流体生成」「光影物理」三条路子。每张卡直接打开对应的那个 HTML，不经过合集页；封面取自原站官方缩略图并已本地存放，避免 GitHub Pages 直连慢。点「原始提示词」回到合集站对应条目，可读当时的完整生成提示词。想看全部 76 个，用上方第 6 张精选卡的合集入口。</div>
+  </div>
+  <section class="cards f52">
+
+    <div class="card" data-g="8" data-url="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/002-airship-terminal-split-flap.html" data-name="飞艇港 · 莉丝贝斯时刻表" data-cat="Claude-Fable-5.2 · 界面 / 排印" data-size="NO.002 · 单文件 HTML">
+      <a class="card-link" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/002-airship-terminal-split-flap.html" target="_blank" rel="noopener" aria-label="在新标签页打开 飞艇港 · 莉丝贝斯时刻表"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="f52-002-aerodrome.jpg" alt="Aerodrome Lisbeth 飞艇港翻牌时刻表" loading="lazy" decoding="async">
+          <span class="chip l">NO.002 · 界面 / 排印</span><span class="chip r">单文件 HTML</span>
+        </div>
+        <div class="card-body">
+          <h3>飞艇港 · 莉丝贝斯时刻表 <span class="mods">NO.002</span></h3>
+          <p class="desc">深色航站楼里立着一块珐琅框的 Solari 翻牌板，属于一座并不存在的飞艇港。开局是空白牌面，三秒内一阵噼啪声从左上滚到右下，翻出以你本机时钟为基准的完整航班表；之后它自己活着：秒针跳动、状态从 ON TIME 一路爬到 BOARDING 与 DEPARTED、过期行整板上移，底部黄色点阵公告冷面播报，风向袋随虚构的风摆动。</p>
+          <div class="keys"><kbd>翻牌时刻表</kbd><kbd>本机时钟</kbd><kbd>状态自动流转</kbd><kbd>点阵公告</kbd></div>
+          <a class="play-btn" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/002-airship-terminal-split-flap.html" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口打开 002</a>
+          <div class="card-foot"><span>Claude Fable 5.2 · 单个 HTML 文件</span>
+            <a href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light#study-002" target="_blank" rel="noopener" data-ext>原始提示词 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-g="8" data-url="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/009-koi-pond-noon.html" data-name="正午的锦鲤池" data-cat="Claude-Fable-5.2 · 流体 / 生成" data-size="NO.009 · 单文件 HTML">
+      <a class="card-link" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/009-koi-pond-noon.html" target="_blank" rel="noopener" aria-label="在新标签页打开 正午的锦鲤池"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="f52-009-koi-pond.jpg" alt="正午俯视的锦鲤池与焦散水光" loading="lazy" decoding="async">
+          <span class="chip l">NO.009 · 流体 / 生成</span><span class="chip r">单文件 HTML</span>
+        </div>
+        <div class="card-body">
+          <h3>正午的锦鲤池 <span class="mods">NO.009</span></h3>
+          <p class="desc">正午俯视的一方庭院池塘，水色从苔石边的浅玉过渡到中心的深青，池底卵石与一层缓缓滑过的焦散光网覆在鱼身上。九到十三条锦鲤各有花色（红白、昭和、黄金、丹顶）与摆动的脊线，一阵冲刺一阵滑行，胸鳍拨水、影子随水深拉长；睡莲叶系着细茎漂，两朵荷花开合，枫叶转色，水黾掠过，偶尔一只蜻蜓带着影子穿框。可与站内 KoiPond 对照着看。</p>
+          <div class="keys"><kbd>焦散水光</kbd><kbd>13 条锦鲤</kbd><kbd>睡莲 / 蜻蜓</kbd><kbd>俯视全幅</kbd></div>
+          <a class="play-btn" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/009-koi-pond-noon.html" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口打开 009</a>
+          <div class="card-foot"><span>Claude Fable 5.2 · 单个 HTML 文件</span>
+            <a href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light#study-009" target="_blank" rel="noopener" data-ext>原始提示词 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-g="8" data-url="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/020-aurora-over-the-fjord.html" data-name="斯克约湾上的极光" data-cat="Claude-Fable-5.2 · 光影 / 物理" data-size="NO.020 · 单文件 HTML">
+      <a class="card-link" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/020-aurora-over-the-fjord.html" target="_blank" rel="noopener" aria-label="在新标签页打开 斯克约湾上的极光"></a>
+      <div class="card-inner">
+        <div class="card-scene">
+          <img class="keyart" src="f52-020-aurora.jpg" alt="北纬 69 度峡湾上空的绿色极光" loading="lazy" decoding="async">
+          <span class="chip l">NO.020 · 光影 / 物理</span><span class="chip r">单文件 HTML</span>
+        </div>
+        <div class="card-body">
+          <h3>斯克约湾上的极光 <span class="mods">NO.020</span></h3>
+          <p class="desc">北纬 69° 一个虚构峡湾岸边的静夜。开场只有星、黑色山脊和一扇亮着灯的木屋窗，随后一道绿幕自左侧展开。三道极光帘按真实透视挂着：折起的缎带、清亮的下缘、横向轻颤的长射线、苍白的核与紫罗兰色上缘，最近的一道拱过头顶，最远的低低压在湾口。雪峰接过绿光，水面把整片天空揉成长长抖动的条纹，栈桥边一缕炊烟升起。</p>
+          <div class="keys"><kbd>三层透视极光</kbd><kbd>水面倒影</kbd><kbd>雪峰 / 炊烟</kbd><kbd>静音氛围</kbd></div>
+          <a class="play-btn" href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/020-aurora-over-the-fjord.html" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M4.5 2.5a1 1 0 0 1 1.53-.85l8 5.5a1 1 0 0 1 0 1.7l-8 5.5a1 1 0 0 1-1.53-.85z"/></svg>新窗口打开 020</a>
+          <div class="card-foot"><span>Claude Fable 5.2 · 单个 HTML 文件</span>
+            <a href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light#study-020" target="_blank" rel="noopener" data-ext>原始提示词 <svg viewBox="0 0 16 16"><path d="M8.6 2H14v5.4l-2-2-3.3 3.3-1.4-1.4L10.6 4zM2 4h4v2H4v6h6v-2h2v4H2z"/></svg></a></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+  <div class="f52-more"><a href="https://miaai-lab.github.io/Claude-Fable-5.2-HTML-Files/?use_xbridge3=true&amp;loader_name=forest&amp;need_sec_link=1&amp;sec_link_scene=im&amp;theme=light" target="_blank" rel="noopener">浏览全部 76 个视觉实验 ↗</a></div>
+
   <div class="section-head" id="astra">
-    <h2>② Awesome GPT-6 Astra · 社区案例库</h2><span class="cnt" id="astraCnt">/ 165 WORKS</span><div class="rule"></div>
+    <h2>③ Awesome GPT-6 Astra · 社区案例库</h2><span class="cnt" id="astraCnt">/ 165 WORKS</span><div class="rule"></div>
     <div class="hint">社区收集的 GPT-6 Astra 游戏与交互作品，源自 <a href="https://github.com/MartinDelophy/awesome-gpt-6-astra" target="_blank" rel="noopener" style="color:var(--a)">MartinDelophy/awesome-gpt-6-astra</a>（目录更新至 2026-09-30）。全部 165 个案例均配有画面；标注 <b style="color:var(--c)">源码</b> 的作品在卡片中直接给出仓库地址。</div>
   </div>
 
@@ -501,15 +663,15 @@
 
   <div class="section-head"><h2>说明</h2><span class="cnt">/ NOTES</span><div class="rule"></div></div>
   <section class="notes">
-    <div class="note"><div class="n-t">🎯 两个合集</div><p>① Claude Opus 5.5 一句话 one-shot 生成的三个 3D 游戏，可页内直接体验；② Awesome GPT-6 Astra 收录的 165 个社区作品，点击跳转原站体验。</p></div>
-    <div class="note"><div class="n-t">📸 全量配图</div><p>165 个案例全部有画面：优先使用构建时实抓的首屏截图，沙箱无法访问的则取自合集仓库官方素材，统一裁切压缩为 640×400 JPEG。</p></div>
+    <div class="note"><div class="n-t">🎯 四个来源</div><p>① Claude Opus 5.5 one-shot 生成的三个 3D 游戏；② Awesome GPT-6 Astra 收录的 165 个社区作品；③ Claude Fable 5.1 的流体交互单作《Synesthesia》；④ Claude Fable 5.2 的 76 个视觉实验——合集入口在精选区，另挑三件在「Claude-Fable-5.2 类目」里单独成卡，直接打开单文件、并可回原站查看原始提示词。</p></div>
+    <div class="note"><div class="n-t">📸 全量配图</div><p>165 个 Astra 案例全部有画面；新加的 Fable 5.1 封面为 xvfb 下实机抓取的流体画面，三张 Fable 5.2 封面取自原站官方缩略图，四张均本地压缩存放，不依赖外网加载。</p></div>
     <div class="note"><div class="n-t">⌘ 源码地址</div><p>20 个公开源码的作品，卡片内以独立条目展示 <b style="color:var(--c)">SOURCE CODE</b> 与 owner/repo 仓库地址，点击直达；其余作品明确标注「未公开源码」。</p></div>
     <div class="note"><div class="n-t">⚡ 在线状态</div><p>「在线可玩」为构建时实测结果。部分站点对数据中心网络有防护或需特定网络环境，在你本机可能正常打开，以实际访问为准。</p></div>
   </section>
 </main>
 
 <footer>
-  <div>AI DEMO HUB · 整合自 <a href="https://github.com/riba2534/claude-opus-5-5-demo" target="_blank" rel="noopener">riba2534/claude-opus-5-5-demo</a> 与 <a href="https://github.com/MartinDelophy/awesome-gpt-6-astra" target="_blank" rel="noopener">MartinDelophy/awesome-gpt-6-astra</a></div>
+  <div>AI DEMO HUB · 整合自 <a href="https://github.com/riba2534/claude-opus-5-5-demo" target="_blank" rel="noopener">riba2534/claude-opus-5-5-demo</a>、<a href="https://github.com/MartinDelophy/awesome-gpt-6-astra" target="_blank" rel="noopener">MartinDelophy/awesome-gpt-6-astra</a>、<a href="https://github.com/MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML" target="_blank" rel="noopener">MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML</a> 与 <a href="https://github.com/MiaAI-Lab/Claude-Fable-5.2-HTML-Files" target="_blank" rel="noopener">MiaAI-Lab/Claude-Fable-5.2-HTML-Files</a></div>
   <div class="mono">各作品版权归其作者所有 · 作品为能力测试用途，与原厂商标无关</div>
 </footer>
 
@@ -576,7 +738,7 @@ function openGame(url,name,accent){
 }
 function closeGame(){player.classList.remove("on");frame.src="about:blank";document.body.style.overflow="";clearTimeout(loadTimer);}
 document.querySelectorAll(".card").forEach(function(card){
-  var accent={"1":"#22d3ee","2":"#fb923c","3":"#a78bfa","4":"#fbbf24"}[card.dataset.g];
+  var accent={"1":"#22d3ee","2":"#fb923c","3":"#a78bfa","4":"#fbbf24","7":"#7be0d4","8":"#e8c98a"}[card.dataset.g];
   // 整卡跳转由 .card-link 这个真实 <a target="_blank"> 承担，
   // 这里只处理卡片内的 ONE-SHOT PROMPT 弹窗（点击不应触发跳转）。
   card.addEventListener("click",function(e){

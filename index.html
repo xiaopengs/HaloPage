@@ -66,17 +66,72 @@
   <header>
     <div class="eyebrow">HALO / 1PANEL / NGINX · STATIC PAGES</div>
     <h1>HaloPage 静态页面项目集合</h1>
-    <p class="sub">一组可直接部署到 Halo、1Panel、Nginx 静态目录的纯静态小项目 —— 无后端、无 API Key、单文件或轻量目录即可运行。</p>
+    <p class="sub">一组可直接部署到 Halo、1Panel、Nginx 静态目录的小项目 —— 十个纯静态、一个全栈，绝大多数无后端、无 API Key、单文件或轻量目录即可运行。</p>
     <div class="meta">
-      <span class="m">6 个项目</span>
-      <span class="m">纯静态 · 零后端</span>
-      <span class="m">JavaScript + React</span>
-      <span class="m">更新于 2026-09-19</span>
+      <span class="m">11 个项目</span>
+      <span class="m">10 静态 + 1 全栈</span>
+      <span class="m">JavaScript · Vue · React</span>
+      <span class="m">更新于 2026-11-08</span>
     </div>
   </header>
 
-  <h3>可在线体验 <span class="n">/ 6 PROJECTS</span></h3>
+  <h3>可在线体验 <span class="n">/ 11 PROJECTS</span></h3>
   <div class="grid">
+
+    <a class="card" href="https://a94a8f1b0aa523f84.app.workbuddy.host/?sharecode=LN3UXZUG76" target="_blank" rel="noopener">
+      <div class="shot"><img src="docs-screenshots/07-homework-tracker.jpg" alt="作业夹 周看板"></div>
+      <div class="info">
+        <span class="tag">📚 全栈应用</span>
+        <h2>作业夹 · 多孩子作业记录 <span class="st">HOMEWORK TRACKER</span></h2>
+        <p>面向家长的多孩子作业记录：拍照识别或逐行批量录入，按「每周 → 每天 → 学科」一屏看清，勾选完成即划线计数；单账号最多 10 个孩子档案、数据按账号隔离，JWT 双 Token 鉴权。Vue 3 + Express 5 + node:sqlite，注册即用，照片按账号分目录存放。</p>
+        <div class="path">外网访问 <b>app.workbuddy.host</b> · 全栈（Vue 3 + Express + SQLite）</div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="/static/niuma-cheer/">
+      <div class="shot"><img src="docs-screenshots/05-niuma-cheer.jpg" alt="牛马鼓励器 实时搬砖收入面板"></div>
+      <div class="info">
+        <span class="tag">🫏 生活小工具</span>
+        <h2>牛马鼓励器 <span class="st">NIUMA CHEER</span></h2>
+        <p>把「今天也在好好搬砖」算成实时收入：按上班 / 午休 / 下班自动算工时与今日进账，上班时数字精确到小数点后四位持续跳动；小驴在卡片里追着胡萝卜原地踏步，永远只差一点点。可在设置里写愿望清单，换算「再干多久就够买」；一键进入 25 分钟专注模式，金额虚化、小驴降饱和。单文件、零依赖、localStorage 存档。</p>
+        <div class="path">部署路径 <b>/static/niuma-cheer/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="/static/summer-drift/">
+      <div class="shot"><img src="docs-screenshots/06-summer-drift.jpg" alt="夏日漂浮 海滩 3D 场景"></div>
+      <div class="info">
+        <span class="tag">🌊 3D 场景</span>
+        <h2>夏日漂浮 <span class="st">SUMMERDRIFT</span></h2>
+        <p>海边夏日场景：蓝发女孩躺在柠檬色气垫上随浪漂浮、喝冰柠檬茶，拖拽环视、滚轮双指缩放、WASD 平移；午后 / 黄昏 / 蓝调 / 夜晚 / 柔光棚五套光照带 SSAO、景深、Bloom 与暗角。扔出漂流瓶后她会察觉、翻身下水游过去捡信、上岸逐字读给你听。Three.js 单文件，骨骼动画混合，模型内嵌不依赖外部 glb。</p>
+        <div class="path">部署路径 <b>/static/summer-drift/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="ManusAgentArchitecture/index.html">
+      <div class="shot"><img src="docs-screenshots/manus-architecture.jpg" alt="Manus 架构图解"></div>
+      <div class="info">
+        <span class="tag">📐 架构图解</span>
+        <h2>Manus 架构拆解 <span class="st">MANUS ARCHITECTURE</span></h2>
+        <p>单文件交互式架构图解：从入口、Agent Loop、工具到 Sandbox 的完整数据流可点击展开，逐项对比 Manus Agent Loop 与标准 ReAct，并给出端云协同、Capability Broker 与分级记忆的推演伪代码。明确区分官方能力、结构推断与未公开实现，零依赖、可离线阅读。</p>
+        <div class="path">部署路径 <b>/static/halopage/ManusAgentArchitecture/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="/static/koi-pond/">
+      <div class="shot"><img src="docs-screenshots/koi-pond.jpg" alt="錦鯉の池 · 双场景（锦鲤池 / 海岛浅滩）"></div>
+      <div class="info">
+        <span class="tag">🎏 交互实验</span>
+        <h2>錦鯉の池 · 双场景 <span class="st">KOIPOND</span></h2>
+        <p>双场景静态作品：日式锦鲤池可撒饵聚鱼、点鱼查品种、划水起涟漪，春樱夏荷秋枫冬雪四景轮换，另有昼夜与虫鸣水声；右上角一键切到热带海岛浅滩，可投鱼入海、撒饵、拖动缩放探索。锦鲤池为 Canvas 2D，海岛为 Three.js WebGL，均单文件零依赖。</p>
+        <div class="path">部署路径 <b>/static/koi-pond/</b></div>
+        <div class="links"><span class="btn p">▶ 进入项目</span></div>
+      </div>
+    </a>
 
     <a class="card" href="PickleballLeague/index.html">
       <div class="shot"><img src="docs-screenshots/01-pickleball.jpg" alt="赛点青 匹克球循环赛记录器"></div>
@@ -147,7 +202,7 @@
       <div class="info">
         <span class="tag">🧪 AI Demo 门户</span>
         <h2>AI Demo 展示门户 <span class="st">DEMO-HUB</span></h2>
-        <p>收录 169 个作品：3 个 Claude Opus 5.5 one-shot 精选 + 独立 WebGPU 作品《小王子：星辰之旅》，Astra 案例库 165 项支持分类筛选与搜索，每项标注试玩地址与开源源码地址。</p>
+        <p>独立收录 175 个「一句话提示词 → 游戏 / 交互作品」：7 个精选入口（含《小王子》WebGPU、第三方开源同人复刻 INKWAVE、Claude Fable 5.1《Synesthesia》与 Claude Fable 5.2 的 76 个视觉实验合集），新增 Claude-Fable-5.2 类目精选 3 件单文件作品，Astra 案例库 165 项支持分类筛选与搜索，每项标注试玩地址与开源源码地址。</p>
         <div class="path">部署路径 <b>站点任意目录 · 纯静态</b></div>
         <div class="links">
           <span class="btn p">▶ 进入门户</span>
@@ -162,6 +217,11 @@
   <table>
     <thead><tr><th>项目</th><th>技术形态</th><th>后端</th><th class="n">体积</th></tr></thead>
     <tbody>
+      <tr><td>作业夹</td><td><code>Vue 3 + Express + SQLite</code></td><td><b>需要（Node 22）</b></td><td class="n">需构建</td></tr>
+      <tr><td>牛马鼓励器</td><td><code>单文件 HTML</code></td><td>不需要</td><td class="n">~32 KB</td></tr>
+      <tr><td>夏日漂浮</td><td><code>Three.js 单文件</code></td><td>不需要</td><td class="n">~2.6 MB</td></tr>
+      <tr><td>Manus 架构拆解</td><td><code>单文件 HTML</code></td><td>不需要</td><td class="n">~68 KB</td></tr>
+      <tr><td>錦鯉の池 · 双场景</td><td><code>Canvas 2D + WebGL</code></td><td>不需要</td><td class="n">~840 KB</td></tr>
       <tr><td>赛点青 匹克球</td><td><code>HTML + CSS + JS</code></td><td>不需要</td><td class="n">~60 KB</td></tr>
       <tr><td>今天吃什么</td><td><code>单文件 HTML</code></td><td>不需要</td><td class="n">~23 KB</td></tr>
       <tr><td>云舟 作品集</td><td><code>HTML + 视频/字体资源</code></td><td>不需要</td><td class="n">~1.5 MB</td></tr>
@@ -180,7 +240,7 @@
   </div>
 
   <div class="note">
-    <b>部署提示</b>：全部项目均为纯静态产物，复制到站点静态目录即可访问。以 Halo 为例，把项目文件夹放到 <code>/path/to/site/static/xxx/</code>，随后访问 <code>https://你的域名/static/xxx/</code>。1Panel / Nginx 同理，只需保证目录名与访问路径一致。
+    <b>部署提示</b>：除「作业夹」需 Node 22 跑后端外，其余项目均为纯静态产物，复制到站点静态目录即可访问。以 Halo 为例，把项目文件夹放到 <code>/path/to/site/static/xxx/</code>，随后访问 <code>https://你的域名/static/xxx/</code>。1Panel / Nginx 同理，只需保证目录名与访问路径一致。
   </div>
 </div>
 </body>

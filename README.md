@@ -3,7 +3,7 @@
 静态页面小项目集合，用于部署到 Halo / 1Panel / Nginx 的 `/static/xxx/` 路径下。
 
 > 除第 9 项「作业夹」为**全栈应用**（Node + SQLite，需运行后端）外，其余项目均为 **纯静态产物** —— 无后端、无 API Key、无数据库，复制即用。
-> 另收录一个独立的 AI Demo 展示门户 [`demo-hub/`](demo-hub/)（169 个作品：精选 4 款 + Astra 案例库 165 项）。
+> 另收录一个独立的 AI Demo 展示门户 [`demo-hub/`](demo-hub/)（175 个作品：精选 7 款 + Claude-Fable-5.2 类目 3 件 + Astra 案例库 165 项）。
 
 ---
 
@@ -33,9 +33,11 @@
 | 7 | AI Demo 展示门户 | [`demo-hub/`](demo-hub/) | 纯静态单页 + JS 数据 | 不需要 | ~11 MB |
 | 8 | Manus 整体架构与 ReAct 对比 | [`ManusAgentArchitecture/`](ManusAgentArchitecture/) | 单文件 HTML + 内联 SVG/JS | 不需要 | ~37 KB |
 | 9 | 作业夹 · 多孩作业记录 | [`homework-tracker/`](homework-tracker/) | Vue 3 + Vite + Node/Express + SQLite | **需要（Node 22）** | 需构建 |
+| 10 | 夏日漂浮 · 气垫上的柠檬茶 | [`SummerDrift/`](SummerDrift/) | 单文件 HTML + Three.js WebGL | 不需要 | ~2.6 MB |
+| 11 | 牛马鼓励器 · 实时搬砖收入面板 | [`NiuMaCheer/`](NiuMaCheer/) | 单文件 HTML + 原生 JS | 不需要 | ~32 KB |
 
 > 第 5 个项目为构建型应用，仓库**仅保留源码**（未含 `dist/` 与 `node_modules/`），请按下方说明自行构建。
-> 第 7 个是独立的展示门户，收录 169 个作品（精选 4 款 + Astra 案例库 165 项），与上述 6 个静态小项目无依赖关系。
+> 第 7 个是独立的展示门户，收录 175 个作品（精选 7 款 + Claude-Fable-5.2 类目 3 件 + Astra 案例库 165 项），与上述静态小项目无依赖关系。
 > 第 9 个是全栈应用，仓库保留源码；启动方式见 [`homework-tracker/README.md`](homework-tracker/README.md)。
 
 ---
@@ -44,15 +46,18 @@
 
 | 项目 | 线上地址 | 状态 |
 |:--|:--|:--|
-| **AI Demo 门户（demo-hub）** | <https://ac94b6715f7cb331d.app.workbuddy.host> | 已部署 |
+| **AI Demo 门户（demo-hub）** | <https://thinkspc.fun/static/halopage/demo-hub/> | 已部署 |
 | 赛点青 匹克球 | <https://halopage-pmnzigqu.manus.space> | 作者部署（Manus） |
 | 今天吃什么 | <https://thinkspc.fun/static/eat/> | 作者部署 |
 | 云舟 · 个人作品集 | <https://thinkspc.fun/> | 作者部署 |
 | 云舟视频加载教程 | <https://thinkspc.fun/video-loading-tutorial/> | 作者部署 |
 | Agent 装配台 | <https://thinkspc.fun/static/soul-init/> | 作者部署 |
 | 研发工作台 | <https://ac8e20005c1f2185e.app.workbuddy.host> | 在线演示 |
+| 夏日漂浮 | <https://thinkspc.fun/static/summer-drift/> | 作者部署 |
+| 牛马鼓励器 | <https://thinkspc.fun/static/niuma-cheer/> | 作者部署 |
+| 作业夹 · 多孩子作业记录 | <https://a94a8f1b0aa523f84.app.workbuddy.host/?sharecode=LN3UXZUG76> | 外网托管（全栈，注册即用；**链接须带 sharecode**） |
 
-> 作业夹为私有部署，演示地址与访问凭据不在仓库公开；本地启动方式见项目 README。
+> 作业夹为全栈应用，已托管在 WorkBuddy 应用平台，**注册账号即可使用**（无需邀请码）；本地启动方式见项目 README。
 
 ---
 
@@ -112,6 +117,18 @@
 |:--|:--|
 | ![錦鯉の池 四季](KoiPond/seasons.jpg) | ![海岛浅滩](OceanShallows/preview.jpg) |
 
+### 夏日漂浮 · 气垫上的柠檬茶
+
+柠檬色气垫随浪起伏，可切换午后 / 黄昏 / 蓝调 / 夜晚 / 柔光棚五套光照。
+
+![夏日漂浮](SummerDrift/preview.jpg)
+
+### 牛马鼓励器 · 实时搬砖收入面板
+
+上班时今日进账按秒跳动，小驴追着胡萝卜原地踏步。
+
+![牛马鼓励器](NiuMaCheer/preview.jpg)
+
 ### 作业夹 · 多孩作业记录（homework-tracker）
 
 课程表式周看板与逐行手动录入；红笔色只用于保存、今天与确认。
@@ -124,7 +141,7 @@
 
 ### AI Demo 展示门户（demo-hub）
 
-门户首页：作品总数、截图墙率、实测在线、附带源码地址四项统计，以及 Claude Opus 5.5 精选三作。
+门户首页：作品总数、截图墙率、实测在线、附带源码地址四项统计，以及 Claude Opus 5.5 精选三作、Claude Fable 5.1 与 5.2 的新增卡片。
 
 ![AI Demo 门户首页](docs-screenshots/hub-01-portal.jpg)
 
@@ -132,7 +149,7 @@ Astra 案例库：165 个案例的卡片墙，每张含实机截图、平台标�
 
 ![Astra 案例库](docs-screenshots/hub-02-astra.jpg)
 
-说明区块：两个合集介绍、全量截图口径、源码地址收录范围，以及在线状态的实测方法说明。
+说明区块：四个来源介绍、全量截图口径、源码地址收录范围，以及在线状态的实测方法说明。
 
 ![门户说明](docs-screenshots/hub-03-notes.jpg)
 
@@ -240,14 +257,17 @@ npm run build    # 产出 dist/
 
 ### 7. AI Demo 展示门户（demo-hub）
 
-一个独立的纯静态单页门户，汇集 **169 个作品**（精选 4 款 + Astra 案例库 165 项）：
+一个独立的纯静态单页门户，汇集 **175 个作品**（精选 7 款 + Claude-Fable-5.2 类目 3 件 + Astra 案例库 165 项）：
 
-- 精选 4 款作品：3 个 Claude Opus 5.5 one-shot 小游戏 + 独立 WebGPU 作品《小王子：星辰之旅》（<https://littleprince.dev>）
+- 精选 7 款作品：3 个 Claude Opus 5.5 one-shot 小游戏 + 独立 WebGPU 作品《小王子：星辰之旅》（<https://littleprince.dev>）+ 第三方开源同人复刻《INKWAVE》+ Claude Fable 5.2 的 76 个视觉实验合集入口 + Claude Fable 5.1《Synesthesia》（实时流体 + 生成式音乐）
+- Claude-Fable-5.2 类目：从 76 个实验中挑出 NO.002 飞艇港时刻表 / NO.009 正午的锦鲤池 / NO.020 峡湾极光，各自直链原站单文件 HTML，封面本地化，可回原站读原始提示词
 - Astra 案例库 165 项，带分类筛选、搜索、分页
 - 每个作品均标注 **试玩地址 + 开源源码地址**
 - 165 张实机截图（无头浏览器抓取 + 官方素材补齐，JPEG 优化）
 
-**数据来源**：[riba2534/claude-opus-5-5-demo](https://github.com/riba2534/claude-opus-5-5-demo)、[MartinDelophy/awesome-gpt-6-astra](https://github.com/MartinDelophy/awesome-gpt-6-astra)。
+**数据来源**：[riba2534/claude-opus-5-5-demo](https://github.com/riba2534/claude-opus-5-5-demo)、[MartinDelophy/awesome-gpt-6-astra](https://github.com/MartinDelophy/awesome-gpt-6-astra)、[jaydendavisnc/inkwave](https://github.com/jaydendavisnc/inkwave)、[MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML](https://github.com/MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML) 与 [MiaAI-Lab/Claude-Fable-5.2-HTML-Files](https://github.com/MiaAI-Lab/Claude-Fable-5.2-HTML-Files)。
+
+> Claude Fable 5.2 的 76 个作品由原合集站自行提供搜索与原始提示词；其中 3 件在「Claude-Fable-5.2 类目」单独成卡，其余通过精选区合集入口访问，均不计入 165 项 Astra 案例库。
 
 详见 [`demo-hub/README.md`](demo-hub/README.md)。
 
@@ -262,6 +282,32 @@ npm run build    # 产出 dist/
 - **隐私设计**：家长账号；孩子仅称呼/年级；照片按用户隔离；隐私政策含儿童个人信息专章
 
 > ⚠️ 这是仓库中唯一的全栈项目，不能当静态页直接打开。需要 Node 22 运行后端，启动方式、环境变量与接口见 [`homework-tracker/README.md`](homework-tracker/README.md)。
+> 线上实例：<https://a94a8f1b0aa523f84.app.workbuddy.host/?sharecode=LN3UXZUG76> —— 托管在 WorkBuddy 应用平台，静态产物与 `/api/v1` 同源，SQLite 与照片目录在服务端。访问必须带 `?sharecode=LN3UXZUG76`，否则返回「链接不完整」；首次带参数进入后会种 cookie，之后同浏览器直达域名即可。
+
+### 10. 夏日漂浮（SummerDrift）
+
+一个纯前端、单文件的海边夏日场景：蓝发女孩躺在柠檬色气垫上随浪漂浮，喝着冰柠檬茶。
+
+- **气垫漂浮**：跟随真实波高起伏、随浪倾斜，带弹簧阻尼的漂移与落水涟漪
+- **视角与光照**：拖拽环视 / 滚轮双指缩放 / `WASD` 平移；午后、黄昏、蓝调、夜晚、柔光棚五套预设，含 SSAO、景深、Bloom 与 DSLR 暗角
+- **漂流瓶剧情**：投掷后真实水花与波纹，女孩察觉、翻身下水、游过去捡瓶、上岸读信、回到气垫，全程骨骼动画混合
+- **信件**：羊皮纸卡片逐字浮现，可收进口袋并切回漂浮状态
+
+**技术栈**：Three.js r0.160 单文件，约 2.6 MB，含 base64 内嵌的 19 骨骼模型；自定义水面着色器与后期管线，无后端。首次打开需联网取 Three.js（unpkg CDN），其余资源全部内嵌。
+
+### 11. 牛马鼓励器（NiuMaCheer）
+
+把「今天也在好好搬砖」算成实时收入的小页面。
+
+- **实时收入**：按上班 / 午休 / 下班自动算工时与今日进账，上班时精确到小数点后四位持续跳动，午休与下班自动冻结
+- **状态与倒计时**：上班中、午休中、还没上班、下班了、周末快乐五种状态
+- **小驴追萝卜**：纯 SVG 小驴，四条腿与尾巴独立节奏，可随时暂停
+- **愿望换算**：在设置里写想买的东西与价格，页面算「再工作多久就够赚『自助烤肉』」
+- **专注模式**：25 分钟计时，金额虚化、小驴降饱和；**本月累计**按当月工作日满勤日薪累加
+- **设置**：上下班时间、午休区间、时薪、愿望清单、顶栏常驻，全部存 localStorage
+
+**技术栈**：单个 `index.html` 约 32 KB，原生 JS + SVG/CSS 动画，无框架、无构建、无外部请求；数字统一 `tabular-nums`，跳动不抖。
+
 
 ---
 
@@ -331,10 +377,24 @@ HaloPage/
 │   └── README.md                  #    项目说明与资料来源
 │
 ├── demo-hub/                       # ⑦ AI Demo 展示门户（独立）
-│   ├── index.html                  #    门户主页（精选 + 案例库 + iframe 体验层）
+│   ├── index.html                  #    门户主页（精选 + Fable 5.2 类目 + 案例库）
 │   ├── astra-data.js               #    案例库数据源（165 项）
+│   ├── f51-synesthesia.jpg         #    第七张精选卡封面（实机抓取）
+│   ├── f52-002-aerodrome.jpg       #    Fable 5.2 类目 · NO.002 封面
+│   ├── f52-009-koi-pond.jpg        #    Fable 5.2 类目 · NO.009 封面
+│   ├── f52-020-aurora.jpg          #    Fable 5.2 类目 · NO.020 封面
 │   ├── README.md                   #    门户说明
 │   └── shots/                      #    165 张作品截图
+│
+├── SummerDrift/                    # ⑩ 夏日漂浮 · 气垫上的柠檬茶
+│   ├── index.html                  #    单文件 Three.js 场景（含内嵌模型）
+│   ├── preview.jpg                 #    预览图
+│   └── README.md
+│
+├── NiuMaCheer/                     # ⑪ 牛马鼓励器 · 实时搬砖收入面板
+│   ├── index.html                  #    单文件应用（HTML+CSS+JS 内联）
+│   ├── preview.jpg                 #    预览图
+│   └── README.md
 │
 ├── homework-tracker/               # ⑨ 作业夹 · 多孩作业记录（全栈，需 Node）
 │   ├── app/                        #    Vue 3 前端 + Node/Express 后端
@@ -452,6 +512,9 @@ python3 -m http.server 8000
 |:--|:--|
 | Astra 案例库（demo-hub 数据源） | <https://github.com/MartinDelophy/awesome-gpt-6-astra> |
 | Claude Opus 5.5 Demo（demo-hub 精选） | <https://github.com/riba2534/claude-opus-5-5-demo> |
+| INKWAVE（demo-hub 精选，第三方同人复刻） | <https://github.com/jaydendavisnc/inkwave> |
+| Claude Fable 5.1（demo-hub 精选，实时流体单作） | <https://github.com/MiaAI-Lab/Claude-Fable-5.1-Beautiful-HTML> |
+| Claude Fable 5.2（demo-hub 精选 + 类目，76 个视觉实验） | <https://github.com/MiaAI-Lab/Claude-Fable-5.2-HTML-Files> |
 
 ### 外部参考
 
